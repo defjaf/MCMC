@@ -1,0 +1,1 @@
+rsync -Cavz --include="*/" --include="*.py" --exclude="*" ./ god.ph.imperial.ac.uk:proj/stats/MCMC/

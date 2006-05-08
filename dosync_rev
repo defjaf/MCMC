@@ -1,0 +1,1 @@
+rsync -Cavz --include="*/" --include="*.py" --exclude="*" ./ snowleopard.ph.imperial.ac.uk:home/proj/stats/MCMC/
