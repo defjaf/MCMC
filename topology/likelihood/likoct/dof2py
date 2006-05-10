@@ -1,0 +1,1 @@
+f2py -c --fcompiler=gnu --link-lapack_opt likoctpy.f -m likoct
