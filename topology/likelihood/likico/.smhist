@@ -1,0 +1,19 @@
+data likico.out
+read { a 1 h 2 l 3}
+limits h l
+box
+?
+help
+device X11
+box
+connect h l
+read { a 1 h2 2 l2 3}
+ctype red
+connect h2 l2
+quit
+data likico.out
+read { a 1 h 2 l 3}
+limits h l
+box
+connect h l
+quit
