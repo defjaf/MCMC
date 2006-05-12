@@ -17,11 +17,11 @@ from likelihood.likdih import likdih
 from likelihood.liktetr import liktetr
 
 from numpy.random import uniform
-from numpy import arange, array, float64, transpose, zeros, ones, where
+from numpy import arange, array, float64, transpose, zeros, ones, where, nonzero
 from numpy import concatenate as cat
 import numpy
 
-noplot = True
+noplot = False
 
 def testall():
     test('ico')
@@ -125,7 +125,7 @@ def plotter(sampler):
     mod = sampler.like.model
     data = sampler.like.data
 
-    params = where(sampler.prop.sigmas>0)
+    params = nonzero(sampler.prop.sigmas>0)
 
     ntot = len(sampler.samples)
     stride = 1 #max(1,ntot//sampler.naccept)
