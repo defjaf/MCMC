@@ -104,6 +104,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
         else:
             ncut += 1
             
+
     fileobj.close()
     
     print 'Data read: ncut=%d, ngood=%d' % (ncut, ngood)
@@ -114,7 +115,9 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
     el = asarray(el, float64)
     ##cts = asarray(cts, float64)
 
-    if neg: beam = -beam
+    if beam.mean() < 0 or neg:
+        print 'negating data'
+        beam = -beam
 
     return BeamData(az, el, beam, sig)
 
@@ -468,8 +471,8 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
 
                 for var in samples.transpose(): pylab.plot(var)
 
-                pylab.figure(nfig*nrun+2)
-                getdist.histgrid(res[det][-1][0])
+                pylab.figure(nfig*run+2)
+                getdist.histgrid(res[det][-1][0][-1])
         reslist.append(res)
 
     return reslist
@@ -517,7 +520,7 @@ def makereport(reslist, file=sys.stdout, hasTOI=False):
 def plotMod(data, params=None, model=None, hold=False, centeronly=False):
     """ plot the data in MAXIPOLBeamdData.data with params 
     actually, doesn't use the model parameter"""
-        
+
     x, y, d = regrid(data.x, data.y, data.d)
     #x, y, d = Numeric.asarray(x), Numeric.asarray(y), Numeric.asarray(d)
     if centeronly:   ## doesn't work yet!

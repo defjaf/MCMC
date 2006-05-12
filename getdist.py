@@ -136,8 +136,12 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
         print s[lnLike.argmax()]
 
     if params is None:
-        npar = s.shape[1]
-        params=xrange(npar)
+        try:
+            params = MCMC.paramBlocks
+            npar = len(params)
+        except AttributeError:            
+            npar = s.shape[1]
+            params=xrange(npar)
     else:
         npar=len(params)
 
