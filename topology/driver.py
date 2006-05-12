@@ -92,7 +92,8 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
     H0_start = 64 #uniform(50,60)
 
     start_params = (1.0e-3, (0.0,0.0,0.0), H0_start)
-    prop_sigmas = (0.3e-3, (0.05, 0.05, 0.05), 3.0)
+    #prop_sigmas = (0.3e-3, (0.05, 0.05, 0.05), 3.0)
+    prop_sigmas = (1.0e-3, (0.5, 0.5, 0.5), 5.0)
     mod.paramBlocks = [0,1,2,3,4]
     #mod.paramBlocks = [-1, 0,1,2,3]
     mod.nBlock = 5
