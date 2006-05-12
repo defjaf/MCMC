@@ -1,12 +1,9 @@
 from __future__ import division
-#from numarray import (array, float64, exp, log, concatenate, 
-#                      reshape, sqrt, identity, where, asarray)
-#from numarray.random_array import uniform
-#from numarray.linear_algebra.LinearAlgebra2 import LinAlgError
-#from numarray import array as empty
+
+### modify (here or Proposal.py?) to go along eigenvectors of the
+###    observed correlation matrix
 
 import math
-from itertools import islice
 
 from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    reshape, sqrt, identity, where, asarray, ones, int32,
