@@ -12,9 +12,10 @@ from pylab import *
 from numpy import arange, array, Float64, transpose, zeros
 
 colorstring='bgrcmyk'
-symstring='os+xD'
+symstring='.s+xD'   ## dots
+symstring='os+xD'   ## circles
 
-mapdir = 'cmb/misc-data/MAP/'
+mapdir = 'cmb/misc-data/WMAP06/'
 homedir = os.path.expandvars('${HOME}/home')
 if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
@@ -43,7 +44,7 @@ def plotCl(filename, plotLike=False, plotBP=False):
 
     plot(ell, llCl)
 
-    legend([set.name for set in data])
+    legend([string.split(set.name, '_')[0] for set in data])
 
     ## need to deal with errors separately like this...
     for iset, set in enumerate(data):
@@ -79,7 +80,7 @@ def plotCl(filename, plotLike=False, plotBP=False):
         figure(2)
         hold(True)
         for set, like in zip(data, transpose(lnlikelist)):
-            plot(ampl, like-min(like), label=set.name)
+            plot(ampl, like-min(like), label=string.split(set.name, '_')[0])
 
         plot(ampl, lnlike-min(lnlike), linewidth=3)
         
@@ -89,6 +90,8 @@ def plotCl(filename, plotLike=False, plotBP=False):
     
     else:
         return None
+        
+        
                     
 if __name__ == "__main__":
     ret = plotCl("data_list.txt", plotLike=True)

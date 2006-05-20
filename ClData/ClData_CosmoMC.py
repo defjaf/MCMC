@@ -179,7 +179,7 @@ class ClData_CosmoMC(object):
             tmp_mat = readMatrix(Ninv_file, file_points, file_points)
             if self.num_points != file_points:
                 # truncate inverse
-                tmp_mat = la.inverse(tmp_mat)
+                tmp_mat = la.inv(tmp_mat)
                 tmp_mat=tmp_mat[first_band:first_band+self.num_points,
                                 first_band:first_band+self.num_points]
                 self.N_inv = la.inverse(tmp_mat)
@@ -227,7 +227,7 @@ class ClData_CosmoMC(object):
             win[:,:] *= range(lmax+1)
 
         ## get the window min and max
-        nz = nonzero(win)[1]
+        nz = where(win)[1]
         self.win_min[i], self.win_max[i] = min(nz), max(nz)
 
         if are_bandpowers:

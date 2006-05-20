@@ -5,7 +5,7 @@ import math
 import copy
 
 #from numarray import array, int32, float64, bool8, arange
-from numpy import array, int32, float64, bool8, arange, rank
+from numpy import array, int32, float64, bool8, arange, rank, dot
 
 import ClData_CosmoMC
 from ClData_CosmoMC import lmax
@@ -23,9 +23,12 @@ class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
         self.readDataset()
 
     def readDataset(self):
-        mapfile = ['wmap_binned_tt_powspec_yr1_v1p1.txt',
-                   'map_binned_te_powspec_yr1_v1.txt']
-        mapdir = 'cmb/misc-data/MAP/'
+        mapfile = ['wmap_binned_tt_powspec_3yr_v2.txt',
+                   'wmap_binned_te_powspec_3yr_v2.txt']
+        mapdir = 'cmb/misc-data/WMAP06/'
+#         mapfile = ['wmap_binned_tt_powspec_yr1_v1p1.txt',
+#                    'map_binned_te_powspec_yr1_v1.txt']
+#         mapdir = 'cmb/misc-data/MAP/'
         homedir = os.path.expandvars('${HOME}/home')
         if not os.path.exists(homedir):
             homedir = os.path.expandvars('${HOME}')
@@ -54,7 +57,8 @@ class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
             if ch_type == 'TT':
                 cols = [0, 3, 4]
             elif ch_type == 'TE':
-                cols = [0, 1, 2]
+#                cols = [0, 1, 2]
+                cols = [0, 3, 4]   # '06 data 
             self.Clpol_idx[ch_type] = [i, i]
             WMAPname ='/'.join((homedir, mapdir, fname))
             for line in open(WMAPname):
@@ -82,7 +86,7 @@ class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
         just assume flat in l(l+1)Cl.
         (use "real" data or binned?)
         """
-        if ranl(Cl)==2:
+        if rank(Cl)==2:
             ClTT = Cl[0]
         elif rank(Cl)==1:
             ClTT=Cl
