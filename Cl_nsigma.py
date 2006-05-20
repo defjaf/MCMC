@@ -67,9 +67,9 @@ def Cl_nsigma(WMAP=False):
 
     ### this only works for the current ordering (WMAP first)
     if WMAP:
-        legend([set.name for set in data[0]])
+        legend([string.split(set.name, '_')[0] for set in data[0]])
     else:
-        legend([set.name for set in data[1:]])
+        legend([string.split(set.name, '_')[0] for set in data[1:]])
         
     hold(False)
 
