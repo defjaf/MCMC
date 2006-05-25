@@ -4,7 +4,7 @@ from __future__ import division
 
 import math
 
-from numpy import array, any
+from numpy import array, any, asarray
 import Proposal
 
 class topo_model(object):
@@ -48,8 +48,9 @@ class topo_model(object):
         for now, don't do anything!
         """
         return None
-            
-    @classmethod
+
+    
+    @classmethod 
     def prior(cls, amplitude, euler_angles, H0):
 
         if amplitude < 0:
@@ -58,10 +59,11 @@ class topo_model(object):
             return 0
         if cls.H0_max is not None and H0>cls.H0_max:
             return 0
-            
-        if any(euler_angles<0):
+
+        ea = asarray(euler_angles)
+        if any(ea<0):
             return 0
-        if any(euler_angles>cls.ang_lims):
+        if any(ea>cls.ang_lims):
             return 0
         
         return 1
