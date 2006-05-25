@@ -37,6 +37,7 @@ def test(modname='ico'):
     datdir = "./topology/likelihood/lik"+modname+"/dat/\0"
     almfile = "alm64_1.dat\0"
     #    almfile = "wmapalm.dat\0"
+    #    almfile = "alm3yrall.dat\0"
 
     print 'using datdir=%s' % datdir
     likfun = lik[modname].alikelihood
@@ -74,9 +75,10 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
 
     datdir = "./topology/likelihood/lik"+topo.strip()+"/dat/\0"
-    if almfile is None: almfile = "alm64_1.dat\0"
-    #almfile = "wmapalm.dat\0"
-    
+    if almfile is None:
+    #   almfile = "alm64_1.dat\0"
+    #    almfile = "wmapalm.dat\0"
+       almfile = 'alm3yrall.dat'
     mod = topo_model.topo_model
     like = topo_likelihood(model=mod, datdir=datdir, almfile=almfile,
                            topo=topo)
