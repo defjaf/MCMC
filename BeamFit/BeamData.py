@@ -16,7 +16,7 @@ class BeamData(GaussianData):
     with noise variance sigma^2 (should work for array or scalar sigma)
     """
 
-    def __init__(self, xarr, yarr, data, sigma):
+    def __init__(self, xarr, yarr, data, sigma, cts=None):
         GaussianData.__init__(self, data, sigma)
 #        if self.n != yarr.size() or self.n != xarr.size():
 #            raise GaussianData.DataSizeError(self.n, xarr.size(), yarr.size())
@@ -25,6 +25,9 @@ class BeamData(GaussianData):
         
         self.x=asarray(xarr, float64)
         self.y=asarray(yarr, float64)
+
+        if cts is not None:
+            self.cts = cts
 
     def plot(self):
         """ plot the data """

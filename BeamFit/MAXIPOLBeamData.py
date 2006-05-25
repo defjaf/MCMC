@@ -54,7 +54,7 @@ def readMAXIPOLdataLuis(filename):
     x = array([2*(ii-min(ia))/(max(ia)-min(ia))-1 for ii in i], float64)
     y = array([2*(jj-min(ja))/(max(ja)-min(ja))-1 for jj in j], float64)
 
-    return BeamData(x, y, beam, sig)
+    return BeamData(x, y, beam, sig, cts=cts)
         
 
 def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
@@ -76,7 +76,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
     ncut = 0;
     offsets = {'el': 0.295, 'az': 0.05}   ## degrees (brad)
     #offsets = {'el': 0.289, 'az': 0.065}   ## degrees (Jeff)
-    az=[]; el=[]; beam=[]; sig=[]  ##; cts=[]
+    az=[]; el=[]; beam=[]; sig=[]; cts=[]
     if filename.endswith('gz'):
         fileobj = gzip.open(filename, "r");
     else:
@@ -99,7 +99,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
         if s1>sigcut and c1>ctscut:
             ## only keep pixels with good data
             az.append(az1); el.append(el1); beam.append(b1);
-            sig.append(s1)  ##; cts.append(c1)
+            sig.append(s1); cts.append(c1)
             ngood += 1
         else:
             ncut += 1
@@ -113,13 +113,13 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
     sig = asarray(sig, float64)
     az = asarray(az, float64)
     el = asarray(el, float64)
-    ##cts = asarray(cts, float64)
+    cts = asarray(cts, float64)
 
     if beam.mean() < 0 or neg:
         print 'negating data'
         beam = -beam
 
-    return BeamData(az, el, beam, sig)
+    return BeamData(az, el, beam, sig, cts=cts)
 
 
 def plot(data):
@@ -214,7 +214,7 @@ def plotter(sampler):
 def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
                 DayNight=2, LuisBrad=1, plotRes=None, useNormalizedBeam=False,
                 noCorrelations=False, fac=None, doBlock=False, cols=None,
-                nhits=None, neg=False):
+                nhits=None, neg=False, rangeScale=None):
     """
     run the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -241,7 +241,7 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
     
     sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
-    ctscut = 2     ## only keep pixels with this many hits
+    ctscut = 4     ## only keep pixels with this many hits
                    ## nb these also apply to TOI data in which case
                    ## cts is the number of hits in the 'parent' pixel
     
@@ -305,10 +305,11 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         like = Likelihood.Likelihood(data=data, model=mod)
         npar = 5
         
-    mod.setxyRange(xyrange)    ## class variables: sets the prior for all instances
-    mod.sigMax = 20.0           # 15.0
+    mod.setxyRange(xyrange, scale=rangeScale)    ## class variables: sets the prior for all instances
+    mod.sigMax = 8.0           # 15.0
+    mod.sigMin = 3.0
 
-    print 'setting sigMax=', mod.sigMax
+    print 'setting sigMin, sigMax=', mod.sigMin, mod.sigMax
     
     dx = (mod.centerMin[0],mod.centerMax[0])
     dy = (mod.centerMin[1],mod.centerMax[1])
@@ -336,18 +337,20 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     if useNormalizedBeam:
         ## amplitude
         prop_sigmas += max(data[0].d)/10,   ## nb commas for tuples; "+=" appends
-        start_params += max(data[0].d)/2,
+        start_params += (max(data[0].d)-min(data[0].d))/2,
 
         ### offset, gradient [cos(theta), phi]
         start_params += (0, 1, 0),
 
-        prop_sigmas += (0.01, 0, 0),
+        prop_sigmas += (0.03, 0, 0),
    #     prop_sigmas += (0, 0, 0),
 
         ### remove the param blocks corresponding to the sig=0 parameters
         ### can't do this with -= etc since those chase 'singleton' class variable each time!
         mod.paramBlocks = [0,1,2,3,4,5,6]
         mod.nBlock = 7
+#        mod.paramBlocks = [0,1,2,3,4,5,6,7,8]
+#        mod.nBlock = 9
    #     mod.paramBlocks = [0,1,2,3,4,5]
    #     mod.nBlock = 6
         
@@ -429,7 +432,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     
 def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
               noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
-              mapOnly=False, nhits=None, neg=False):
+              mapOnly=False, nhits=None, neg=False, rangeScale=None):
     """
     run the sampler nruns times for the detectors with TOI data
     """
@@ -464,7 +467,8 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
                                          useNormalizedBeam=useNormalizedBeam,
                                          noCorrelations=noCorrelations,
                                          doBlock=doBlock, cols=cols,
-                                         nhits=nhits, neg=neg))
+                                         nhits=nhits, neg=neg,
+                                         rangeScale=rangeScale))
                 pylab.figure(nfig*run+1)
                 pylab.subplot(nrow, ncol, ib+1)
                 samples = cat([ s.samples for s in res[det][-1][0] ])

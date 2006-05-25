@@ -73,7 +73,7 @@ class GaussianBeamModel2D(object):
             cls.sigMax = max(max(xmax)-min(xmax), max(ymax)-min(ymax))
 
     @classmethod
-    def setxyRange(cls, xrng, yrng=None):
+    def setxyRange(cls, xrng, yrng=None, scale=None):
         """
         set the min and max possible values for the x,y coordinates
         nb. this is a classmethod: sets the values for *all* instances!!!
@@ -92,6 +92,16 @@ class GaussianBeamModel2D(object):
                 yrng = xrng
             cls.centerMin = (min(xrng), min(yrng))
             cls.centerMax = (max(xrng), max(yrng))
+
+        if scale is not None:
+            xr = 0.5*(cls.centerMax[0] - cls.centerMin[0])
+            yr = 0.5*(cls.centerMax[1] - cls.centerMin[1])
+            x0 = 0.5*(cls.centerMax[0] + cls.centerMin[0])
+            y0 = 0.5*(cls.centerMax[1] + cls.centerMin[1])
+
+            cls.centerMin = x0-scale*xr, y0-scale*yr
+            cls.centerMax = x0+scale*xr, y0+scale*yr
+            
             
             
     def setParameters_XYRho(self, center, sigma_xy, rho):
@@ -131,7 +141,9 @@ class GaussianBeamModel2D(object):
         return gauss2d(data.x, data.y, self.center[0], self.center[1], *self.Cinv)
 
     def atxy(self, x, y):
-        """get the [array of] value[s] of the beam for the given x, y value[s] """
+        """
+        get the [array of] value[s] of the beam for the given x, y value[s]
+        """
         return gauss2d(x, y, self.center[0], self.center[1], *self.Cinv)
 
     __call__ = at
@@ -139,20 +151,23 @@ class GaussianBeamModel2D(object):
     @classmethod
     def prior(cls, center, sigmas, angle):
         """get the unnormalized prior for the parameters
-           nb. needs to be staticmethod since classmethod would find the inherited
-           instances of the class variables -- which don't propagate
         """
+
         
-        if sigmas[0]<0 or sigmas[1]<0:
-            return 0
-        elif cls.centerMin is not None and (
+        if cls.centerMin is not None and (
                 center[0] < cls.centerMin[0] or center[1] < cls.centerMin[1] or
                 center[0] > cls.centerMax[0] or center[1] > cls.centerMax[1]):
             return 0
-        elif cls.sigMax is not None and max(sigmas) > cls.sigMax:
+
+        if cls.sigMin is None and (sigmas[0]<0 or sigmas[1]<0):
+            return 0
+        elif sigmas[0]<cls.sigMin or sigmas[1]<cls.sigMin:
+            return 0
+
+        if cls.sigMax is not None and max(sigmas) > cls.sigMax:
             return 0    # too restrictive?
-        else:
-            return 1
+
+        return 1
 
     ## note that we do (angle % pi) in these [probably really only needed in 'package'?]
     def unpackage(param_seqs):
