@@ -179,7 +179,7 @@ def grid1d(x, dx=0, nx=0):
     dx = min(diff)
     n = int(round((max(u)-min(u))/dx)+1)
 
-    return [minx + dx*i for i in range(n)] 
+    return [minx + dx*i for i in range(n)] ### use linspace?
 
 def plotter(sampler):
     """
