@@ -11,7 +11,6 @@ class GaussianBeamModelRound(BeamModel.GaussianBeamModel2D):
     """
     round (sigma1=sigma2) version of BeamModel.GaussianBeamModel2D
     """
-
     
     ### class variables
     centerMin = None
@@ -48,3 +47,4 @@ class GaussianBeamModelRound(BeamModel.GaussianBeamModel2D):
 
         ## inverse array in a "packed" form (xx, xy, yy)
         self.Cinv = array([1.0/sig2x, 0, 1.0/sig2y], float64)
+
