@@ -19,7 +19,7 @@ import gzip
 
 import numpy
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
-                    arange, asarray, sqrt, minimum)
+                    arange, asarray, sqrt, minimum, maximum)
 from numpy import concatenate as cat
 
 from numpy.random import uniform
@@ -115,7 +115,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
     el = asarray(el, float64)
     cts = asarray(cts, float64)
 
-    if beam.mean() < 0 or neg:
+    if neg is not False and ((neg is None and beam.mean() < 0) or neg):
         print 'negating data'
         beam = -beam
 
@@ -332,6 +332,7 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     #start_params = ( ((dx[0]+dx[1])/2, (dy[0]+dy[1])/2), 
     #                 (delx/5, dely/5), 0) 
     startsigs = minimum([sqrt(stats[2]), sqrt(stats[3])], mod.sigMax)
+    startsigs = maximum(startsigs, mod.sigMin)
     start_params = ((stats[0], stats[1]), startsigs, 0)
 
     if useNormalizedBeam:

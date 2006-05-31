@@ -43,15 +43,15 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
     
     nparam = 9
 
-    def __init__(self, center, sigmas, angle, amplitude, plane):
+    def __init__(self, center, sigmas, angle, amplitude, plane, round=None):
         """
         set the parameters from
             (x, y), (sigma_major, sigma_minor), angle, amplitude,
             (offset, mu, phi)
         """
-        self.setParameters_MajMinAng(center, sigmas, angle)
+        self.setParameters_MajMinAng(center, sigmas, angle, round=round)
         self.amplitude = amplitude
-        sqrtdet = sigmas[0]*sigmas[1]    
+        #sqrtdet = sigmas[0]*sigmas[1]    
         #self.norm = amplitude/sqrtdet/2/math.pi   ### CHECK THIS
         self.norm = amplitude   ### CHECK THIS
 
