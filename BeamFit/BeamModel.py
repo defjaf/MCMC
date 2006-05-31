@@ -41,12 +41,14 @@ class GaussianBeamModel2D(object):
     
     texNames = [r"x", r"y", r"$\sigma_1$", r"$\sigma_2$", r"$\alpha$", r"$A$"]
     
-    def setParameters_MajMinAng(self, center, sigmas, angle, round=None):
+    def setParameters_MajMinAng(self, center, sigmas, angle):
         """set the parameters from x, y, sigma_major, sigma_minor, angle"""
+
         
         self.center = center
         self.sigmas = sigmas
         self.angle = angle % math.pi
+
 
         c = cos(angle); s = sin(angle)
         s12 = sigmas[0]*sigmas[0]
