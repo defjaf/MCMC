@@ -6,6 +6,9 @@ from numpy import matrixmultiply, where, zeros, asarray, float64
 import numpy.linalg as la
 from copy import copy
 
+#TODO: modify to allow rotated parameters based on some correlation matrix
+#      add flag self.rotate to __init__? or subclass?
+
 class GenericGaussianProposal(object):
     """
     multivariate Proposal Density for MCMC
