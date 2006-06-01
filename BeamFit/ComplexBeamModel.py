@@ -69,6 +69,7 @@ class ComplexBeamModel(object):
     def package(params_flat):
         """ convert from flat array to structured sequence of parameters """
         return array(params_flat)
+
         
     ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
