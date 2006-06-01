@@ -7,6 +7,7 @@ import os.path
 import pylab
 import pyfits
 import MCMC
+import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
 from binnedCl.binnedClModel import binnedClModel
 from ClData import ClData
@@ -45,7 +46,7 @@ def main(nMC=(1000,)):
     manybins = True
     onebin = False
 
-    testshape=True
+    testshape=False
 
     data = ClData.getClData(filename, no_pol=True)
 
@@ -103,6 +104,9 @@ def main(nMC=(1000,)):
     samples = cat([ s.samples for s in retval[0] ])
     for var in samples.transpose(): pylab.plot(var)     
     
+    pylab.figure(2)
+    getdist.histgrid(retval[0][-1])
+    
     #numarray.Error.popMode()
     return retval
 
@@ -116,7 +120,7 @@ def plotter(sampler):
     mod = sampler.like.model
     data = sampler.like.data
 
-    params = where(sampler.prop.sigmas>0)
+    params = where(sampler.prop.sigmas>0)[0]
 
 
     ntot = len(sampler.samples)
