@@ -139,14 +139,13 @@ def plotter(sampler):
     print sigs  #sampler.like.model.fmtstring % tuple(ana[1])
     print ana[2]
     
-def doall():
+def doall(nMC=(100,500,10000), file='wmap06res_10000.pickle'):
 
-    
     res = {}
     for i, x in enumerate(['ico', 'oct', 'tetr', 'dih']):
-        res[x] = main(almfile='alm3yrall.dat\0', nMC=(100,500,10000), topo=x, fig=10*i)
+        res[x] = main(almfile='alm3yrall.dat\0', nMC=nMC, topo=x, fig=10*i)
 
-    pkl = open('wmap06res_10000.pickle', 'w')
+    pkl = open(file, 'w')
     cPickle.dump(res, pkl);
     pkl.close()
 
