@@ -4,7 +4,7 @@ import pylab
 
 import cPickle
 
-import MAXIPOLBeamData as MP
+import BeamFit.MAXIPOLBeamData as MP
 
 def main():
     
