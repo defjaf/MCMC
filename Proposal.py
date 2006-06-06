@@ -2,7 +2,7 @@ from __future__ import division
 #from numarray.random_array import normal
 #from numarray import matrixmultiply
 from numpy.random import normal, seed
-from numpy import matrixmultiply, where, zeros, asarray, float64
+from numpy import dot, where, zeros, asarray, float64
 import numpy.linalg as la
 from copy import copy
 
@@ -115,7 +115,7 @@ class GenericGaussianProposal(object):
         if self.sqrtMatrix is None:
             offset = normal(0,1, self.n)*self.sigmas
         else:
-            offset = matrixmultiply(self.sqrtMatrix,
+            offset = dot(self.sqrtMatrix,
                                      normal(0,1, self.n))*self.sigmas
                                      
         if block is None:
