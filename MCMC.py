@@ -14,8 +14,6 @@ from numpy import empty
 
 from getdist import stddev
 
-import pylab
-
 from Likelihood import ZeroPosterior
 
 ### assumes likelihood > 0 (so use lnLike) but prior can be 0 (so call

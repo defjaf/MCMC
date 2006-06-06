@@ -125,7 +125,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 def plot(data):
     """ contour the MAXIPOLBeamData data """
     x, y, d = regrid(data.x, data.y, data.d)
-    return pylab.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
+    return pylab.gca().imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
                  interpolation='nearest', origin='lower', aspect='free')
     #return pylab.contour(x, y, ma.log(d))    
 
@@ -368,7 +368,7 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         vals = like.model.package(ana[0])
         sigs = like.model.package(ana[1])
         
-        pylab.cla()
+        pylab.gca().cla()
         for d in data: plotMod(d, vals, mod)
 
 
@@ -410,10 +410,10 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
         res={}
         for ib, det in enumerate(dets):
             print 'Detector: %d' % det
-            pylab.figure(irun*ntotrun+nfig*run)
+            fig=pylab.figure(irun*ntotrun+nfig*run)
             if not plotOne:
-                pylab.subplot(nrow, ncol, ib+1)
-                pylab.cla()
+                ax=fig.add_subplot(nrow, ncol, ib+1)
+                ax.cla()
             res[det] = sample1beam(num=det, nMC=nMC, DayNight=DayNight, fac=fac,
                        useNormalizedBeam=useNormalizedBeam, noCorrelations=noCorrelations,
                        doBlock=doBlock)
@@ -421,12 +421,12 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 pylab.xlim(-100,100)
                 pylab.ylim(-100,100)
 
-            pylab.figure(irun*ntotrun+nfig*run+1)
-            pylab.subplot(nrow, ncol, ib+1)
+            fig=pylab.figure(irun*ntotrun+nfig*run+1)
+            ax=fig.add_subplot(nrow, ncol, ib+1)
             samples = cat([ s.samples for s in res[det][0] ])
             #samples.transpose()
             ## nb. with numpy, a.transpose doesn't change the array, just gives a new view.
-            for var in samples.transpose(): pylab.plot(var)
+            for var in samples.transpose(): ax.plot(var)
         reslist.append(res)
 
     return reslist
@@ -461,25 +461,26 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
             files = [pref+str(det).strip()+suff for suff in suffs]
             for fil in files:
                 print 'Running: ', fil
-                pylab.figure(nfig*run)
-                pylab.subplot(nrow, ncol, ib+1)
-                pylab.cla()
+                fig=pylab.figure(nfig*run)
+                ax=fig.add_subplot(nrow, ncol, ib+1)
+                ax.cla()
                 res[det].append(sample1beam(nMC=nMC, fac=fac, files=[fil],
                                          useNormalizedBeam=useNormalizedBeam,
                                          noCorrelations=noCorrelations,
                                          doBlock=doBlock, cols=cols,
                                          nhits=nhits, neg=neg,
                                          rangeScale=rangeScale))
-                pylab.figure(nfig*run+1)
-                pylab.subplot(nrow, ncol, ib+1)
+                fig=pylab.figure(nfig*run+1)
+                ax=fig.add_subplot(nrow, ncol, ib+1)
                 samples = cat([ s.samples for s in res[det][-1][0] ])
 
-                for var in samples.transpose(): pylab.plot(var)
+                for var in samples.transpose(): ax.plot(var)
 
-                pylab.figure(nfig*run+2)
+                fig=pylab.figure(nfig*run+2)
                 getdist.histgrid(res[det][-1][0][-1])
         reslist.append(res)
 
+    pylab.show()
     return reslist
 
 
@@ -533,15 +534,17 @@ def plotMod(data, params=None, model=None, hold=False, centeronly=False):
         m3 = where(d.filled(0) < max(d.filled(0))*math.exp(-8.0))  ## 4 sig in beam
         newmask = ma.mask_or(d.mask(), m3)
         d = ma.masked_array(d, mask=newmask)
+        
+    ax = pylab.gca()
     xx, yy = pylab.meshgrid(x,y)
-    pylab.pcolor(xx, yy, d, shading='flat', hold='true')
+    ax.pcolor(xx, yy, d, shading='flat', hold='true')
     ## aspect = 'preserve' for square pixels; can't do that with contour however
     if params is not None:
         vals = model(*params).atxy(xx, yy)
         vals.shape = d.shape
         arng=cat(([0.1], arange(5)))
         levs = max(numpy.ravel(vals))*exp(-0.5*arng**2)
-        pylab.contour(x, y, vals, levs, hold='true', colors='black')
+        ax.contour(x, y, vals, levs, hold='true', colors='black')
         
 
 class DataSizeError(Exception):
