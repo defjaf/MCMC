@@ -30,14 +30,15 @@ def testall():
     test('tetr')
     
 
-def test(modname='ico'):
+def test(modname='ico', almfile=None):
 
     lik = { 'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
     datdir = "./topology/likelihood/lik"+modname+"/dat/\0"
-    almfile = "alm64_1.dat\0"
-    #    almfile = "wmapalm.dat\0"
-    #    almfile = "alm3yrall.dat\0"
+    if almfile is None:
+        # almfile = "alm64_1.dat\0"
+        #    almfile = "wmapalm.dat\0"
+        almfile = "alm3yrall.dat\0"
 
     print 'using datdir=%s' % datdir
     likfun = lik[modname].alikelihood
@@ -50,7 +51,7 @@ def test(modname='ico'):
     hmin = 52.
     hmax = 70.
     hub = 64.0
-    dh = 0.5
+    dh = 1.0
     nstep = int(1+(hmax - hmin)/dh)
     a = []; h=[]; l=[]
     for i, hub in enumerate(numpy.arange(hmin, hmax, dh)):
@@ -70,7 +71,7 @@ def test(modname='ico'):
     
 
 def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
-         almfile=None, topo='ico', fig=0):
+         almfile=None, topo='ico', fig=0, doSim=False):
     
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
 
@@ -95,11 +96,15 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
 
     start_params = (1.0e-3, (0.0,0.0,0.0), H0_start)
     #prop_sigmas = (0.3e-3, (0.05, 0.05, 0.05), 3.0)
-    prop_sigmas = (1.0e-3, (0.5, 0.5, 0.5), 5.0)
+    prop_sigmas = (1.0e-3, (0.5, 0.5, 0.5), 2.0)
     mod.paramBlocks = [0,1,2,3,4]
     #mod.paramBlocks = [-1, 0,1,2,3]
     mod.nBlock = 5
         
+    if doSim:
+        print "Assuming simulation amplitude ~ 1"
+        start_params=(1.0, (0.0,0.0,0.0), H0_start)
+        prop_sigmas = (0.3, (0.5, 0.5, 0.5), 2.0)
 
     print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
     print ("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas))
