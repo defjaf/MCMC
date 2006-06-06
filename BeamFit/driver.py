@@ -14,7 +14,7 @@ def main():
     for cols in [(4,5), (6,7)]:
         res[cols] = MP.testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                noCorrelations=True, fac=None, doBlock=True, cols=None, dets=dets,
-               mapOnly=False, nhits=None, neg=False, rangeScale=None)
+               mapOnly=False, nhits=None, neg=False, rangeScale=None, closeFigs)
                
     fp = open("all.pickle", 'wb')  
     
