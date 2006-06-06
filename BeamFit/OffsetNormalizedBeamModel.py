@@ -49,7 +49,7 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
             (x, y), (sigma_major, sigma_minor), angle, amplitude,
             (offset, mu, phi)
         """
-        self.setParameters_MajMinAng(center, sigmas, angle, round=round)
+        self.setParameters_MajMinAng(center, sigmas, angle)
         self.amplitude = amplitude
         #sqrtdet = sigmas[0]*sigmas[1]    
         #self.norm = amplitude/sqrtdet/2/math.pi   ### CHECK THIS
