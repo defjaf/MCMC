@@ -433,7 +433,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     
 def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
               noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
-              mapOnly=False, nhits=None, neg=False, rangeScale=None):
+              mapOnly=False, nhits=None, neg=False, rangeScale=None, 
+              closeFigs=False):
     """
     run the sampler nruns times for the detectors with TOI data
     """
@@ -478,6 +479,8 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
 
                 fig=pylab.figure(nfig*run+2)
                 getdist.histgrid(res[det][-1][0][-1])
+                
+                if closeFigs: pylab.close('all')
         reslist.append(res)
 
     pylab.show()
