@@ -448,7 +448,10 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
  #   nrow=4; ncol=3
 
     if dets is None: dets = [33, 34, 43, 45]
-    nrow = ncol = 2
+
+    nrow = ncol = int(math.sqrt(len(dets)))
+    if nrow*ncol < len(dets): ncol += 1
+    if nrow*ncol < len(dets): nrow += 1
 
     pref = 'TOI_polarized/b'
     suffs = ['_map.txt.gz','_TOI.txt.gz']
