@@ -111,6 +111,10 @@ class GenericGaussianProposal(object):
         ### nb. copy crucial here otherwise you just change the prevParams
         ### when unpackage doesn't create a new object (e.g., the identity)!
 
+        ###TODO: sample a single parameter in the "rotated" direction
+        ###      *should* just require changing normal(0,1,n) to normal(0,1)*e_i
+        ###      need another flag? still use 'block'? how to randomize directions?
+
         self.newParams = copy(self.unpackage(prevParams))
         if self.sqrtMatrix is None:
             offset = normal(0,1, self.n)*self.sigmas
