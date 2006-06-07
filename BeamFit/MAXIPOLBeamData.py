@@ -434,7 +434,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
               noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
               mapOnly=False, nhits=None, neg=False, rangeScale=None, 
-              closeFigs=False):
+              closeFigs=False, figName=None):
     """
     run the sampler nruns times for the detectors with TOI data
     """
@@ -454,16 +454,23 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
     if nrow*ncol < len(dets): nrow += 1
 
     pref = 'TOI_polarized/b'
-    suffs = ['_map.txt.gz','_TOI.txt.gz']
+    ident = ['_map','_TOI']
+    suff = '.txt.gz'
     if mapOnly: 
-        suffs = [suffs[0]] 
+        ident = [ident[0]] 
 
     for run in range(nruns):
         res={}
         for ib, det in enumerate(dets):
             res[det] = []
-            files = [pref+str(det).strip()+suff for suff in suffs]
-            for fil in files:
+            filebase = [str(det).strip()+id1 for id1 in ident]
+            
+            for fb in filebase:
+                fil = pref+fb+suff
+                figf = fb
+                if isinstance(figName, (str, unicode)):
+                    figf = figName+figf
+
                 print 'Running: ', fil
                 fig=pylab.figure(nfig*run)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
@@ -474,16 +481,24 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
                                          doBlock=doBlock, cols=cols,
                                          nhits=nhits, neg=neg,
                                          rangeScale=rangeScale))
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
+                    
                 sys.stdout.flush()
                 fig=pylab.figure(nfig*run+1)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 samples = cat([ s.samples for s in res[det][-1][0] ])
 
                 for var in samples.transpose(): ax.plot(var)
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
 
                 fig=pylab.figure(nfig*run+2)
                 getdist.histgrid(res[det][-1][0][-1])
                 
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
+
                 if closeFigs: pylab.close('all')
         reslist.append(res)
 

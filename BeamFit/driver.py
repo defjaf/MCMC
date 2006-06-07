@@ -12,11 +12,14 @@ def main():
     
     res = {}
     for cols in [(4,5), (6,7)]:
+        colname = str(cols[0]).strip()+'_'+str(cols[0]).strip()
         res[cols] = MP.testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
-               noCorrelations=True, fac=None, doBlock=True, cols=None, dets=dets,
-               mapOnly=True, nhits=None, neg=False, rangeScale=None, closeFigs=True)
+                               noCorrelations=True, fac=None, doBlock=True,
+                               cols=None, dets=dets, mapOnly=True, nhits=None,
+                               neg=False, rangeScale=None, closeFigs=True,
+                               figName='cols_'+colname+'_')
                
-    fp = open("all.pickle", 'wb')  
+    fp = open("all2.pickle", 'wb')  
     
     cPickle.dump(res, fp)   
     
