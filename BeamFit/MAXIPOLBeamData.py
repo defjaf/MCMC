@@ -474,6 +474,7 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
                                          doBlock=doBlock, cols=cols,
                                          nhits=nhits, neg=neg,
                                          rangeScale=rangeScale))
+                sys.stdout.flush()
                 fig=pylab.figure(nfig*run+1)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 samples = cat([ s.samples for s in res[det][-1][0] ])
