@@ -475,30 +475,38 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
                 fig=pylab.figure(nfig*run)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 ax.cla()
-                res[det].append(sample1beam(nMC=nMC, fac=fac, files=[fil],
-                                         useNormalizedBeam=useNormalizedBeam,
-                                         noCorrelations=noCorrelations,
-                                         doBlock=doBlock, cols=cols,
-                                         nhits=nhits, neg=neg,
-                                         rangeScale=rangeScale))
-                if figName:
-                    fig.savefig(figf+str(fig.number).strip()+'.png')
-                    
-                sys.stdout.flush()
-                fig=pylab.figure(nfig*run+1)
-                ax=fig.add_subplot(nrow, ncol, ib+1)
-                samples = cat([ s.samples for s in res[det][-1][0] ])
 
-                for var in samples.transpose(): ax.plot(var)
-                if figName:
-                    fig.savefig(figf+str(fig.number).strip()+'.png')
-
-                fig=pylab.figure(nfig*run+2)
-                getdist.histgrid(res[det][-1][0][-1])
+                try:
+                    res[det].append(sample1beam(
+                        nMC=nMC, fac=fac, files=[fil],
+                        useNormalizedBeam=useNormalizedBeam,
+                        noCorrelations=noCorrelations, doBlock=doBlock,
+                        cols=cols, nhits=nhits, neg=neg,
+                        rangeScale=rangeScale))
+                    if figName:
+                        fig.savefig(figf+str(fig.number).strip()+'.png')
                 
-                if figName:
-                    fig.savefig(figf+str(fig.number).strip()+'.png')
+                    
+                    
+                    sys.stdout.flush()
+                    fig=pylab.figure(nfig*run+1)
+                    ax=fig.add_subplot(nrow, ncol, ib+1)
+                    samples = cat([ s.samples for s in res[det][-1][0] ])
 
+                    for var in samples.transpose(): ax.plot(var)
+                    if figName:
+                        fig.savefig(figf+str(fig.number).strip()+'.png')
+
+                    fig=pylab.figure(nfig*run+2)
+                    getdist.histgrid(res[det][-1][0][-1])
+
+                    if figName:
+                        fig.savefig(figf+str(fig.number).strip()+'.png')
+
+                except:
+                    print "Unexpected error:", sys.exc_info()[0]
+                    print "... when running ", fil, fb
+                    
                 if closeFigs: pylab.close('all')
         reslist.append(res)
 
