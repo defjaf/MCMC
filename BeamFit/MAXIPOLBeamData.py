@@ -214,7 +214,7 @@ def plotter(sampler):
 def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
                 DayNight=2, LuisBrad=1, plotRes=None, useNormalizedBeam=False,
                 noCorrelations=False, fac=None, doBlock=False, cols=None,
-                nhits=None, neg=False, rangeScale=None):
+                nhits=None, neg=False, rangeScale=None, startCols=None, nMCstart=None):
     """
     run the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -233,6 +233,11 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     statistics for the last run
 
     set DayNight=0,1,2 for Day, Night, Both
+    
+    get the data from column numbers 'cols' from the file
+    
+    if startCols is not None, get the starting point from startCols (probably 2,3),
+       running for nMCstart samples
     """
     
     #plotter = None
@@ -286,9 +291,16 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         if num is None and files is not None: 
             day = [False]*len(files)
             print 'Setting day=', day
+
+#    AHJ: how to avoid just duplicating everything for cols/startCols etc?
+#            if startCols is not None:
+#                startData = [
+#                    readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=startCols, nhits=nhits)                        neg=neg)
+#                        for fil, d in zip(files, day) ]
+                
             data = [
                 readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=cols, nhits=nhits, neg=neg)
-                for fil, d in zip(files, day) ]
+                    for fil, d in zip(files, day) ]
         xyrange = data[0]   ### set from the zeroth dataset
 
 
@@ -357,6 +369,10 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         
     print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
     print ("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas))
+
+#    if startCols is not None:
+#        start = 
+
 
     if plotRes is None:
         return MCMC.sampler(like, nMC, prop_sigmas, start_params, 
@@ -542,15 +558,20 @@ def makereport(reslist, file=sys.stdout, hasTOI=False):
         for det, res in resrun.iteritems():
             file.write("%d" % det)
 
-            if not hasTOI: 
-                val = res[1][0]
-                sig = res[1][1]
-            else:
-                val = res[-1][1][0]
-                sig = res[-1][1][1]
+            try:
+                if not hasTOI: 
+                    val = res[1][0]
+                    sig = res[1][1]
+                else:
+                    val = res[-1][1][0]
+                    sig = res[-1][1][1]
                 
-            for (v, s) in zip(val, sig):
-                file.write("   %f +- %f" % (v, s))
+                for (v, s) in zip(val, sig):
+                    file.write("   %f +- %f" % (v, s))
+            except:
+                print "\n... when running ", irun, det,
+                print "Unexpected error:", sys.exc_info()[0]
+                    
             file.write("\n")
 
 def plotMod(data, params=None, model=None, hold=False, centeronly=False):
