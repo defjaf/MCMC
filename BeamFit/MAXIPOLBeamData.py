@@ -211,10 +211,11 @@ def plotter(sampler):
     except:
         print 'Unknown error: Cannot plot results for this data'
 
-def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
-                DayNight=2, LuisBrad=1, plotRes=None, useNormalizedBeam=False,
-                noCorrelations=False, fac=None, doBlock=False, cols=None,
-                nhits=None, neg=False, rangeScale=None, startCols=None, nMCstart=None):
+def setup_sampler(dir=None, files=None,  num=None,
+                  DayNight=2, LuisBrad=1, useNormalizedBeam=False,
+                  cols=None,
+                  nhits=None, neg=False, rangeScale=None, startCols=None,
+                  nMCstart=None, prop_sigmas=None, start_params=None):
     """
     run the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -240,11 +241,12 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
        running for nMCstart samples
     """
     
-    #plotter = None
-    #print "not using plotter for now"
+
     
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
-    
+
+
+#### READ DATA
     sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
     ctscut = 4     ## only keep pixels with this many hits
                    ## nb these also apply to TOI data in which case
@@ -304,6 +306,8 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         xyrange = data[0]   ### set from the zeroth dataset
 
 
+#### set likelihood, model
+
     if useNormalizedBeam:
         #mod = NormalizedBeamModel.NormalizedBeamModel
         #like = NormalizedBeamLikelihood.NormalizedBeamLikelihood(data=data, model=mod)
@@ -316,7 +320,7 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         mod = BeamModel.GaussianBeamModel2D
         like = Likelihood.Likelihood(data=data, model=mod)
         npar = 5
-        
+
     mod.setxyRange(xyrange, scale=rangeScale)    ## class variables: sets the prior for all instances
     mod.sigMax = 8.0           # 15.0
     mod.sigMin = 3.0
@@ -329,9 +333,20 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     dely = dy[1]-dy[0]
     
     print 'center min, max=', mod.centerMin, mod.centerMax
+
+
+### set initial width and location of proposal
     
-   # prop_sigmas = ( (delx/3, dely/3 ), (delx/5, dely/5 ), 0.6)
-    prop_sigmas = ( (delx/10, dely/10), (delx/10, dely/10), 0.6)
+    need_prop_sig = need_start_params = False
+    if prop_sigmas is None:
+        need_prop_sig = True
+    if start_params is None:
+        need_prop_sig = True
+
+    if need_prop_sig:
+        # prop_sigmas = ( (delx/3, dely/3 ), (delx/5, dely/5 ), 0.6)
+        prop_sigmas = ( (delx/10, dely/10), (delx/10, dely/10), 0.6)
+        
 
  #   start_params = ( (uniform(*dx), uniform(*dy)), 
  #                    (uniform(0,delx)/5, uniform(0,dely)/5),
@@ -343,23 +358,28 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     
     #start_params = ( ((dx[0]+dx[1])/2, (dy[0]+dy[1])/2), 
     #                 (delx/5, dely/5), 0) 
-    startsigs = minimum([sqrt(stats[2]), sqrt(stats[3])], mod.sigMax)
-    startsigs = maximum(startsigs, mod.sigMin)
-    start_params = ((stats[0], stats[1]), startsigs, 0)
+ 
+    if need_start_params:
+        startsigs = minimum([sqrt(stats[2]), sqrt(stats[3])], mod.sigMax)
+        startsigs = maximum(startsigs, mod.sigMin)
+        start_params = ((stats[0], stats[1]), startsigs, 0)
 
     if useNormalizedBeam:
         ## amplitude
-        prop_sigmas += max(data[0].d)/10,   ## nb commas for tuples; "+=" appends
-        start_params += (max(data[0].d)-min(data[0].d))/2,
+        if need_prop_sig:           ## nb commas for tuples; "+=" appends
+            prop_sigmas += max(data[0].d)/10,   
+            prop_sigmas += (0.03, 0, 0),   # offset, gradient [cos(theta), phi]
+            #   prop_sigmas += (0, 0, 0),
+            
+        if need_start_params:
+            start_params += (max(data[0].d)-min(data[0].d))/2,
+            start_params += (0, 1, 0),  # offset, gradient [cos(theta), phi]
 
-        ### offset, gradient [cos(theta), phi]
-        start_params += (0, 1, 0),
-
-        prop_sigmas += (0.03, 0, 0),
-   #     prop_sigmas += (0, 0, 0),
 
         ### remove the param blocks corresponding to the sig=0 parameters
-        ### can't do this with -= etc since those chase 'singleton' class variable each time!
+        ### can't do this with -= etc
+        ###            since those chase 'singleton' class variable each time!
+            
         mod.paramBlocks = [0,1,2,3,4,5,6]
         mod.nBlock = 7
 #        mod.paramBlocks = [0,1,2,3,4,5,6,7,8]
@@ -370,10 +390,16 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
     print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
     print ("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas))
 
-#    if startCols is not None:
-#        start = 
+    ### needs to
+    return like, prop_sigmas, start_params
 
 
+
+def sample1beam(like, nMC=(1000,1000), prop_sigmas, start_params ,
+                fac=None, plotRes=None, noCorrelations=False, doBlock=False):
+
+    #plotter = None
+    #print "not using plotter for now"
     if plotRes is None:
         return MCMC.sampler(like, nMC, prop_sigmas, start_params, 
                             plotter=plotter, fac=fac, 
@@ -430,9 +456,15 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
             if not plotOne:
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 ax.cla()
-            res[det] = sample1beam(num=det, nMC=nMC, DayNight=DayNight, fac=fac,
-                       useNormalizedBeam=useNormalizedBeam, noCorrelations=noCorrelations,
-                       doBlock=doBlock)
+
+            ### TODO: split into setup_sampler(), sample1beam()
+            like, prop_sigmas, start_params = setup_sampler(num=det, DayNight=DayNight,
+                                                            useNormalizedBeam=useNormalizedBeam)
+            
+            res[det] = sample1beam(like nMC=nMC,  fac=fac,
+                                   prop_sigmas=prop_sigmas, start_params=start_params,
+                                   noCorrelations=noCorrelations,
+                                   doBlock=doBlock)
             if plotOne: 
                 pylab.xlim(-100,100)
                 pylab.ylim(-100,100)
@@ -447,12 +479,12 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 
     return reslist
     
-def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
-              noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
-              mapOnly=False, nhits=None, neg=False, rangeScale=None, 
-              closeFigs=False, figName=None):
+def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
+            noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
+            mapOnly=False, nhits=None, neg=False, rangeScale=None, 
+            closeFigs=False, figName=None, startCols=None):
     """
-    run the sampler nruns times for the detectors with TOI data
+    run the sampler  for the detectors with TOI data
     """
     
     reslist = []
@@ -475,59 +507,76 @@ def testTOI(nruns=1, nMC=(3000, 100000), useNormalizedBeam=True,
     if mapOnly: 
         ident = [ident[0]] 
 
-    for run in range(nruns):
-        res={}
-        for ib, det in enumerate(dets):
-            res[det] = []
-            filebase = [str(det).strip()+id1 for id1 in ident]
-            
-            for fb in filebase:
-                fil = pref+fb+suff
-                figf = fb
-                if isinstance(figName, (str, unicode)):
-                    figf = figName+figf
+    res={}
+    for ib, det in enumerate(dets):
+        res[det] = []
+        startres = []
+        filebase = [str(det).strip()+id1 for id1 in ident]
 
-                print 'Running: ', fil
-                fig=pylab.figure(nfig*run)
-                ax=fig.add_subplot(nrow, ncol, ib+1)
-                ax.cla()
+        for fb in filebase:
+            fil = pref+fb+suff
+            figf = fb
+            if isinstance(figName, (str, unicode)):
+                figf = figName+figf
 
-                try:
-                    res[det].append(sample1beam(
-                        nMC=nMC, fac=fac, files=[fil],
+            print 'Running: ', fil
+            fig=pylab.figure(nfig*run)
+            ax=fig.add_subplot(nrow, ncol, ib+1)
+            ax.cla()
+
+            try:
+                if startCols is not None:
+                    like, prop_sigmas, start_params = setup_sampler(
+                        files=[fil],
                         useNormalizedBeam=useNormalizedBeam,
-                        noCorrelations=noCorrelations, doBlock=doBlock,
-                        cols=cols, nhits=nhits, neg=neg,
-                        rangeScale=rangeScale))
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
+                        cols=startCols, nhits=nhits, neg=neg,
+                        rangeScale=rangeScale)
+
+                    startres = sample1beam(like, nMC=nMC, prop_sigmas, start_params, fac=fac, 
+                        noCorrelations=noCorrelations, doBlock=doBlock)
+
+                    ### TODO: parse the appropriate initial conditions
+                    ### from startres
+
+                    start_params = []
+                    prop_sigmas = []
+                    
+                else:
+                    like, prop_sigmas, start_params = setup_sampler(
+                        files=[fil],
+                        useNormalizedBeam=useNormalizedBeam,
+                        cols=startCols, nhits=nhits, neg=neg,
+                        rangeScale=rangeScale)
+
+                res[det] = sample1beam(like, nMC=nMC, prop_sigmas, start_params, fac=fac, 
+                        noCorrelations=noCorrelations, doBlock=doBlock)
                 
-                    
-                    
-                    sys.stdout.flush()
-                    fig=pylab.figure(nfig*run+1)
-                    ax=fig.add_subplot(nrow, ncol, ib+1)
-                    samples = cat([ s.samples for s in res[det][-1][0] ])
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
 
-                    for var in samples.transpose(): ax.plot(var)
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
+                sys.stdout.flush()
+                fig=pylab.figure(nfig*run+1)
+                ax=fig.add_subplot(nrow, ncol, ib+1)
+                samples = cat([ s.samples for s in res[det][-1][0] ])
 
-                    fig=pylab.figure(nfig*run+2)
-                    getdist.histgrid(res[det][-1][0][-1])
+                for var in samples.transpose(): ax.plot(var)
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
 
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
+                fig=pylab.figure(nfig*run+2)
+                getdist.histgrid(res[det][-1][0][-1])
 
-                except:
-                    print "Unexpected error:", sys.exc_info()[0]
-                    print "... when running ", fil, fb
-                    
-                if closeFigs: pylab.close('all')
-        reslist.append(res)
+                if figName:
+                    fig.savefig(figf+str(fig.number).strip()+'.png')
+
+            except:
+                print "Unexpected error:", sys.exc_info()[0]
+                print "... when running ", fil, fb
+
+            if closeFigs: pylab.close('all')
 
     pylab.show()
-    return reslist
+    return res
 
 
 def saveres(reslist, file=None):
