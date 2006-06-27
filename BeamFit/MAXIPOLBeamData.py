@@ -213,9 +213,7 @@ def plotter(sampler):
 
 def setup_sampler(dir=None, files=None,  num=None,
                   DayNight=2, LuisBrad=1, useNormalizedBeam=False,
-                  cols=None,
-                  nhits=None, neg=False, rangeScale=None, startCols=None,
-                  nMCstart=None, prop_sigmas=None, start_params=None):
+                  cols=(2,3), nhits=None, neg=False, rangeScale=None)
     """
     run the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -237,11 +235,7 @@ def setup_sampler(dir=None, files=None,  num=None,
     
     get the data from column numbers 'cols' from the file
     
-    if startCols is not None, get the starting point from startCols (probably 2,3),
-       running for nMCstart samples
     """
-    
-
     
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
 
@@ -293,12 +287,6 @@ def setup_sampler(dir=None, files=None,  num=None,
         if num is None and files is not None: 
             day = [False]*len(files)
             print 'Setting day=', day
-
-#    AHJ: how to avoid just duplicating everything for cols/startCols etc?
-#            if startCols is not None:
-#                startData = [
-#                    readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=startCols, nhits=nhits)                        neg=neg)
-#                        for fil, d in zip(files, day) ]
                 
             data = [
                 readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=cols, nhits=nhits, neg=neg)
@@ -478,6 +466,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
         reslist.append(res)
 
     return reslist
+
     
 def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
@@ -532,8 +521,10 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                         cols=startCols, nhits=nhits, neg=neg,
                         rangeScale=rangeScale)
 
-                    startres = sample1beam(like, nMC=nMC, prop_sigmas, start_params, fac=fac, 
-                        noCorrelations=noCorrelations, doBlock=doBlock)
+                    startres = sample1beam(like, nMC=nMC, fac=fac, 
+                                           prop_sigmas=prop_sigmas,
+                                           start_params=start_params,
+                                           noCorrelations=noCorrelations, doBlock=doBlock)
 
                     ### TODO: parse the appropriate initial conditions
                     ### from startres
@@ -548,8 +539,9 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                         cols=startCols, nhits=nhits, neg=neg,
                         rangeScale=rangeScale)
 
-                res[det] = sample1beam(like, nMC=nMC, prop_sigmas, start_params, fac=fac, 
-                        noCorrelations=noCorrelations, doBlock=doBlock)
+                res[det] = sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
+                                       start_params=start_params, fac=fac, 
+                                       noCorrelations=noCorrelations, doBlock=doBlock)
                 
                 if figName:
                     fig.savefig(figf+str(fig.number).strip()+'.png')
