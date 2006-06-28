@@ -213,9 +213,9 @@ def plotter(sampler):
 
 def setup_sampler(dir=None, files=None,  num=None,
                   DayNight=2, LuisBrad=1, useNormalizedBeam=False,
-                  cols=(2,3), nhits=None, neg=False, rangeScale=None)
+                  cols=(2,3), nhits=None, neg=False, rangeScale=None):
     """
-    run the sampler for a single beam with data in directory 'dir',
+    setup for the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
     'num'.
     
@@ -227,9 +227,9 @@ def setup_sampler(dir=None, files=None,  num=None,
     if a single run fails (because no new samples are accepted, or the
     variance is zero, continue from there with the same number of
     samples to be added)
-
-    return the full MCMC sample class as well as the summary
-    statistics for the last run
+    
+    return the likelihood object, the starting parameters, 
+    and the starting variances for the proposal
 
     set DayNight=0,1,2 for Day, Night, Both
     
@@ -278,8 +278,6 @@ def setup_sampler(dir=None, files=None,  num=None,
         files=["Day/binnedb25.txt", "Night/binnedb25.txt"]
         day = [True, False]
 
-    if operator.isNumberType(nMC):
-        nMC = (nMC, nMC)
     if LuisBrad == 0:
         data = [ readMAXIPOLdataLuis(dir+fil) for fil in files ]
         xyrange = (-1,1)
@@ -325,11 +323,12 @@ def setup_sampler(dir=None, files=None,  num=None,
 
 ### set initial width and location of proposal
     
-    need_prop_sig = need_start_params = False
-    if prop_sigmas is None:
-        need_prop_sig = True
-    if start_params is None:
-        need_prop_sig = True
+    need_prop_sig = need_start_params = True
+#    need_prop_sig = need_start_params = False
+#    if prop_sigmas is None:
+#        need_prop_sig = True
+#    if start_params is None:
+#        need_prop_sig = True
 
     if need_prop_sig:
         # prop_sigmas = ( (delx/3, dely/3 ), (delx/5, dely/5 ), 0.6)
@@ -383,11 +382,18 @@ def setup_sampler(dir=None, files=None,  num=None,
 
 
 
-def sample1beam(like, nMC=(1000,1000), prop_sigmas, start_params ,
+def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000), 
                 fac=None, plotRes=None, noCorrelations=False, doBlock=False):
-
+    """
+    return the full MCMC sample class as well as the summary
+    statistics for the last run
+    """
+    
     #plotter = None
     #print "not using plotter for now"
+    if operator.isNumberType(nMC):
+         nMC = (nMC, nMC)
+             
     if plotRes is None:
         return MCMC.sampler(like, nMC, prop_sigmas, start_params, 
                             plotter=plotter, fac=fac, 
@@ -445,11 +451,10 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 ax.cla()
 
-            ### TODO: split into setup_sampler(), sample1beam()
             like, prop_sigmas, start_params = setup_sampler(num=det, DayNight=DayNight,
                                                             useNormalizedBeam=useNormalizedBeam)
             
-            res[det] = sample1beam(like nMC=nMC,  fac=fac,
+            res[det] = sample1beam(like, nMC=nMC,  fac=fac,
                                    prop_sigmas=prop_sigmas, start_params=start_params,
                                    noCorrelations=noCorrelations,
                                    doBlock=doBlock)
@@ -478,7 +483,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
     
     reslist = []
     nfig=2
-    ntotrun = nruns*nfig
+    ntotrun = nfig
 
  #### AHJ: polz only
  #if dets is None: dets = [13, 14, 15, 23, 24, 25, 33, 34, 35, 43, 44, 45]
@@ -509,7 +514,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 figf = figName+figf
 
             print 'Running: ', fil
-            fig=pylab.figure(nfig*run)
+            fig=pylab.figure(0)
             ax=fig.add_subplot(nrow, ncol, ib+1)
             ax.cla()
 
@@ -524,30 +529,37 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     startres = sample1beam(like, nMC=nMC, fac=fac, 
                                            prop_sigmas=prop_sigmas,
                                            start_params=start_params,
-                                           noCorrelations=noCorrelations, doBlock=doBlock)
+                                           noCorrelations=noCorrelations,
+                                           doBlock=doBlock)
 
                     ### TODO: parse the appropriate initial conditions
                     ### from startres
 
-                    start_params = []
-                    prop_sigmas = []
+                    orig_params = []
+                    orig_sigmas = []
                     
-                else:
-                    like, prop_sigmas, start_params = setup_sampler(
-                        files=[fil],
-                        useNormalizedBeam=useNormalizedBeam,
-                        cols=startCols, nhits=nhits, neg=neg,
-                        rangeScale=rangeScale)
+                    
+                ## need to run this to get the correct likelihood.
+                ##   therefore may need to adjust prior ranges
+                like, prop_sigmas, start_params = setup_sampler(
+                    files=[fil],
+                    useNormalizedBeam=useNormalizedBeam,
+                    cols=cols, nhits=nhits, neg=neg,
+                    rangeScale=rangeScale)
+                    
+                if startCols is not None:
+                    prop_sigmas = orig_sigmas
+                    start_params = orig_params
 
-                res[det] = sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
+                res[det].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
                                        start_params=start_params, fac=fac, 
-                                       noCorrelations=noCorrelations, doBlock=doBlock)
+                                       noCorrelations=noCorrelations, doBlock=doBlock))
                 
                 if figName:
                     fig.savefig(figf+str(fig.number).strip()+'.png')
 
                 sys.stdout.flush()
-                fig=pylab.figure(nfig*run+1)
+                fig=pylab.figure(1)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 samples = cat([ s.samples for s in res[det][-1][0] ])
 
@@ -555,13 +567,13 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 if figName:
                     fig.savefig(figf+str(fig.number).strip()+'.png')
 
-                fig=pylab.figure(nfig*run+2)
+                fig=pylab.figure(2)
                 getdist.histgrid(res[det][-1][0][-1])
 
                 if figName:
                     fig.savefig(figf+str(fig.number).strip()+'.png')
 
-            except:
+            except None:
                 print "Unexpected error:", sys.exc_info()[0]
                 print "... when running ", fil, fb
 
@@ -629,7 +641,8 @@ def plotMod(data, params=None, model=None, hold=False, centeronly=False):
         
     ax = pylab.gca()
     xx, yy = pylab.meshgrid(x,y)
-    ax.pcolor(xx, yy, d, shading='flat', hold='true')
+    #ax.pcolor(xx, yy, d, shading='flat', hold='true')
+    ax.pcolor(xx, yy, d, shading='flat', hold=hold)
     ## aspect = 'preserve' for square pixels; can't do that with contour however
     if params is not None:
         vals = model(*params).atxy(xx, yy)
