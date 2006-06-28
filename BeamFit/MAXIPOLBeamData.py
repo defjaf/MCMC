@@ -526,7 +526,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                         cols=startCols, nhits=nhits, neg=neg,
                         rangeScale=rangeScale)
 
-                    startres = sample1beam(like, nMC=nMC, fac=fac, 
+                    startres, ana = sample1beam(like, nMC=nMC, fac=fac, 
                                            prop_sigmas=prop_sigmas,
                                            start_params=start_params,
                                            noCorrelations=noCorrelations,
@@ -535,9 +535,12 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     ### TODO: parse the appropriate initial conditions
                     ### from startres
 
-                    orig_params = []
-                    orig_sigmas = []
-                    
+                    mod = like.model
+                    orig_params = mod.package(ana[0])     ## startres[-1].mean()
+                    orig_sigmas = mod.package(3*ana[1])   ## startres[-1].stdev()
+
+                    print ("Start: " + mod.fmtstring) % tuple(mod.unpackage(orig_params))
+                    print ("Sigma: " + mod.fmtstring) % tuple(mod.unpackage(orig_sigmas))
                     
                 ## need to run this to get the correct likelihood.
                 ##   therefore may need to adjust prior ranges
