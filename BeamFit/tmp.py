@@ -9,13 +9,13 @@ import os.path
 import pickle
 import pylab
 
-from numarray import array, Float64, zeros, ones, Int, log
+from numarray import array, float64, zeros, ones, int, log
 from numarray import concatenate as cat
 import numarray
 import numarray.ma as ma
 from numarray.random_array import uniform
 
-#from scipy.base import array, Float64, zeros, ones, Int, log, empty
+#from scipy.base import array, float64, zeros, ones, int, log, empty
 #from scipy.base import concatenate as cat
 #import scipy.base
 #import scipy.base.ma as ma
@@ -41,11 +41,11 @@ def readMAXIPOLdataLuis(filename):
             ## only keep pixels with data
             i.append(i1); j.append(j1); beam.append(b1); sig.append(s1); cts.append(c1)
 
-    beam = array(beam, Float64)
-    sig = array(sig, Float64)
+    beam = array(beam, float64)
+    sig = array(sig, float64)
     ## map i and j (before deletion) onto (-1,1)
-    x = array([2*(ii-min(ia))/(max(ia)-min(ia))-1 for ii in i], Float64)
-    y = array([2*(jj-min(ja))/(max(ja)-min(ja))-1 for jj in j], Float64)
+    x = array([2*(ii-min(ia))/(max(ia)-min(ia))-1 for ii in i], float64)
+    y = array([2*(jj-min(ja))/(max(ja)-min(ja))-1 for jj in j], float64)
 
     return BeamData(x, y, beam, sig)
         
@@ -69,10 +69,10 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0):
             ## only keep pixels with data
             az.append(az1); el.append(el1); beam.append(b1); sig.append(s1); cts.append(c1)
 
-    beam = array(beam, Float64)
-    sig = array(sig, Float64)
-    az = array(az, Float64)
-    el = array(el, Float64)
+    beam = array(beam, float64)
+    sig = array(sig, float64)
+    az = array(az, float64)
+    el = array(el, float64)
 
     return BeamData(az, el, beam, sig)
 
@@ -98,8 +98,8 @@ def regrid(x, y, data, fill=0):
     xx = grid1d(x)
     yy = grid1d(y)
 
-    d = fill + zeros(shape=(len(yy), len(xx)), type=Float64)
-    mask = ones(shape=(len(yy), len(xx)), type=Int)
+    d = fill + zeros(shape=(len(yy), len(xx)), type=float64)
+    mask = ones(shape=(len(yy), len(xx)), type=int)
     for x1, y1, d1 in zip(x, y, data):
         i = int(round((x1-xx[0])/(xx[1]-xx[0])))
         j = int(round((y1-yy[0])/(yy[1]-yy[0])))
@@ -367,8 +367,8 @@ def plotMod(data, params=None, model=None, hold=False):
     x, y, d = regrid(data.x, data.y, data.d)
     ### make full 2d x, y arrays (there's probably a more clever way to do this!)
     ij = 0
-    xx = array(shape=len(x)*len(y), type=Float64)
-    yy = array(shape=len(x)*len(y), type=Float64)
+    xx = array(shape=len(x)*len(y), type=float64)
+    yy = array(shape=len(x)*len(y), type=float64)
     for j in range(len(y)):
         for i in range(len(x)):
             xx[ij] = x[i]

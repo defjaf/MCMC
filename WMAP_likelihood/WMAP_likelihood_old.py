@@ -8,7 +8,7 @@
 """
 
 from __future__ import division
-from numarray import array, Float64, sqrt, log, sum, zeros, arange, where
+from numarray import array, float64, sqrt, log, sum, zeros, arange, where
 
 
 ### module variables
@@ -23,18 +23,18 @@ num_diag_TT = (WMAP_lmax_TT-1)*(WMAP_lmax_TT-2)//2
 num_diag_TE = (WMAP_lmax_TE-1)*(WMAP_lmax_TE-2)//2
 
 # TT
-cl_data = array(shape=WMAP_lmax_TT+1, type=Float64)
-neff = array(shape=WMAP_lmax_TT+1, type=Float64)
-fskyeff = array(shape=WMAP_lmax_TT+1, type=Float64)
-r_off_diag = array(shape=num_diag_TT, type=Float64)
-off_diag = array(shape=num_diag_TT, type=Float64)
+cl_data = array(shape=WMAP_lmax_TT+1, type=float64)
+neff = array(shape=WMAP_lmax_TT+1, type=float64)
+fskyeff = array(shape=WMAP_lmax_TT+1, type=float64)
+r_off_diag = array(shape=num_diag_TT, type=float64)
+off_diag = array(shape=num_diag_TT, type=float64)
 
 #TE data
-te_data = array(shape=WMAP_lmax_TE+1, type=Float64)
-ntt = array(shape=WMAP_lmax_TE+1, type=Float64)
-nee = array(shape=WMAP_lmax_TE+1, type=Float64)
-te_off_diag = zeros(shape=num_diag_TE, type=Float64)
-te_tt = array(shape=WMAP_lmax_TE+1, type=Float64)
+te_data = array(shape=WMAP_lmax_TE+1, type=float64)
+ntt = array(shape=WMAP_lmax_TE+1, type=float64)
+nee = array(shape=WMAP_lmax_TE+1, type=float64)
+te_off_diag = zeros(shape=num_diag_TE, type=float64)
+te_tt = array(shape=WMAP_lmax_TE+1, type=float64)
 
 def WMAP_init_TT (clFile, offDiag):
 
@@ -102,10 +102,10 @@ def WMAP_LnLike_TT(clth):
     lmax = min(WMAP_lmax_TT+1, len(clth))  ## really l_max+1
     l = arange(WMAP_lmin_TT, lmax)
 
-    Fdiag = zeros(lmax, type=Float64)
-    Fdiagsqrt = zeros(lmax, type=Float64)
-    z = zeros(lmax, type=Float64)
-    zbar = zeros(lmax, type=Float64)
+    Fdiag = zeros(lmax, type=float64)
+    Fdiagsqrt = zeros(lmax, type=float64)
+    z = zeros(lmax, type=float64)
+    zbar = zeros(lmax, type=float64)
 
     ## nb global objects are indexed by l=lmin:lmax+1,
     ## local are indexed: 0:lmax-lmin+1
@@ -150,11 +150,11 @@ def WMAP_LnLike_TE(cltt, clte, clee):
     chisq = 0.0
 
     lmax = min(WMAP_lmax_TE+1, len(cltt), len(clte), len(clee))
-    Fdiagsqrt = zeros(lmax, Float64)
+    Fdiagsqrt = zeros(lmax, float64)
 
 
 
-    l = arange(WMAP_lmin_TE, lmax, type=Float64)
+    l = arange(WMAP_lmin_TE, lmax, type=float64)
     ztt = cltt[l] + ntt[l]
     ztt[where(ztt<=0.0)] = 1.0e-10   ### AHJ
     zee = clee[l] + nee[l]

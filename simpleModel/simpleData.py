@@ -1,5 +1,5 @@
 from __future__ import division
-from numarray import asarray, Float64, log
+from numarray import asarray, float64, log
 from numarray.random_array import uniform, normal
 
 import pylab
@@ -17,7 +17,7 @@ class simpleData(GaussianData):
         if self.n != xarr.size():
             raise GaussianData.DataSizeError(self.n, xarr.size())
         
-        self.x=asarray(xarr, Float64)
+        self.x=asarray(xarr, float64)
 
     def plot(self):
         """ plot the data """

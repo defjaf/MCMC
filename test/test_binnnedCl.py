@@ -12,7 +12,7 @@ import ClData
 from pylab import *
 import numarray
 from numarray.random_array import uniform
-from numarray import arange, array, Float64, Error, transpose, zeros
+from numarray import arange, array, float64, Error, transpose, zeros
 
 
 filename = "data_list.txt"
@@ -41,9 +41,9 @@ def main(nMC=1000):
     like = binnedClLikelihood.binnedClLikelihood(data=data, model=mod)
 
     npar = len(bins)
-    prop_sigmas = zeros(npar, Float64) + 10.0
+    prop_sigmas = zeros(npar, float64) + 10.0
 
-    start_params = zeros(npar, Float64) + 1000.0
+    start_params = zeros(npar, float64) + 1000.0
 
     sampler = MCMC.MCMC(like, startProposal=prop_sigmas, nMC=nMC,
                         startParams=start_params)
