@@ -1,5 +1,5 @@
 from __future__ import division
-from numarray import asarray, Float64
+from numarray import asarray, float64
 from numarray.random_array import uniform, normal
 
 # AHJ: modify/extend/subclass for non-uniform noise
@@ -18,9 +18,9 @@ class BeamData(object):
             self.nsig != 1 and self.nsig != self.n)):
             raise DataSizeError(self.f, self.nsig)
         
-        self.x=asarray(xarr, Float64)
-        self.y=asarray(yarr, Float64)
-        self.d=asarray(data, Float64)
+        self.x=asarray(xarr, float64)
+        self.y=asarray(yarr, float64)
+        self.d=asarray(data, float64)
         self.sig=sigma
         self.sig2=sigma*sigma
 

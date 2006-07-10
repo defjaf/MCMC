@@ -219,20 +219,6 @@ def setup_sampler(dir=None, files=None,  num=None,
     given by the files in the sequence 'files', or with detector
     'num'.
     
-    do a sequence of MCMC runs with the number of samples given in nMC
-    (start each one at the mean of the previous using the previous
-    covariance, scaled appropriately, for a gaussian sampling
-    distribution)
-
-    if a single run fails (because no new samples are accepted, or the
-    variance is zero, continue from there with the same number of
-    samples to be added)
-    
-    return the likelihood object, the starting parameters, 
-    and the starting variances for the proposal
-
-    set DayNight=0,1,2 for Day, Night, Both
-    
     get the data from column numbers 'cols' from the file
     
     """
@@ -241,8 +227,10 @@ def setup_sampler(dir=None, files=None,  num=None,
 
 
 #### READ DATA
-    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
-    ctscut = 4     ## only keep pixels with this many hits
+    sigcut = 0.2 
+    ctscut = 12  
+#    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
+#    ctscut = 4     ## only keep pixels with this many hits
                    ## nb these also apply to TOI data in which case
                    ## cts is the number of hits in the 'parent' pixel
     
@@ -287,8 +275,9 @@ def setup_sampler(dir=None, files=None,  num=None,
             print 'Setting day=', day
                 
             data = [
-                readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=cols, nhits=nhits, neg=neg)
-                    for fil, d in zip(files, day) ]
+                readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=cols, 
+                                    nhits=nhits, neg=neg)
+                for fil, d in zip(files, day) ]
         xyrange = data[0]   ### set from the zeroth dataset
 
 
@@ -387,6 +376,20 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
     """
     return the full MCMC sample class as well as the summary
     statistics for the last run
+    
+    do a sequence of MCMC runs with the number of samples given in nMC
+    (start each one at the mean of the previous using the previous
+    covariance, scaled appropriately, for a gaussian sampling
+    distribution)
+
+    if a single run fails (because no new samples are accepted, or the
+    variance is zero, continue from there with the same number of
+    samples to be added)
+    
+    return the likelihood object, the starting parameters, 
+    and the starting variances for the proposal
+
+    set DayNight=0,1,2 for Day, Night, Both
     """
     
     #plotter = None
@@ -476,7 +479,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
             mapOnly=False, nhits=None, neg=False, rangeScale=None, 
-            closeFigs=False, figName=None, startCols=None):
+            closeFigs=False, figName=None, startCols=None, startParams=None):
     """
     run the sampler  for the detectors with TOI data
     """
@@ -531,10 +534,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                                            start_params=start_params,
                                            noCorrelations=noCorrelations,
                                            doBlock=doBlock)
-
-                    ### TODO: parse the appropriate initial conditions
-                    ### from startres
-
+                                           
                     mod = like.model
                     orig_params = mod.package(ana[0])     ## startres[-1].mean()
                     orig_sigmas = mod.package(3*ana[1])   ## startres[-1].stdev()
@@ -549,10 +549,14 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     useNormalizedBeam=useNormalizedBeam,
                     cols=cols, nhits=nhits, neg=neg,
                     rangeScale=rangeScale)
-                    
+                
+
                 if startCols is not None:
                     prop_sigmas = orig_sigmas
                     start_params = orig_params
+                    
+                if startParams is not None:
+                    start_params=startParams
 
                 res[det].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
                                        start_params=start_params, fac=fac, 

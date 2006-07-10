@@ -8,8 +8,8 @@ import os.path
 import math
 import pyfits
 from pylab import *
-#from numarray import arange, array, Float64, Error, transpose, zeros
-from numpy import arange, array, Float64, transpose, zeros
+#from numarray import arange, array, float64, Error, transpose, zeros
+from numpy import arange, array, float64, transpose, zeros
 
 colorstring='bgrcmyk'
 symstring='.s+xD'   ## dots
@@ -30,7 +30,7 @@ def plotCl(filename, plotLike=False, plotBP=False):
     norm = 1e6
     ClTT = array(norm**2*mapd.field(0))
     llCl = ClTT*ell*(ell+1)/(2*math.pi)
-    Cl = array([ClTT, zeros(len(ClTT), Float64), zeros(len(ClTT), Float64)])
+    Cl = array([ClTT, zeros(len(ClTT), float64), zeros(len(ClTT), float64)])
 
     data = ClData.getClData(filename)
 
