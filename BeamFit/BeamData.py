@@ -48,6 +48,9 @@ class BeamData(GaussianData):
             dd = abs(self.d)
         else:
             dd = self.d
+            
+        offset = dd.mean()    ## should really do this out of the center
+        dd -= offset          ## IS THIS ACTUALLY SHIFTING THE self.d???
 
         if sigcut is not None:
             idx = nonzero(dd > sigcut*self.sig)
