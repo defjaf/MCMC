@@ -6,6 +6,9 @@ from numpy import dot, where, zeros, asarray, float64
 import numpy.linalg as la
 from copy import copy
 
+#debugf = file("debug.out", "w")
+
+
 #TODO: modify to allow rotated parameters based on some correlation matrix
 #      add flag self.rotate to __init__? or subclass?
 
@@ -87,16 +90,27 @@ class GenericGaussianProposal(object):
         for i in range(np):
             for j in range(np):
                 self.sqrtMatrix[self.which[i],self.which[j]] = sqrtMatrix[i,j]
+                
+#        # DEBUG
+#        print "set sqrtMatrix=", self.sqrtMatrix
 
     def setNormalizedMatrixFromSqrt(self, matrix):
         """ set the Normalized correlation matrix from the sqrt
         """
         self.sqrtMatrix=matrix
-
+        # DEBUG
+#        print "set sqrtMatrix=", self.sqrtMatrix
+          
+          
     def setSigmas(self, sigmas):
         self.sigmas = asarray(self.unpackage(sigmas))
         self.n = len(self.sigmas)
         self.which = where(self.sigmas>0)
+        
+        ## DEBUG
+#        print "set self.sigmas=", self.sigmas
+#        print "    self.n=", self.n
+#        print "    self.which=", self.which
 
     def getSigmas(self):
         return self.package(self.sigmas)
@@ -120,12 +134,15 @@ class GenericGaussianProposal(object):
             offset = normal(0,1, self.n)*self.sigmas
         else:
             offset = dot(self.sqrtMatrix,
-                                     normal(0,1, self.n))*self.sigmas
+                         normal(0,1, self.n))*self.sigmas
                                      
         if block is None:
             self.newParams += offset
         else:
             self.newParams[block] += offset[block]
+            
+        ## DEBUG
+#        print >> debugf, block, offset
 
         return self.package(self.newParams)
 

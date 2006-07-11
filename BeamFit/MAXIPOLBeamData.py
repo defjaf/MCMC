@@ -19,7 +19,7 @@ import gzip
 
 import numpy
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
-                    arange, asarray, sqrt, minimum, maximum)
+                    arange, asarray, sqrt, minimum, maximum, logical_and)
 from numpy import concatenate as cat
 
 from numpy.random import uniform
@@ -227,10 +227,10 @@ def setup_sampler(dir=None, files=None,  num=None,
 
 
 #### READ DATA
-    sigcut = 0.2 
-    ctscut = 12  
-#    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
-#    ctscut = 4     ## only keep pixels with this many hits
+#    sigcut = 0.2 
+#    ctscut = 12  
+    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
+    ctscut = 4     ## only keep pixels with this many hits
                    ## nb these also apply to TOI data in which case
                    ## cts is the number of hits in the 'parent' pixel
     
@@ -343,8 +343,14 @@ def setup_sampler(dir=None, files=None,  num=None,
     if useNormalizedBeam:
         ## amplitude
         if need_prop_sig:           ## nb commas for tuples; "+=" appends
-            prop_sigmas += max(data[0].d)/10,   
-            prop_sigmas += (0.03, 0, 0),   # offset, gradient [cos(theta), phi]
+            
+            # no need to be this fancy, really, just make sure that sigma is large 
+            #  enough to "jump the barrier"!
+            x = data[0].x-stats[0]; y=data[0].y-stats[1]; d=data[0].d
+            dctr = d[logical_and(abs(x)<startsigs[0], abs(y)<startsigs[1])]
+            
+            prop_sigmas += 2*(max(dctr)-min(dctr)),   # used to be /10 or something -- bad!
+            prop_sigmas += (0.3, 0, 0),   # offset, gradient [cos(theta), phi]
             #   prop_sigmas += (0, 0, 0),
             
         if need_start_params:
@@ -369,7 +375,26 @@ def setup_sampler(dir=None, files=None,  num=None,
     ### needs to
     return like, prop_sigmas, start_params
 
-
+def get_likelihood_grid(like, params):
+    """calculate the likelihood in an x,y grid with other params set as in params
+    """
+    xx = numpy.linspace(like.data[0].x.min(), like.data[0].x.max())
+    yy = numpy.linspace(like.data[0].y.min(), like.data[0].y.max())
+    xg,yg = pylab.meshgrid(xx,yy)
+    
+    def mylike(x1,y1):
+        myparams = [(x1,y1)]
+        myparams.extend(params[1:])
+        return like(tuple(myparams))
+    
+    ll = numpy.array([mylike(x,y) for x in xx for y in yy])
+    ll.shape=(len(xx),len(yy))
+    ax = pylab.gca()
+    #ax.pcolor(xx, yy, d, shading='flat', hold='true')
+    ax.pcolor(xg, yg, numpy.transpose(ll), shading='flat')
+    pylab.show()
+    return xg, yg, ll
+                
 
 def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000), 
                 fac=None, plotRes=None, noCorrelations=False, doBlock=False):
@@ -550,13 +575,18 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     cols=cols, nhits=nhits, neg=neg,
                     rangeScale=rangeScale)
                 
-
                 if startCols is not None:
                     prop_sigmas = orig_sigmas
                     start_params = orig_params
                     
                 if startParams is not None:
                     start_params=startParams
+                
+                #prev_fig = pylab.gcf()    
+                #pylab.figure(4)
+                #ll, xx, yy = get_likelihood_grid(like, start_params) 
+                ##return ll,xx,yy
+                #pylab.figure(prev_fig)
 
                 res[det].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
                                        start_params=start_params, fac=fac, 

@@ -76,7 +76,7 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
     @classmethod
     def prior(cls, center, sigmas, angle, amplitude, plane):
         # plane[1]==mu -> only care about 0<theta<pi/2
-      #  if amplitude <= 0 or plane[1]<-1 or plane[1]>1:
+        if amplitude <= 0: return 0
         if plane[1]<-1 or plane[1]>1:
             return 0
         else:

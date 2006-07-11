@@ -174,8 +174,8 @@ class MCMC(object):
             
 #        print >> debugf, prior, '|', next, '|', next_lnPr, 
 
-        ### lnalpha<0 check short-circuits the log(uniform()) calc?
-        if prior<=0 or (lnalpha < 0 and lnalpha<log(uniform(0,1))):
+        ### lnalpha<0 check short-circuits the exp(lnalpha)?
+        if prior<=0 or (lnalpha < 0 and exp(lnalpha)<uniform(0,1)):
             next = self.prev   ### reject: keep the old parameters
             next_lnPr = self.prev_lnPr
         else:
@@ -281,7 +281,7 @@ class MCMC(object):
 
         if doBlock is None:
             doBlock=self.doBlock
-
+            
         startP = self.like.model.package(fac*array(self.like.model.unpackage(stdevs)))
         newSampler = MCMC(self.like, startProposal=startP, startParams=newStart,
                           doBlock=doBlock)
