@@ -663,10 +663,13 @@ def saveres(reslist, file=None):
         fp.close()
     return newres
 
-def makereport(reslist, file=sys.stdout, hasTOI=False):
+def makereport(reslist, file=sys.stdout, hasTOI=False, hasRuns=False):
     """
     print out a 'report' of the MCMC run
     """
+
+    if not hasRuns: reslist=[reslist]
+    
     for irun, resrun in enumerate(reslist):
         file.write("Run: %d\n" % irun)
         for det, res in resrun.iteritems():
