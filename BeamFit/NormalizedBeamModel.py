@@ -24,7 +24,7 @@ class NormalizedBeamModel(GaussianBeamModel2D):
     
     nparam = 6
 
-    print "NB. allowing amplitude < 0!"
+    #print "NB. allowing amplitude < 0!"
 
     def __init__(self, center, sigmas, angle, amplitude):
         """
