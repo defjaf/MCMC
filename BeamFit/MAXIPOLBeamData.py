@@ -9,6 +9,7 @@ import os.path
 import pickle
 import pylab
 import gzip
+from itertools import izip, repeat
 
 #from numarray import (array, float64, zeros, ones, int32, log, where, ravel, exp,
 #                      arange, asarray, sqrt)
@@ -503,7 +504,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     
 def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
-            mapOnly=False, nhits=None, neg=False, rangeScale=None, 
+            mapOnly=False, nhits=None, neg=None, rangeScale=None, 
             closeFigs=False, figName=None, startCols=None, startParams=None):
     """
     run the sampler  for the detectors with TOI data
@@ -513,9 +514,26 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
     nfig=2
     ntotrun = nfig
 
+
  #### AHJ: polz only
- #if dets is None: dets = [13, 14, 15, 23, 24, 25, 33, 34, 35, 43, 44, 45]
- #   nrow=4; ncol=3
+ ####if dets is None: dets = [13, 14, 15, 23, 24, 25, 33, 34, 35, 43, 44, 45]
+ #####   nrow=4; ncol=3
+    
+#### needed multipliers for data: -, + are strong requirements, 0 is don't care
+#                [33, 34, 43, 45]  [13, 14, 15, 23, 24, 25, 35, 44]
+#columns 4-5      -    -   -   -     0  0   0+   0   0  0+   0   0-
+#columns 6-7     0-   0-   +   -     -  0    0   +   -   -   0   0
+    
+    alldets = [33, 34, 43, 45, 13, 14, 15, 23, 24, 25, 35, 44]
+    neg45   = [-1, -1, -1, -1, +1, +1, +1, +1, +1, +1, +1, -1]
+    neg67   = [-1, -1, +1, -1, -1, +1, +1, +1, -1, -1, +1, +1]
+
+    dfac = {}
+    dfac[(2,3)] = dict(izip(alldets, repeat(1)))
+    dfac[(4,5)] = dict(izip(alldets, neg45))
+    dfac[(6,7)] = dict(izip(alldets, neg67))
+
+    neg1 = neg
 
     if dets is None: dets = [33, 34, 43, 45]
 
@@ -531,6 +549,8 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
 
     res={}
     for ib, det in enumerate(dets):
+
+        
         res[det] = []
         startres = []
         filebase = [str(det).strip()+id1 for id1 in ident]
@@ -548,10 +568,12 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
 
             try:
                 if startCols is not None:
+                    if neg is None: neg1 = (dfac[tuple(startCols)][det]<0)
+
                     like, prop_sigmas, start_params = setup_sampler(
                         files=[fil],
                         useNormalizedBeam=useNormalizedBeam,
-                        cols=startCols, nhits=nhits, neg=neg,
+                        cols=startCols, nhits=nhits, neg=neg1,
                         rangeScale=rangeScale)
 
                     startres, ana = sample1beam(like, nMC=nMC, fac=fac, 
@@ -569,10 +591,12 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     
                 ## need to run this to get the correct likelihood.
                 ##   therefore may need to adjust prior ranges
+
+                if neg is None: neg1 = (dfac[tuple(cols)][det]<0)
                 like, prop_sigmas, start_params = setup_sampler(
                     files=[fil],
                     useNormalizedBeam=useNormalizedBeam,
-                    cols=cols, nhits=nhits, neg=neg,
+                    cols=cols, nhits=nhits, neg=neg1,
                     rangeScale=rangeScale)
                 
                 if startCols is not None:
