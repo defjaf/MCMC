@@ -6,12 +6,12 @@ from math import log
 import numpy as N
 
 import Likelihood
-import likelihood.likico.likico as likico
-import likelihood.likoct.likoct as likoct
-import likelihood.likdih.likdih as likdih
-import likelihood.liktetr.liktetr as liktet
+from likelihood.likico import likico
+from likelihood.likoct import likoct
+from likelihood.likdih import likdih
+from likelihood.liktetr import liktetr
 
-likfuns = {'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktet}
+likfuns = {'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
 ### alpha, beta, gamma limits
 ang_lims = {'ico':  [2/5, 1, 2/5],
