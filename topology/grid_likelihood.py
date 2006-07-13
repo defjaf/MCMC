@@ -28,6 +28,7 @@ def like_grid(modname='ico', almfile=None):
     (could make much more generic?)
     
     """
+    numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
     
     lik = { 'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
@@ -54,11 +55,12 @@ def like_grid(modname='ico', almfile=None):
 ### amplitude, alpha, beta, gamma, H0        
     param_min = (5.0e-5, 54.0, 0.0,   0.0,   0.1)
     param_max = (5.0e-3, 72.0, al[0], al[1], al[2])
-    nstep =     (10,     10,   10,    10,    10)
+    nstep =     (5,)*5
     
     npar = len(nstep)
     assert len(param_min)==len(param_max)==npar, 'Bad number of parameters'
 
+    #kind of inelegant, but it does the job...
     args = tuple(slice(p1, p2, n*1j) for p1,p2,n in zip(param_min, param_max, nstep))
     param_steps = N.ogrid.__getitem__(args)
     param_grid = N.mgrid.__getitem__(args)
@@ -71,7 +73,7 @@ def like_grid(modname='ico', almfile=None):
 
     ## now need to iterate over all permutations of the params grid
 
-    viewstep = 1
+    viewstep = 100
     for ip, par in enumerate(param_list):
         if not (ip % viewstep): print ip, par, ' ',
         try:
