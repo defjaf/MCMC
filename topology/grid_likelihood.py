@@ -28,7 +28,7 @@ def like_grid(modname='ico', almfile=None):
     (could make much more generic?)
     
     """
-    numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
+    N.set_printoptions(precision=4, linewidth=150, suppress=True)
     
     lik = { 'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
