@@ -22,7 +22,7 @@ from numpy import concatenate as cat
 import numpy as N
 
     
-def like_grid(modname='ico', almfile=None, datname=None, outfile=None):
+def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10):
     """
     compute n-dimensional grid of topology likelihood
     (could make much more generic?)
@@ -66,10 +66,13 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None):
 ### amplitude, alpha, beta, gamma, H0        
     param_min = (5.0e-5, 54.0, 0.0,   0.0,   0.1)
     param_max = (5.0e-3, 72.0, al[0], al[1], al[2])
-    nstep =     (5,)*5
+    npar = len(param_min)
+        
+    if N.size(nstep) == 1: nstep = (nstep,)*npar
+
+    parfmt = '%f '*npar
     
-    npar = len(nstep)
-    assert len(param_min)==len(param_max)==npar, 'Bad number of parameters'
+    assert len(nstep)==len(param_max)==npar, 'Bad number of parameters'
 
     #kind of inelegant, but it does the job...
     args = tuple(slice(p1, p2, n*1j) for p1,p2,n in zip(param_min, param_max, nstep))
@@ -97,8 +100,10 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None):
         if not (ip % viewstep): print like1
 
         if outfile is not None:
-            write()
+            fp.write(('%d '+parfmt+'%f\n') % ((ip,) + tuple(par) + (like1,)))
 
+    if needs_close: fp.close()
+    
     return param_grid, like
 
 
