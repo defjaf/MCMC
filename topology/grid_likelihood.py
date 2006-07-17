@@ -22,7 +22,7 @@ from numpy import concatenate as cat
 import numpy as N
 
     
-def like_grid(modname='ico', almfile=None):
+def like_grid(modname='ico', almfile=None, datname=None, outfile=None):
     """
     compute n-dimensional grid of topology likelihood
     (could make much more generic?)
@@ -30,9 +30,20 @@ def like_grid(modname='ico', almfile=None):
     """
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     
+    if outfile is not None:
+        try:
+            fp = open(outfile, 'wa')
+            needs_close=True
+        except:
+            ### assume outfile is a file-like object already; should really check!
+            fp = outfile
+            needs_close=False
+    
     lik = { 'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
-    datdir = "./topology/likelihood/lik"+modname+"/dat/\0"
+    if datname is None: datname = modname
+
+    datdir = "./topology/likelihood/lik"+datname+"/dat/\0"
     if almfile is None:
         # almfile = "alm64_1.dat\0"
         #    almfile = "wmapalm.dat\0"
@@ -85,14 +96,24 @@ def like_grid(modname='ico', almfile=None):
         like.flat[ip] = like1
         if not (ip % viewstep): print like1
 
+        if outfile is not None:
+            write()
+
     return param_grid, like
 
 
-def analyze_grid(like):
+def analyze_grid(param_grid, like, names=None):
     """
     analyze an n-dimensional likelihood grid
     (calculate means, marginalized likelihoods, find maxima)
+    
+    TODO: allow an 'ogrid' of parameters, instead of an 'mgrid'
     """
+    
+    assert param_grid.shape==like.shape, 'Bad shapes'
+    
+    
+
 
     
 #### want to make an iterator which takes a sequence of sequences (!)
