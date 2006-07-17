@@ -1,27 +1,16 @@
 from __future__ import division
 
 import math
-import string
-import os.path
-import cPickle
 
-import pylab
-import MCMC
-import getdist
-
-import topo_model
-from topo_likelihood import topo_likelihood
 from likelihood.likico import likico
 from likelihood.likoct import likoct
 from likelihood.likdih import likdih
 from likelihood.liktetr import liktetr
 
-from numpy.random import uniform
-from numpy import arange, array, float64, transpose, zeros, ones, where, nonzero
-from numpy import concatenate as cat
 import numpy as N
-
+from numpy import float64
     
+
 def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10):
     """
     compute n-dimensional grid of topology likelihood
@@ -40,53 +29,53 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
             needs_close=False
     
     lik = { 'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
-
+    
     if datname is None: datname = modname
-
+    
     datdir = "./topology/likelihood/lik"+datname+"/dat/\0"
     if almfile is None:
         # almfile = "alm64_1.dat\0"
         #    almfile = "wmapalm.dat\0"
         almfile = "alm3yrall.dat\0"
-
+    
     print 'using datdir=%s' % datdir
     likfun = lik[modname].alikelihood
     
     lik[modname].readdata(N.array(datdir), N.array(almfile))
-
+    
     ang_lims = {'ico':  [2/5, 1, 2/5],
                 'oct':  [1/2, 1, 1/2],
-                'dih':  [1/2, 1, 1/2], 
+                'dih':  [1/2, 1, 1/2],
                 'tetr': [1/2, 1, 1/2]}
-
+    
     for key, lims in ang_lims.iteritems():
         ang_lims[key] = N.array(lims) * math.pi
-
+    
     al = ang_lims[modname]
-### amplitude, alpha, beta, gamma, H0        
+### amplitude, alpha, beta, gamma, H0
     param_min = (5.0e-5, 54.0, 0.0,   0.0,   0.1)
     param_max = (5.0e-3, 72.0, al[0], al[1], al[2])
     npar = len(param_min)
-        
+    
     if N.size(nstep) == 1: nstep = (nstep,)*npar
-
+    
     parfmt = '%f '*npar
     
     assert len(nstep)==len(param_max)==npar, 'Bad number of parameters'
-
+    
     #kind of inelegant, but it does the job...
     args = tuple(slice(p1, p2, n*1j) for p1,p2,n in zip(param_min, param_max, nstep))
     param_steps = N.ogrid.__getitem__(args)
     param_grid = N.mgrid.__getitem__(args)
-    param_list = N.transpose(N.asarray(param_grid).reshape(len(param_min), -1))
-
+    param_list = N.transpose(N.asarray(param_grid).reshape(npar, -1))
+    
     #for p1, p2, n in zip(param_min, param_max, nstep):
     #    params.append(N.linspace(p1, p2, n))
-
+    
     like = N.empty(nstep, dtype=float64)
-
+    
     ## now need to iterate over all permutations of the params grid
-
+    
     viewstep = 100
     for ip, par in enumerate(param_list):
         if not (ip % viewstep): print ip, par, ' ',
@@ -95,19 +84,19 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
         except:
             print "\nlikelihood failure at ", ip, par
             like1 = N.nan
-            
+        
         like.flat[ip] = like1
         if not (ip % viewstep): print like1
-
+        
         if outfile is not None:
             fp.write(('%d '+parfmt+'%f\n') % ((ip,) + tuple(par) + (like1,)))
-
+    
     if needs_close: fp.close()
     
     return param_grid, like
 
 
-def analyze_grid(param_grid, like, names=None, print=True):
+def analyze_grid(param_grid, like, names=None, printstats=True):
     """
     analyze an n-dimensional likelihood grid
     (calculate means, marginalized likelihoods, find maxima)
@@ -118,28 +107,24 @@ def analyze_grid(param_grid, like, names=None, print=True):
     assert param_grid.shape==like.shape, 'Bad shapes'
     
     npar = param_grid.shape[0]
-
+    
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
-    weights = exp(like)   ### really like=ln(P)
-
+    weights = N.exp(like)   ### really like=ln(P)
+    
     for i in xrange(npar):
-        means[i] = average(param_grid[i], weights=weights)
-
+        means[i] = N.average(param_grid[i], weights=weights)
+    
     for i in xrange(npar):
         for j in xrange(npar):
-            covar[i,j] = (average(param_grid[i]*param_grid[j], weights=weights)
+            covar[i,j] = (N.average(param_grid[i]*param_grid[j], weights=weights)
                           -means[i]*means[j])
-
-    stdevs = sqrt(covar.diag())
-
-    if print:
+    
+    stdevs = N.sqrt(covar.diag())
+    
+    if printstats:
         print means
         print stdevs
         print covar
-
-    return means, stdevs, covar
-
     
-#### want to make an iterator which takes a sequence of sequences (!)
-####    and returns a tuple 
+    return means, stdevs, covar
