@@ -107,7 +107,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
     return param_grid, like
 
 
-def analyze_grid(param_grid, like, names=None):
+def analyze_grid(param_grid, like, names=None, print=True):
     """
     analyze an n-dimensional likelihood grid
     (calculate means, marginalized likelihoods, find maxima)
@@ -117,8 +117,28 @@ def analyze_grid(param_grid, like, names=None):
     
     assert param_grid.shape==like.shape, 'Bad shapes'
     
-    
+    npar = param_grid.shape[0]
 
+    means = N.empty(npar, dtype=float64)
+    covar = N.empty((npar, npar), dtype=float64)
+    weights = exp(like)   ### really like=ln(P)
+
+    for i in xrange(npar):
+        means[i] = average(param_grid[i], weights=weights)
+
+    for i in xrange(npar):
+        for j in xrange(npar):
+            covar[i,j] = (average(param_grid[i]*param_grid[j], weights=weights)
+                          -means[i]*means[j])
+
+    stdevs = sqrt(covar.diag())
+
+    if print:
+        print means
+        print stdevs
+        print covar
+
+    return means, stdevs, covar
 
     
 #### want to make an iterator which takes a sequence of sequences (!)
