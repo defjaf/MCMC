@@ -104,23 +104,24 @@ def analyze_grid(param_grid, like, names=None, printstats=True):
     TODO: allow an 'ogrid' of parameters, instead of an 'mgrid'
     """
     
-    assert param_grid.shape==like.shape, 'Bad shapes'
+    assert param_grid[0].shape==like.shape, 'Bad shapes'
     
     npar = param_grid.shape[0]
     
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
-    weights = N.exp(like)   ### really like=ln(P)
+    weights = N.exp(like).flat   ### really like=ln(P)
     
     for i in xrange(npar):
-        means[i] = N.average(param_grid[i], weights=weights)
+        means[i] = N.average(param_grid[i].flat, weights=weights)
     
     for i in xrange(npar):
         for j in xrange(npar):
-            covar[i,j] = (N.average(param_grid[i]*param_grid[j], weights=weights)
+            covar[i,j] = (N.average((param_grid[i]*param_grid[j]).flat,
+                                    weights=weights)
                           -means[i]*means[j])
     
-    stdevs = N.sqrt(covar.diag())
+    stdevs = N.sqrt(covar.diagonal())
     
     if printstats:
         print means
