@@ -53,7 +53,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
     
     al = ang_lims[modname]
 ### amplitude, alpha, beta, gamma, H0
-    param_min = (5.0e-5, 54.0, 0.0,   0.0,   0.1)
+    param_min = (5.0e-5, 54.0, 0.0,   0.0,   0.0)
     param_max = (5.0e-3, 72.0, al[0], al[1], al[2])
     npar = len(param_min)
     
