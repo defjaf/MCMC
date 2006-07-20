@@ -96,7 +96,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
     return param_grid, like
 
 
-def analyze_grid(param_grid, like, names=None, printstats=True):
+def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     """
     analyze an n-dimensional likelihood grid
     (calculate means, marginalized likelihoods, find maxima)
@@ -110,7 +110,8 @@ def analyze_grid(param_grid, like, names=None, printstats=True):
     
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
-    weights = N.exp(like).flat   ### really like=ln(P)
+    like = N.exp(lnlike)
+    weights = like.flat
     
     for i in xrange(npar):
         means[i] = N.average(param_grid[i].flat, weights=weights)
@@ -122,6 +123,14 @@ def analyze_grid(param_grid, like, names=None, printstats=True):
                           -means[i]*means[j])
     
     stdevs = N.sqrt(covar.diagonal())
+    
+    ## a list since there aren't necessarilly the same number in each dimension
+    ## could use an object array?
+    ## need to iterate over dimensions
+    ## assumes linear parameter spacing!
+  #  lnlike1d = []    
+  #  for i in xrange(npar):
+  #      lnlike1d.append()
     
     if printstats:
         print means
