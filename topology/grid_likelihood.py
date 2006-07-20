@@ -9,7 +9,17 @@ from likelihood.liktetr import liktetr
 
 import numpy as N
 from numpy import float64
-    
+
+def do_all():
+
+    ret = {}
+    dir = 'topology/out/'
+    for mod in ['ico', 'oct', 'dih', 'tetr']:
+        print '*********** running model %s *****************' % mod
+        ret[mod] = like_grid(modname=mod, outfile=dir+'lik_'+mod+'_grid.out', nstep=12)
+
+    return ret
+
 
 def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10):
     """
@@ -79,11 +89,14 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
     viewstep = 100
     for ip, par in enumerate(param_list):
         if not (ip % viewstep): print ip, par, ' ',
-        try:
-            like1 = likfun(*par)
-        except:
-            print "\nlikelihood failure at ", ip, par
-            like1 = N.nan
+        like1 = likfun(*par)
+        ## the following is a problem since it catches things like ctrl-C!
+        
+        #try:
+        #    like1 = likfun(*par)
+        #except:
+        #    print "\nlikelihood failure at ", ip, par
+        #    like1 = N.nan
         
         like.flat[ip] = like1
         if not (ip % viewstep): print like1
