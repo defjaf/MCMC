@@ -164,4 +164,4 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
         print stdevs
         print covar
     
-    return means, stdevs, covar
+    return lnEv, means, stdevs, covar
