@@ -121,14 +121,17 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     
     npar = param_grid.shape[0]
 
-    ## get the 'deltas' in each dimension from the mgrid param_grid?
+    ## get the steps and 'deltas' in each dimension from the mgrid param_grid
+    ## (i.e. recreate the ogrid)
     deltas = N.empty(npar, dtype=float64)
-    for i in range(npar):
-        idxtup = (i,)+(0,)*i + (1,) + (0,)*(npar-1-i)
-        deltas[i] = param_grid[idxtup] - param_grid[((i,)+(0,)*npar )]
-    
+    steps = []
+    for i in xrange(npar):
+        steps.append(N.array([param_grid[(i,) + (0,)*i + (j,) + (0,)*(npar-1-i)]
+                            for j in xrange(param_grid.shape[i+1])]))
+        deltas[i] = steps[-1][1] - steps[-1][0]
+        
     dNpar = deltas.prod()
-    
+        
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
     like = N.exp(lnlike)
@@ -151,9 +154,9 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     ## could use an object array?
     ## need to iterate over dimensions
     ## assumes linear parameter spacing!
-  #  lnlike1d = []    
-  #  for i in xrange(npar):
-  #      lnlike1d.append()
+    lnlike1d = []    
+    for ipar, istep in enumerate(steps):
+        lnlike1d.append
     
     if printstats:
         print 'ln Evidence: ', lnEv
