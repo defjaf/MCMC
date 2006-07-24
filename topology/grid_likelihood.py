@@ -120,11 +120,21 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     assert param_grid[0].shape==like.shape, 'Bad shapes'
     
     npar = param_grid.shape[0]
+
+    ## get the 'deltas' in each dimension from the mgrid param_grid?
+    deltas = N.empty(npar, dtype=float64)
+    for i in range(npar):
+        idxtup = (i,)+(0,)*i + (1,) + (0,)*(npar-1-i)
+        deltas[i] = param_grid[idxtup] - param_grid[((i,)+(0,)*npar )]
+    
+    dNpar = deltas.prod()
     
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
     like = N.exp(lnlike)
     weights = like.flat
+
+    lnEv = N.log(weights.sum()) + N.log(dNpar)
     
     for i in xrange(npar):
         means[i] = N.average(param_grid[i].flat, weights=weights)
@@ -146,6 +156,7 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
   #      lnlike1d.append()
     
     if printstats:
+        print 'ln Evidence: ', lnEv
         print means
         print stdevs
         print covar
