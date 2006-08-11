@@ -42,7 +42,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
 
     if gauss:
         mean = s1.mean()
-        stdv = stddev(s1)
+        stdv = s1.std()  ## stddev(s1)
         print 'mean = %f +- %f' % (mean, stdv)
         smin, smax = min(hist[1]), max(hist[1])
         norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
@@ -184,6 +184,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
     if not quiet: pylab.draw()
 
 
+### no longer needed -- array.std() now uses 1/N
 def stddev(arr):
     return arr.std()*numpy.sqrt((arr.size-1)/arr.size)
 

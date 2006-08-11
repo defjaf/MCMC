@@ -12,8 +12,6 @@ from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
 from numpy import empty
 
-from getdist import stddev
-
 from Likelihood import ZeroPosterior
 
 ### assumes likelihood > 0 (so use lnLike) but prior can be 0 (so call
@@ -211,7 +209,7 @@ class MCMC(object):
         params = range(self.nparams)
         chain = self.samples[burn::stride]
         #nsamp = chain.shape[0]   ##nsamp = (chain.shape[0]-burn)//stride  WRONG
-        self.stdevs = [ stddev(chain[:,i]) for i in params ]
+        self.stdevs = [ chain[:,i].std() for i in params ]
 
         return self.like.model.package(self.stdevs)
             
@@ -360,7 +358,7 @@ def chain_analyze(chain, params=None):
     nsamp = chain.shape[0]
     means = [ chain[:,i].mean() for i in range(n) ]
     
-    stdevs = [ stddev(chain[:,i]) for i in range(n) ]
+    stdevs = [ chain[:,i].std() for i in range(n) ]
 
     covar=zeros( (n,n), dtype=float64 )
     for i in params:
