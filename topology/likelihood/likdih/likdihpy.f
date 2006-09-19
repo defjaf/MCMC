@@ -22,7 +22,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double precision alikelihood,hub
       common /input/kwav,mult,hubble,dlnk,apowers,transferf,xi,alm
 
-      character*150 datdir, almfile
+      character*150 datdir, almfile, filename
       
       datdir = './dat/'
       almfile = ''
@@ -76,45 +76,45 @@ Cf2py intent(in) datdir, almfile
       double complex xi(kvalnum,mmax,(kmax+1)**2),alm(dim)
       common /input/kwav,mult,hubble,dlnk,apowers,transferf,xi,alm
 
-      integer lnblnk
-      external lnblnk
+c      integer len_trim
+c      external len_trim
 
-      if (lnblnk(almfile).eq.0) then
+      if (len_trim(almfile).eq.0) then
           almfile = 'alm64_1.dat'
       endif
 
-      open(2,file=datdir(1:lnblnk(datdir))//almfile)
+      open(22,file=datdir(1:len_trim(datdir))//almfile)
       do i=1,dim
-         read(2,*)idum,dreal1,dreal2
+         read(22,*)idum,dreal1,dreal2
          alm(i)=complex(dreal1,dreal2)
       enddo
-      close(2)
-      open(3,file=datdir(1:lnblnk(datdir))//'hubblelist.dat')
+      close(22)
+      open(23,file=datdir(1:len_trim(datdir))//'hubblelist.dat')
       do i=1,hubblenum
-         read(3,*)int1
+         read(23,*)int1
          hubble(i)=dble(int1)
       enddo
-      close(3)
+      close(23)
 c      print*,hubble(hubblenum)
-      open(5,file=datdir(1:lnblnk(datdir))//'transf.dat')
+      open(25,file=datdir(1:len_trim(datdir))//'transf.dat')
       do i=1,hubblenum
          do j=1,kvalnum
             do ll=1,lmax-1
-               read(5,*)idum,idum,dlnk(i,j,ll),apowers(i,j,ll),
+               read(25,*)idum,idum,dlnk(i,j,ll),apowers(i,j,ll),
      *transferf(i,j,ll)
             enddo
          enddo
       enddo
-      close(5)
+      close(25)
 c      print*,dlnk(hubblenum,kvalnum,lmax-1),
 c     *apowers(hubblenum,kvalnum,lmax-1),
 c     *transferf(hubblenum,kvalnum,lmax-1)
-      open(7,file=datdir(1:lnblnk(datdir))//'kvalues.dat')
+      open(27,file=datdir(1:len_trim(datdir))//'kvalues.dat')
       do i=1,kvalnum
-         read(7,*)kwav(i),mult(i)
+         read(27,*)kwav(i),mult(i)
 c      print*,kwav(i),mult(i)
       enddo
-      close(7)
+      close(27)
 c      print*,kwav(kvalnum),mult(kvalnum)
       do i=1,kvalnum
          do j=1,mult(kvalnum)
@@ -123,26 +123,28 @@ c      print*,kwav(kvalnum),mult(kvalnum)
             enddo
          enddo
       enddo
-      open(8,file=datdir(1:lnblnk(datdir))//'BinaryDihedral2-4orth.dat')
+      open(28,file=
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-4orth.dat')
          do j=1,mult(1)
             do k=1,(kwav(1)+1)**2
-            read(8,*)idum,idum,idum,dreal1,dreal2
+            read(28,*)idum,idum,idum,dreal1,dreal2
             xi(1,j,k)=complex(dreal1,dreal2)
             enddo
          enddo
-       close(8)
+       close(28)
 c      print*,kwav(1),xi(1,mult(1),(kwav(1)+1)**2)
-      open(9,file=datdir(1:lnblnk(datdir))//'BinaryDihedral2-6orth.dat')
+      open(29,file=
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-6orth.dat')
          do j=1,mult(2)
             do k=1,(kwav(2)+1)**2
-            read(9,*)idum,idum,idum,dreal1,dreal2
+            read(29,*)idum,idum,idum,dreal1,dreal2
             xi(2,j,k)=complex(dreal1,dreal2)
             enddo
          enddo
-       close(9)
+       close(29)
 c      print*,kwav(2),xi(2,mult(2),(kwav(2)+1)**2)
       open(10,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-8orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-8orth.dat')
          do j=1,mult(3)
             do k=1,(kwav(3)+1)**2
             read(10,*)idum,idum,idum,dreal1,dreal2
@@ -152,7 +154,7 @@ c      print*,kwav(2),xi(2,mult(2),(kwav(2)+1)**2)
        close(10)
 c      print*,kwav(3),xi(3,mult(3),(kwav(3)+1)**2)
       open(11,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-10orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-10orth.dat')
          do j=1,mult(4)
             do k=1,(kwav(4)+1)**2
             read(11,*)idum,idum,idum,dreal1,dreal2
@@ -162,7 +164,7 @@ c      print*,kwav(3),xi(3,mult(3),(kwav(3)+1)**2)
        close(11)
 c      print*,kwav(4),xi(4,mult(4),(kwav(4)+1)**2)
       open(12,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-12orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-12orth.dat')
          do j=1,mult(5)
             do k=1,(kwav(5)+1)**2
             read(12,*)idum,idum,idum,dreal1,dreal2
@@ -172,7 +174,7 @@ c      print*,kwav(4),xi(4,mult(4),(kwav(4)+1)**2)
        close(12)
 c      print*,kwav(5),xi(5,mult(5),(kwav(5)+1)**2)
       open(13,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-14orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-14orth.dat')
          do j=1,mult(6)
             do k=1,(kwav(6)+1)**2
             read(13,*)idum,idum,idum,dreal1,dreal2
@@ -182,7 +184,7 @@ c      print*,kwav(5),xi(5,mult(5),(kwav(5)+1)**2)
        close(13)
 c      print*,kwav(6),xi(6,mult(6),(kwav(6)+1)**2)
       open(14,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-16orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-16orth.dat')
          do j=1,mult(7)
             do k=1,(kwav(7)+1)**2
             read(14,*)idum,idum,idum,dreal1,dreal2
@@ -192,7 +194,7 @@ c      print*,kwav(6),xi(6,mult(6),(kwav(6)+1)**2)
        close(14)
 c      print*,kwav(7),xi(7,mult(7),(kwav(7)+1)**2)
       open(15,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-18orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-18orth.dat')
          do j=1,mult(8)
             do k=1,(kwav(8)+1)**2
             read(15,*)idum,idum,idum,dreal1,dreal2
@@ -202,7 +204,7 @@ c      print*,kwav(7),xi(7,mult(7),(kwav(7)+1)**2)
        close(15)
 c      print*,kwav(8),xi(8,mult(8),(kwav(8)+1)**2)
       open(16,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-20orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-20orth.dat')
          do j=1,mult(9)
             do k=1,(kwav(9)+1)**2
             read(16,*)idum,idum,idum,dreal1,dreal2
@@ -212,7 +214,7 @@ c      print*,kwav(8),xi(8,mult(8),(kwav(8)+1)**2)
        close(16)
 c      print*,kwav(9),xi(9,mult(9),(kwav(9)+1)**2)
       open(17,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-22orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-22orth.dat')
          do j=1,mult(10)
             do k=1,(kwav(10)+1)**2
             read(17,*)idum,idum,idum,dreal1,dreal2
@@ -222,7 +224,7 @@ c      print*,kwav(9),xi(9,mult(9),(kwav(9)+1)**2)
        close(17)
 c      print*,kwav(10),xi(10,mult(10),(kwav(10)+1)**2)
       open(18,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-24orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-24orth.dat')
          do j=1,mult(11)
             do k=1,(kwav(11)+1)**2
             read(18,*)idum,idum,idum,dreal1,dreal2
@@ -232,7 +234,7 @@ c      print*,kwav(10),xi(10,mult(10),(kwav(10)+1)**2)
        close(18)
 c      print*,kwav(11),xi(11,mult(11),(kwav(11)+1)**2)
       open(19,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-26orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-26orth.dat')
          do j=1,mult(12)
             do k=1,(kwav(12)+1)**2
             read(19,*)idum,idum,idum,dreal1,dreal2
@@ -242,7 +244,7 @@ c      print*,kwav(11),xi(11,mult(11),(kwav(11)+1)**2)
        close(19)
 c      print*,kwav(12),xi(12,mult(12),(kwav(12)+1)**2)
       open(20,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-28orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-28orth.dat')
          do j=1,mult(13)
             do k=1,(kwav(13)+1)**2
             read(20,*)idum,idum,idum,dreal1,dreal2
@@ -252,7 +254,7 @@ c      print*,kwav(12),xi(12,mult(12),(kwav(12)+1)**2)
        close(20)
 c      print*,kwav(13),xi(13,mult(13),(kwav(13)+1)**2)
       open(21,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-30orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-30orth.dat')
          do j=1,mult(14)
             do k=1,(kwav(14)+1)**2
             read(21,*)idum,idum,idum,dreal1,dreal2
@@ -262,7 +264,7 @@ c      print*,kwav(13),xi(13,mult(13),(kwav(13)+1)**2)
        close(21)
 c      print*,kwav(14),xi(14,mult(14),(kwav(14)+1)**2)
       open(22,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-32orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-32orth.dat')
          do j=1,mult(15)
             do k=1,(kwav(15)+1)**2
             read(22,*)idum,idum,idum,dreal1,dreal2
@@ -272,7 +274,7 @@ c      print*,kwav(14),xi(14,mult(14),(kwav(14)+1)**2)
        close(22)
 c      print*,kwav(15),xi(15,mult(15),(kwav(15)+1)**2)
       open(23,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-34orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-34orth.dat')
          do j=1,mult(16)
             do k=1,(kwav(16)+1)**2
             read(23,*)idum,idum,idum,dreal1,dreal2
@@ -282,7 +284,7 @@ c      print*,kwav(15),xi(15,mult(15),(kwav(15)+1)**2)
        close(23)
 c      print*,kwav(16),xi(16,mult(16),(kwav(16)+1)**2)
       open(24,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-36orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-36orth.dat')
          do j=1,mult(17)
             do k=1,(kwav(17)+1)**2
             read(24,*)idum,idum,idum,dreal1,dreal2
@@ -292,7 +294,7 @@ c      print*,kwav(16),xi(16,mult(16),(kwav(16)+1)**2)
        close(24)
 c      print*,kwav(17),xi(17,mult(17),(kwav(17)+1)**2)
       open(25,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-38orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-38orth.dat')
          do j=1,mult(18)
             do k=1,(kwav(18)+1)**2
             read(25,*)idum,idum,idum,dreal1,dreal2
@@ -302,7 +304,7 @@ c      print*,kwav(17),xi(17,mult(17),(kwav(17)+1)**2)
        close(25)
 c      print*,kwav(17),xi(17,mult(17),(kwav(17)+1)**2)
       open(26,file=
-     *datdir(1:lnblnk(datdir))//'BinaryDihedral2-40orth.dat')
+     *datdir(1:len_trim(datdir))//'BinaryDihedral2-40orth.dat')
          do j=1,mult(19)
             do k=1,(kwav(19)+1)**2
             read(26,*)idum,idum,idum,dreal1,dreal2
