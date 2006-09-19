@@ -9,6 +9,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
       end
       
+      ! function lnblnk(string)
+      ! integer lnblnk, len_trim
+      ! character string
+      ! lnblnk = len_trim(string)
+      ! return
+      ! end   
+      
       subroutine main
        integer dim,hubblenum,kvalnum,lmax,kmax
        parameter(dim=117,hubblenum=10,kvalnum=7,lmax=10,kmax=40,mmax=41)
@@ -83,41 +90,42 @@ Cf2py intent(in) datdir, almfile
       double complex xi(kvalnum,mmax,(kmax+1)**2),alm(dim)
       common /input/kwav,mult,hubble,dlnk,apowers,transferf,xi,alm
 
-      integer lnblnk
-      external lnblnk
+      !!integer len_trim
+      !!external len_trim
 
-      if (lnblnk(almfile).eq.0) then
+      if (len_trim(almfile).eq.0) then
           almfile = 'alm64_1.dat'
       endif
 
-      open(2,file=datdir(1:lnblnk(datdir))//almfile)
+      open(22,file=datdir(1:len_trim(datdir))//almfile)
       do i=1,dim
-         read(2,*)idum,dreal1,dreal2
+         read(22,*)idum,dreal1,dreal2
          alm(i)=complex(dreal1,dreal2)
       enddo
-      close(2)
-      open(3,file=datdir(1:lnblnk(datdir))//'hubblelist.dat')
+      close(22)
+
+      open(23,file=datdir(1:len_trim(datdir))//'hubblelist.dat')
       do i=1,hubblenum
-         read(3,*)int1
+         read(23,*)int1
          hubble(i)=dble(int1)
       enddo
-      close(3)
-      open(5,file=datdir(1:lnblnk(datdir))//'transf.dat')
+      close(23)
+      open(25,file=datdir(1:len_trim(datdir))//'transf.dat')
       do i=1,hubblenum
          do j=1,kvalnum
             do ll=1,lmax-1
-               read(5,*)idum,idum,dlnk(i,j,ll),apowers(i,j,ll),
+               read(25,*)idum,idum,dlnk(i,j,ll),apowers(i,j,ll),
      *transferf(i,j,ll)
             enddo
          enddo
       enddo
-      close(5)
-      open(7,file=datdir(1:lnblnk(datdir))//'kvalues.dat')
+      close(25)
+      open(27,file=datdir(1:len_trim(datdir))//'kvalues.dat')
       do i=1,kvalnum
-         read(7,*)kwav(i),mult(i)
+         read(27,*)kwav(i),mult(i)
 c      print*,kwav(i),mult(i)
       enddo
-      close(7)
+      close(27)
       do i=1,kvalnum
          do j=1,mult(kvalnum)
             do k=1,kwav(kvalnum)+1
@@ -125,16 +133,16 @@ c      print*,kwav(i),mult(i)
             enddo
          enddo
       enddo
-      open(8,file=datdir(1:lnblnk(datdir))//'xiall.dat')
+      open(28,file=datdir(1:len_trim(datdir))//'xiall.dat')
       do i=1,kvalnum
          do j=1,mult(i)
             do k=1,(kwav(i)+1)**2
-            read(8,*)idum,idum,idum,dreal1,dreal2
+            read(28,*)idum,idum,idum,dreal1,dreal2
             xi(i,j,k)=complex(dreal1,dreal2)
             enddo
          enddo
        enddo
-       close(8)
+       close(28)
        return
        end
 
@@ -216,7 +224,7 @@ c                   print*,ind1,ind2,sumxi
           enddo
        enddo
        enddo
-c       open(12,file=datdir(1:lnblnk(datdir))//'clmc.dat')
+c       open(12,file=datdir(1:len_trim(datdir))//'clmc.dat')
 c       do i=1,117
 c       do j=1,117
 c       write(12,*)i,j,dreal(clm(i,j)),dimag(clm(i,j))
@@ -234,7 +242,7 @@ c       print*,info1
        dlogdet=dlogdet+dlog(2.d0*dacos(-1.d0))
        call zgetri(117,clm,117,ipiv,work,9360,info)
 c       print*,info
-c       open(13,file=datdir(1:lnblnk(datdir))//'invclmc.dat')
+c       open(13,file=datdir(1:len_trim(datdir))//'invclmc.dat')
 c       do i=1,117
 c       do j=1,117
 c       write(13,*)i,j,dreal(clm(i,j)),dimag(clm(i,j))
