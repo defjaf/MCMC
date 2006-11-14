@@ -1,1 +1,1 @@
-f2py -c --fcompiler=gnu --link-lapack_opt likdihpy.f -m likdih
+f2py -c --fcompiler=gnu95 --link-lapack_opt likdihpy.f -m likdih

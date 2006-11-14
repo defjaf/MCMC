@@ -11,13 +11,13 @@ import numpy as N
 from numpy import float64
 
 def do_all():
-
+    
     ret = {}
     dir = 'topology/out/'
     for mod in ['ico', 'oct', 'dih', 'tetr']:
         print '*********** running model %s *****************' % mod
         ret[mod] = like_grid(modname=mod, outfile=dir+'lik_'+mod+'_grid.out', nstep=12)
-
+    
     return ret
 
 
@@ -120,7 +120,7 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     assert param_grid[0].shape==like.shape, 'Bad shapes'
     
     npar = param_grid.shape[0]
-
+    
     ## get the steps and 'deltas' in each dimension from the mgrid param_grid
     ## (i.e. recreate the ogrid)
     deltas = N.empty(npar, dtype=float64)
@@ -129,14 +129,14 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
         steps.append(N.array([param_grid[(i,) + (0,)*i + (j,) + (0,)*(npar-1-i)]
                             for j in xrange(param_grid.shape[i+1])]))
         deltas[i] = steps[-1][1] - steps[-1][0]
-        
+    
     dNpar = deltas.prod()
-        
+    
     means = N.empty(npar, dtype=float64)
     covar = N.empty((npar, npar), dtype=float64)
     like = N.exp(lnlike)
     weights = like.flat
-
+    
     lnEv = N.log(weights.sum()) + N.log(dNpar)
     
     for i in xrange(npar):
@@ -154,7 +154,7 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     ## could use an object array?
     ## need to iterate over dimensions
     ## assumes linear parameter spacing!
-    lnlike1d = []    
+    lnlike1d = []
     for ipar, istep in enumerate(steps):
         lnlike1d.append
     

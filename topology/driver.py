@@ -78,6 +78,7 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
     
     datdir = "./topology/likelihood/lik"+topo.strip()+"/dat/\0"
     if almfile is None:
+    #   almfile = "alm60_1.dat\0"
     #   almfile = "alm64_1.dat\0"
     #    almfile = "wmapalm.dat\0"
        almfile = 'alm3yrall.dat'
@@ -135,7 +136,7 @@ def plotter(sampler):
     mod = sampler.like.model
     data = sampler.like.data
     
-    params = nonzero(sampler.prop.sigmas>0)
+    params = nonzero(sampler.prop.sigmas>0)[0]  ### [0] added since tuple returned
     
     ntot = len(sampler.samples)
     stride = 1 #max(1,ntot//sampler.naccept)
