@@ -1,1 +1,1 @@
-f2py -c --fcompiler=gnu --link-lapack_opt liktetrpy.f -m liktetr
+f2py -c --fcompiler=gnu95 --link-lapack_opt liktetrpy.f -m liktetr

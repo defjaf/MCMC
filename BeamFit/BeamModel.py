@@ -30,7 +30,7 @@ class GaussianBeamModel2D(object):
     centerMin = None
     centerMax = None
     sigMax = None
-
+    
     nparam = 5
     
     fmtstring = "(%.3f %.3f) (%.3f %.3f) %.3f"
@@ -43,24 +43,24 @@ class GaussianBeamModel2D(object):
     
     def setParameters_MajMinAng(self, center, sigmas, angle):
         """set the parameters from x, y, sigma_major, sigma_minor, angle"""
-
+        
         
         self.center = center
         self.sigmas = sigmas
         self.angle = angle % math.pi
 
-
+        
         c = cos(angle); s = sin(angle)
         s12 = sigmas[0]*sigmas[0]
         s22 = sigmas[1]*sigmas[1]
         
-        self.sig2_xy = (c*c*s12 + s*s*s22, s*s*s12 + c*c*s22)   
+        self.sig2_xy = (c*c*s12 + s*s*s22, s*s*s12 + c*c*s22)
         self.rho = c*s*(s22-s12)/sqrt(self.sig2_xy[0]*self.sig2_xy[1])  # sign issue???
         
         self.set_Cinv()
-
+    
     __init__ = setParameters_MajMinAng  ## default to these params
-
+    
     @classmethod
     def setsigMax(cls, xmax, ymax=None):
         """
@@ -73,7 +73,7 @@ class GaussianBeamModel2D(object):
             if ymax is None:
                 ymax = xmax
             cls.sigMax = max(max(xmax)-min(xmax), max(ymax)-min(ymax))
-
+    
     @classmethod
     def setxyRange(cls, xrng, yrng=None, scale=None):
         """
@@ -85,7 +85,7 @@ class GaussianBeamModel2D(object):
             a (min, max) tuples
         set the yrange the same as the xrange if the former isn't given
         """
-
+        
         try:
             cls.centerMin = min(xrng.x), min(xrng.y)
             cls.centerMax = max(xrng.x), max(xrng.y)
@@ -94,38 +94,38 @@ class GaussianBeamModel2D(object):
                 yrng = xrng
             cls.centerMin = (min(xrng), min(yrng))
             cls.centerMax = (max(xrng), max(yrng))
-
+        
         if scale is not None:
             xr = 0.5*(cls.centerMax[0] - cls.centerMin[0])
             yr = 0.5*(cls.centerMax[1] - cls.centerMin[1])
             x0 = 0.5*(cls.centerMax[0] + cls.centerMin[0])
             y0 = 0.5*(cls.centerMax[1] + cls.centerMin[1])
-
+            
             cls.centerMin = x0-scale*xr, y0-scale*yr
             cls.centerMax = x0+scale*xr, y0+scale*yr
             
             
-            
+    
     def setParameters_XYRho(self, center, sigma_xy, rho):
         """set the parameters from x, y, sig_x, sig_y, rho=corr.coeff."""
         
         self.sig2_xy=array(sigma_xy, float64)**2
-        self.rho = rho        
+        self.rho = rho
         self.set_Cinv()
     
     def set_Cinv(self):
         """set the packed inverse correlation matrix values"""
-
+        
         sig2x, sig2y = self.sig2_xy
         det = sig2x * sig2y * (1.0 - self.rho*self.rho)
         
         ## inverse array in a "packed" form (xx, xy, yy)
         self.Cinv = array([
             sig2y, -self.rho*sqrt(sig2x*sig2y), sig2x], float64)/det
-
+    
     def get_XYRho(self):
         """
-        get the parameters tuple((x,y), (s2x, s2y), rho) 
+        get the parameters tuple((x,y), (s2x, s2y), rho)
         nb. for now we return sigma^2, not sigma!
            """
         return self.center, self.sig2_xy, self.rho
@@ -137,40 +137,40 @@ class GaussianBeamModel2D(object):
             ## calculate sigma_maj, min; angle from sig_xy, rho
             pass   # for now
         return self.center, self.sigmas, self.angle
-
+    
     def at(self, data):
         """get the [array of] value[s] of the beam for the given dataset"""
         return gauss2d(data.x, data.y, self.center[0], self.center[1], *self.Cinv)
-
+    
     def atxy(self, x, y):
         """
         get the [array of] value[s] of the beam for the given x, y value[s]
         """
         return gauss2d(x, y, self.center[0], self.center[1], *self.Cinv)
-
+    
     __call__ = at
-
+    
     @classmethod
     def prior(cls, center, sigmas, angle):
         """get the unnormalized prior for the parameters
         """
-
+        
         
         if cls.centerMin is not None and (
                 center[0] < cls.centerMin[0] or center[1] < cls.centerMin[1] or
                 center[0] > cls.centerMax[0] or center[1] > cls.centerMax[1]):
             return 0
-
+        
         if cls.sigMin is None and (sigmas[0]<0 or sigmas[1]<0):
             return 0
         elif sigmas[0]<cls.sigMin or sigmas[1]<cls.sigMin:
             return 0
-
+        
         if cls.sigMax is not None and max(sigmas) > cls.sigMax:
             return 0    # too restrictive?
-
+        
         return 1
-
+    
     ## note that we do (angle % pi) in these [probably really only needed in 'package'?]
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
@@ -181,16 +181,16 @@ class GaussianBeamModel2D(object):
         """ convert from flat array to structured sequence of parameters """
         return (tuple(params_flat[0:2]), tuple(params_flat[2:4]),
                 params_flat[4] % math.pi)
-
+    
     ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
                                                 unpackage=unpackage)
 
 ## need to do this conversion after we send the methods to the Proposal class
-    unpackage=staticmethod(unpackage)  
+    unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-
+    
     def startfrom(self, data, random=None):
         """
         generate a set of starting parameters for the model:
@@ -202,13 +202,13 @@ class GaussianBeamModel2D(object):
         if random is not None:
             dx = (self.centerMin[0], self.centerMax[0])
             dy = (self.centerMin[1], self.centerMax[1])
-        
-            start_params = ( (uniform(*dx), uniform(*dy)), 
+            
+            start_params = ( (uniform(*dx), uniform(*dy)),
                          (uniform(0,(dx[1]-dx[0])/5), uniform(0,(dy[1]-dy[0])/5)),
                          uniform(0,math.pi/2) )
         else:
             pass
-    
+
 def gauss2d(x, y, x0, y0, Cinv_xx, Cinv_xy, Cinv_yy):
     dx = x-x0; dy = y-y0
     return exp(-0.5 * (dx*dx*Cinv_xx + dy*dy*Cinv_yy + 2*dx*dy*Cinv_xy))
