@@ -210,7 +210,8 @@ def plotter(sampler):
     except DataSizeError:
         print 'Data too big: Cannot plot results for this data'
     except:
-        print 'Unknown error: Cannot plot results for this data'
+        print 'Unknown error: Cannot plot results for this data:'
+        print sys.exc_info()[0]
 
 def setup_sampler(dir=None, files=None,  num=None,
                   DayNight=2, LuisBrad=1, useNormalizedBeam=False,
@@ -706,7 +707,7 @@ def plotMod(data, params=None, model=None, hold=False, centeronly=False):
     ax = pylab.gca()
     xx, yy = pylab.meshgrid(x,y)
     #ax.pcolor(xx, yy, d, shading='flat', hold='true')
-    ax.pcolor(xx, yy, d, shading='flat', hold=hold)
+    ax.pcolor(xx, yy, d, shading='flat') #, hold=hold)
     ## aspect = 'preserve' for square pixels; can't do that with contour however
     if params is not None:
         vals = model(*params).atxy(xx, yy)
