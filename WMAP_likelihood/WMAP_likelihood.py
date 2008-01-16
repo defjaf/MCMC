@@ -10,7 +10,7 @@
 """
 
 from __future__ import division
-#from numarray import array, float64, sqrt, log, sum, zeros, arange, where
+
 from numpy import float64, sqrt, log, sum, zeros, arange, where, empty, int32
 from gzip import open as gzopen
 

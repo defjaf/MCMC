@@ -28,13 +28,6 @@ import math
 import operator
 import copy
 
-#from numarray import array, float64, int32, bool8, ones, zeros, nonzero, \
-#     reshape, log, exp, abs, transpose, dot, arange, any, logical_not, where
-#import numarray.objects as obj
-#from numarray import array as empty
-#import numarray.linear_algebra as la
-
-
 from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, rank,
                    reshape, log, exp, transpose, fabs, dot, arange, any, 
                    logical_not, where)

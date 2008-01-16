@@ -13,7 +13,7 @@
 ##     sigma=0 proposal density
 
 from __future__ import division
-#from numarray import array, exp, asarray, cos, sin, sqrt, float64
+
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, fabs
 import math
 

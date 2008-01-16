@@ -2,7 +2,6 @@
 
 from __future__ import division
 
-#from numarray import asarray, float64, log
 from numpy import asarray, float64, log
 
 class GaussianData(object):
