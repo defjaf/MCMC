@@ -4,7 +4,6 @@ import os.path
 import math
 import copy
 
-#from numarray import array, int32, float64, bool8, arange
 from numpy import array, int32, float64, bool8, arange, rank, dot
 
 import ClData_CosmoMC

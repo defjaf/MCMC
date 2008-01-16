@@ -18,7 +18,7 @@ import math
 from operator import isNumberType, __and__,  isSequenceType
 from copy import copy
 
-from numarray import array, arange, float64, zeros
+from numpy import array, arange, float64, zeros
 import Proposal
 
 class simpleModel(object):

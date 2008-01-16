@@ -1,6 +1,6 @@
 from __future__ import division
-from numarray import asarray, float64, log
-from numarray.random_array import uniform, normal
+from numpy import asarray, float64, log
+from numpy.random_array import uniform, normal   #check
 
 import pylab
 

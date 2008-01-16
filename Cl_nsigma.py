@@ -10,8 +10,8 @@ import os.path
 import math
 import pyfits
 from pylab import *
-#from numarray import arange, array, float64, Error, transpose, zeros
-from scipy import arange, array, float64, transpose, zeros
+
+from numpy import arange, array, float64, transpose, zeros
 
 def Cl_nsigma(WMAP=False):
 

@@ -1,6 +1,5 @@
 from __future__ import division
-#from numarray.random_array import normal
-#from numarray import matrixmultiply
+
 from numpy.random import normal, seed
 from numpy import dot, where, zeros, asarray, float64
 import numpy.linalg as la

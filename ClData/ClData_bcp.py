@@ -5,11 +5,6 @@ import math
 import string
 import copy
 
-#from numarray import array, exp, log, transpose, zeros, ones, \
-#     int32, float64, bool8
-#from numarray import array as empty
-#import numarray.linear_algebra as la
-
 from numpy import (array, exp, log, transpose, zeros, ones, 
                    int32, float64, bool8, empty)
 import numpy.linalg as la

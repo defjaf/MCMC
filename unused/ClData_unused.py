@@ -4,7 +4,7 @@ class ClData0(GaussianData.GaussianData):
     """
     C_l data:
        array of class ClDataPoint for each bin
-          this may not make sense for numarray-type calculations;
+          this may not make sense for numpy-type calculations;
           don't want to convert each of these to an array each time
           (maybe just important for <C>, variance, x?)
        optional correlation matrix

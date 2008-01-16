@@ -11,13 +11,6 @@ import pylab
 import gzip
 from itertools import izip, repeat
 
-#from numarray import (array, float64, zeros, ones, int32, log, where, ravel, exp,
-#                      arange, asarray, sqrt)
-#from numarray import concatenate as cat
-#import numarray
-#import numarray.ma as ma
-#from numarray.random_array import uniform
-
 import numpy
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
                     arange, asarray, sqrt, minimum, maximum, logical_and)
