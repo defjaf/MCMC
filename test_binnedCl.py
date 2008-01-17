@@ -128,11 +128,18 @@ def plotter(sampler):
     ana = MCMC.chain_analyze(sampler.samples[(ntot//5)::stride,:], params=params)
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
+    
+### need to take shape into account???
+    
+    #vals = vals*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
+    #sigs = sigs*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
+
+
     print vals  #sampler.like.model.fmtstring % tuple(ana[0])
     print sigs  #sampler.like.model.fmtstring % tuple(ana[1])
     print ana[2]
     
-    
+
     ### or replace with mod.plotmod if written...
     pylab.cla()
     pylab.errorbar(mod.ellctr, vals, yerr=sigs)

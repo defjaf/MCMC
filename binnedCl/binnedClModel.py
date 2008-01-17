@@ -6,6 +6,9 @@ from operator import isSequenceType
 from numpy import asarray, array, arange, float64, zeros, all
 import Proposal
 
+## add a function to convert from "parameters" to l(l+1)C_l/(2pi)?
+## or just cls.binnorm[] factors
+
 # need to set fmtstring -- setBinning
 
 class binnedClModel(object):
@@ -78,7 +81,7 @@ class binnedClModel(object):
         cls.ellnorm[0] = 0.0
 
         ## bin centres
-        cls.ellctr = [(b[0]+b[1])/2 for b in bins]
+        cls.ellctr = asarray([(b[0]+b[1])/2 for b in bins])
 
 
         cls.nparam = len(bins)
