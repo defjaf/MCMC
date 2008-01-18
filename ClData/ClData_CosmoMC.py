@@ -264,8 +264,8 @@ class ClData_CosmoMC(object):
             if self.has_xfactors and (self.calib_uncertainty>1.0e-4 or self.beam_uncertain):
                 chisq = self.getCalibMargexChisq(bandpowers)
             else:
-                diffs = getdelta(bandpowers)
-                chisq = getquadform(diffs)
+                diffs = self.getdelta(bandpowers)
+                chisq = self.getquadform(diffs)
 
                 if self.calib_uncertainty > 1.0e-4 or self.beam_uncertain:
                     tmp = getlinform(bandpowers)

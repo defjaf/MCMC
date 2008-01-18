@@ -145,6 +145,86 @@ def plotter(sampler):
     pylab.errorbar(mod.ellctr, vals, yerr=sigs)
     
 
+########################################################
+def getlike(ibin=1):
+    mod = binnedClModel
+
+    mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
+    mapd = pyfits.getdata(mapf)
+
+    ll = arange(mapd.shape[0])
+    norm = 1e6
+    ClTT = array(norm**2*mapd.field(0))
+    llCl = ClTT*ll*(ll+1)/(2*math.pi)
+
+    manybins = True
+    onebin = False
+
+    testshape=False
+
+    data = ClData.getClData(filename, no_pol=True)
+    
+    for d in data:
+        d.beam_uncertain=False
+        d.calib_uncertainty = 0.0
+        #d.has_xfactors=False
+
+    if manybins:
+#        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
+#                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
+#                 651, 701, 801, 901, 1001,  len(llCl)-1]
+#        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+#                 701, 801, 1001, len(llCl)-1]
+        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+        for i, b in enumerate(bins[:-1]):
+            bins[i] = (b, bins[i+1])
+        bins = bins[:-1]
+        npar = len(bins)
+
+        ell = [int((b[0]+b[1])/2) for b in bins]
+        ## start at a reasonable model
+        if not testshape:
+            Clbins = [b for b in ell if b<len(llCl) ]
+            start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
+            start_params[0:len(Clbins)] = llCl[Clbins]
+            shape = 1.0
+            prop_sigmas = zeros(npar, float64) + 100.0
+        else:
+            shape = llCl
+            start_params = ones(shape=(npar,), dtype=float64)
+            prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.1
+            
+
+    elif onebin:
+        bins = [(2, len(llCl)//2), (len(llCl)//2+1,len(llCl)-1)]
+        npar = len(bins)
+        shape = llCl
+        start_params = ones(shape=(npar,), dtype=float64)
+        prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
+
+    mod.setBinning(bins, shapefun=shape)
+
+    ell = [(b[0]+b[1])/2 for b in bins]
+    print 'bins:'
+    print ell
+    
+    like = binnedClLikelihood(data=data, model=mod)
+    
+    #### plot the likelihood as a function of power in a single bin
+    
+    bps = numpy.linspace(0, 10*start_params[ibin], 100)
+    likearr = numpy.empty_like(bps)
+    for i, bp in enumerate(bps):
+        pars = start_params
+        pars[ibin] = bp
+        likearr[i] = like.lnLike(pars)
+        
+    plot(bps, likearr)
+    
+    return like
+    
+########################################################
+
 import hotshot, hotshot.stats
 def profrun():
     #profile.Profile.bias=1e-5
