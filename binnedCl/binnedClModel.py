@@ -11,6 +11,8 @@ import Proposal
 
 # need to set fmtstring -- setBinning
 
+### nb -- 
+
 class binnedClModel(object):
     """
     model for C_l in bins with specified "window functions"
@@ -19,7 +21,7 @@ class binnedClModel(object):
     
     def __init__(self, Cb):
         """
-        set the parameters to the C_bins = Cb
+        set the parameters to the C_bins = Cb [[bandpowers]]
         """
         self.Cb = asarray(Cb)
 
@@ -33,6 +35,7 @@ class binnedClModel(object):
         # can use the window-function methods from the CosmoMC likelihood?
         self.Cl[0] = self.shapefun
         for Cb, rng in zip(self.Cb, self.bins):
+            ## nb. bins are (beginning, end) so need the +1 for python
             self.Cl[0, rng[0]:rng[1]+1] *= Cb
             
         self.Cl[0] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
