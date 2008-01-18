@@ -49,16 +49,23 @@ def main(nMC=(1000,)):
     testshape=False
 
     data = ClData.getClData(filename, no_pol=True)
+    
+    print "unsetting beam and calib uncertainty"
+    for d in data:
+        d.beam_uncertain=False
+        d.calib_uncertainty = 0.0
+        #d.has_xfactors=False
 
     if manybins:
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
 #                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
 #                 651, 701, 801, 901, 1001,  len(llCl)-1]
-#        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
-#                 701, 801, 1001, len(llCl)-1]
+##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+##                 701, 801, 1001, len(llCl)-1]
         bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+##        bins = [ 2, 61, 221, 501, 1001, len(llCl)-1]
         for i, b in enumerate(bins[:-1]):
-            bins[i] = (b, bins[i+1])
+            bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
         bins = bins[:-1]
         npar = len(bins)
 
@@ -143,6 +150,9 @@ def plotter(sampler):
     ### or replace with mod.plotmod if written...
     pylab.cla()
     pylab.errorbar(mod.ellctr, vals, yerr=sigs)
+    m = mod(vals); c1 = m()[0]; ell = numpy.arange(c1.size)
+    c = c1*ell*(ell+1)/(2*numpy.pi)
+    pylab.plot(ell, c)
     
 
 ########################################################
@@ -177,7 +187,7 @@ def getlike(ibin=1):
 #                 701, 801, 1001, len(llCl)-1]
         bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
         for i, b in enumerate(bins[:-1]):
-            bins[i] = (b, bins[i+1])
+            bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
         bins = bins[:-1]
         npar = len(bins)
 

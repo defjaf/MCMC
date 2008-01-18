@@ -226,13 +226,14 @@ class ClData_CosmoMC(object):
         if are_bandpowers:
             ###  include prefactor for sum_l C_l [W_l (2l+1)/4pi]
             
-            for l in range(self.win_min[i], self.win_max[i]+1):
-                win[:,l] *= (l+0.5)
+            ellwin = arange(self.win_min[i], self.win_max[i]+1)
+            #for l in ellwin:
+            #    win[:,l] *= (l+0.5)
+            win[:, self.win_min[i]:self.win_max[i]+1] *= (ellwin+0.5)
 
             if not are_normalized:
                 ## normalize to 1 = sum_l W_l (l+1/2)/(l(l+1)) 
-                IW = sum([win[0,l]/(l*(l+1)) for l in \
-                          range(self.win_min[i], self.win_max[i]+1) ])
+                IW = sum(win[0,self.win_min[i]:self.win_max[i]+1]/(ellwin*(ellwin+1.0)))
                 win[0,self.win_min[i]:self.win_max[i]+1] /= IW
 
             win[0,self.win_min[i]:self.win_max[i]+1] /= (2*math.pi) 
@@ -396,6 +397,7 @@ class ClData_CosmoMC(object):
         if self.has_pol and rank(Cl)==2 and self.inc_pol[i]:
             bandpower += (Cl[1:num_cls, win_min[i], maxl+1]*
                           self.window[i, 1:num_cls, win_min[i], maxl+1]).sum()
+            print 'Accessing polarization getWinBandpower: band', i
             #for l in xrange(self.win_min[i], maxl):
             #    bandpower += dot(Cl[1:num_cls, l], self.window[i, 1:num_cls, l])            
         return bandpower
