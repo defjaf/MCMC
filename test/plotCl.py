@@ -91,7 +91,9 @@ def plotCl(filename, plotLike=False, plotBP=False):
     else:
         return None
         
+def main():
+    return plotCl("data_list.txt", plotLike=True)
                     
 
 if __name__ == "__main__":
-    ret = plotCl("data_list.txt", plotLike=True)
+    ret = main()
