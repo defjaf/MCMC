@@ -69,7 +69,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
                 else:
                     minmax[1,i] = 0
             
-            line = fp.readline().strip()
+            line = fp.readline().strip() 
         else:
             #use all bands in file
             for i in range(6):
@@ -151,7 +151,12 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         lines = fp.readlines()
         tmp_lis=[]
         for line in lines:
-            tmp_lis.append([float(e) for e in line.split()])
+            try:
+                tmp_lis.append([float(e) for e in line.split()])
+            except ValueError:
+                print "Possible syntax error; ignoring line:", line.strip()
+                
+            
         tmp_mat=array(tmp_lis)
         tmp_mat.reshape(file_points, file_points)
 
