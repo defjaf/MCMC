@@ -55,6 +55,7 @@ class binnedClModel(object):
         """
         set up the binning and shape functions
         binning is a sequence [(lmin0, lmax0), (lmin1, lmax1), ...]
+        nb. inclusive (non-pythonic), so lmax0<lmin1, etc
         
         shapefun should be a sequence D[l] = [l(l+1)C/2pi] for l=0...ell_max
         if shapefun=None, flat in l(l+1)C_l/2pi (with amplitude 1)

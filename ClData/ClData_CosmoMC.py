@@ -35,7 +35,7 @@ import numpy.linalg as la
 
 ### "static" variables for this whole module
 num_cls = 3   ### TT, TE, EE (change to 4 for BB)
-lmax = 2100
+lmax = 3100
 halfsteps = 5
 
 def initNumericalMarge(halfsteps):
@@ -269,12 +269,12 @@ class ClData_CosmoMC(object):
                 chisq = self.getquadform(diffs)
 
                 if self.calib_uncertainty > 1.0e-4 or self.beam_uncertain:
-                    tmp = getlinform(bandpowers)
+                    tmp = self.getlinform(bandpowers)
                     chi2op = dot(diffs, tmp)
                     chi2pp = dot(bandpowers, tmp)
                     if self.beam_uncertain:
                         beam = self.beam_err*bandpowers
-                        tmp = getlinform(beam)
+                        tmp = self.getlinform(beam)
                         chi2dd = dot(beam, tmp)
                         chi2pd = dot(bandpowers, tmp)
                         chi2od = dot(diffs, tmp)

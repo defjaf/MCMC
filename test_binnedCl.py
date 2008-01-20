@@ -42,6 +42,9 @@ def main(nMC=(1000,)):
     norm = 1e6
     ClTT = array(norm**2*mapd.field(0))
     llCl = ClTT*ll*(ll+1)/(2*math.pi)
+    
+    max_ell = len(llCl)-1
+    #max_ell = 2100
 
     manybins = True
     onebin = False
@@ -50,20 +53,21 @@ def main(nMC=(1000,)):
 
     data = ClData.getClData(filename, no_pol=True)
     
-    print "unsetting beam and calib uncertainty"
-    for d in data:
-        d.beam_uncertain=False
-        d.calib_uncertainty = 0.0
-        #d.has_xfactors=False
+    # print "unsetting beam and calib uncertainty"
+    # for d in data:
+    #     d.beam_uncertain=False
+    #     d.calib_uncertainty = 0.0
+    #     #d.has_xfactors=False
 
     if manybins:
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
 #                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
-#                 651, 701, 801, 901, 1001,  len(llCl)-1]
-##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
-##                 701, 801, 1001, len(llCl)-1]
-        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
-##        bins = [ 2, 61, 221, 501, 1001, len(llCl)-1]
+#                 651, 701, 801, 901, 1001,  max_ell]
+        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+                 701, 801, 1001, max_ell]
+##                 701, 801, 1001, 1201, 1401, 1601, 1801, max_ell]
+##        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
             bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
         bins = bins[:-1]
@@ -229,7 +233,7 @@ def getlike(ibin=1):
         pars[ibin] = bp
         likearr[i] = like.lnLike(pars)
         
-    plot(bps, likearr)
+    plot(bps, likearr-max(likearr))
     
     return like
     
