@@ -63,7 +63,8 @@ def main(nMC=(1000,)):
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
 #                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
 #                 651, 701, 801, 901, 1001,  max_ell]
-        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
                  701, 801, 1001, max_ell]
 ##                 701, 801, 1001, 1201, 1401, 1601, 1801, max_ell]
 ##        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
@@ -103,8 +104,12 @@ def main(nMC=(1000,)):
     like = binnedClLikelihood(data=data, model=mod)
 
     pylab.figure(0)
+    
+    fac = 2.4/sqrt(len(ell))   ## equiv to fac=None
+    fac*=3
+    
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
-                        fac=None, noCorrelations=True, doBlock=True)
+                        fac=fac, noCorrelations=True, doBlock=True)
                         
     if testshape:
         pylab.plot([ll[0], ll[-1]], [1, 1], hold='true')

@@ -1,6 +1,6 @@
 #WMAP
 data/acbar2007.newdat
-#data/CBI2.0_2to14.dataset
+data/CBI2.0_2to14.dataset
 data/DASI01.dataset
 data/MAXI01.dataset
 data/VSAF.dataset
