@@ -30,7 +30,7 @@ import copy
 
 from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, rank,
                    reshape, log, exp, transpose, fabs, dot, arange, any, 
-                   logical_not, where)
+                   logical_not, where, logical_and)
 import numpy.linalg as la
 
 ### "static" variables for this whole module
@@ -242,6 +242,14 @@ class ClData_CosmoMC(object):
             self.inc_pol[i] = any(win[1,:] != 0)
 
         fp.close()
+        
+        ## remove small values
+        smallfac = 1.0e-6
+        maxw = max(fabs(win[0,:]))
+        midx = where(logical_and(fabs(win[0,:])<maxw*smallfac, fabs(win[0,:]>0.0)))
+        if len(midx[0])>0: 
+            print "zeroing %d points< %f in window" % (len(midx[0]), maxw*smallfac)
+            win[0,midx] *= 0
 
         # these methods all relate to "models" but require access to lots of local data
 
@@ -346,7 +354,7 @@ class ClData_CosmoMC(object):
             ndx = logical_not(idx)
             
             zth = BP[idx] + self.xfactors[idx]
-            zth[where(zth<=0.0)] = 1.0e-10   ### AHJ
+            #zth[where(zth<=0.0)] = 1.0e-10   ### AHJ
 
             diffs[idx] = self.obs[idx] - log(zth)
             diffs[ndx] = self.obs[ndx] - BP[ndx]
