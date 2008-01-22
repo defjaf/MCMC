@@ -120,7 +120,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
             ch_type = fp.readline().strip()[0:2]
             self.Clpol_idx[ch_type] = [use_i, use_i]
             print '  ch_type=%s' % ch_type
-            for i in xrange(npol[k]):   ### check on zero or one-base!!!
+            for i in xrange(npol[k]):   ### AHJ CHECK on zero or one-base!!!
                 line = fp.readline().split()
                 if i>=minmax[0,k] and i<=minmax[1,k]:
                     self.Clpol_idx[ch_type][1] += 1
@@ -163,6 +163,9 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         # is this efficient?
         idx = [ used_bands ] * self.num_points   ## replicate, not multiply!
         self.N_inv=tmp_mat[ transpose(idx), idx ]
+        
+   #     print "Noise mat, first, last entries:", \
+   #        self.N_inv[0,0], self.N_inv[self.num_points-1, self.num_points-1]
 
 
         self.beam_err = exp(-self.ell*(self.ell+1)*
@@ -179,7 +182,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
             self.N_inv *= 2.725**4 * 1.0e24
 
         if self.has_xfactors:
-            self.xfactors = tmp_x[0:self.num_points]
+            self.xfactors = cal**2 * tmp_x[0:self.num_points]
             ## transform to z=ln(C+x) for N_inv,  obs and var
 
             ## there must be a more pythonic way to do this than these loops!
