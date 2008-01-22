@@ -196,5 +196,5 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
             self.var[idx] /= (self.obs[idx]+self.xfactors[idx])**2
             self.obs[idx] = log(self.obs[idx] + self.xfactors[idx])
                     
-            self.N_inv = la.inv(self.N_inv)
+        self.N_inv = la.inv(self.N_inv)
         
