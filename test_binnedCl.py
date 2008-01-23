@@ -66,10 +66,10 @@ def main(nMC=(1000,)):
 ##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
 #        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
 #                 701, 801, 1001, max_ell]
-#        bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
-#                751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-#                1451, 1511, 1571, 1651, 1751, 1851, 1950]
-        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+        bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
+                751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
+                1451, 1511, 1571, 1651, 1751, 1851, 1950]
+##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
             bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
@@ -196,7 +196,10 @@ def getlike(ibin=1):
 #                 651, 701, 801, 901, 1001,  len(llCl)-1]
 #        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
 #                 701, 801, 1001, len(llCl)-1]
-        bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+        #bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+        bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
+                751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
+                1451, 1511, 1571, 1651, 1751, 1851, 1950]
         for i, b in enumerate(bins[:-1]):
             bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
         bins = bins[:-1]
@@ -208,6 +211,7 @@ def getlike(ibin=1):
             Clbins = [b for b in ell if b<len(llCl) ]
             start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
             start_params[0:len(Clbins)] = llCl[Clbins]
+            start_params[where(start_params==0)]=2000.0
             shape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
@@ -233,7 +237,7 @@ def getlike(ibin=1):
     
     #### plot the likelihood as a function of power in a single bin
     
-    bps = numpy.linspace(0, 10*start_params[ibin], 100)
+    bps = numpy.linspace(0, 100*start_params[ibin], 100)
     likearr = numpy.empty_like(bps)
     for i, bp in enumerate(bps):
         pars = start_params
@@ -242,7 +246,8 @@ def getlike(ibin=1):
         
     plot(bps, likearr-max(likearr))
     
-    return like
+    return like, likearr
+    
     
 ########################################################
 

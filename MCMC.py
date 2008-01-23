@@ -171,7 +171,9 @@ class MCMC(object):
     #        print >> debugf, prior, '|', next, '|', next_lnPr,
         
         ### lnalpha<0 check short-circuits the exp(lnalpha)?
-        if prior<=0 or (lnalpha < 0 and exp(lnalpha)<uniform(0,1)):
+        #if prior<=0 or (lnalpha < 0 and exp(lnalpha)<uniform(0,1)):
+        ## rewrite as not (not check) to catch NaNs if they appear
+        if not prior>0 or (not lnalpha >= 0 and not exp(lnalpha)>uniform(0,1)):
             next = self.prev   ### reject: keep the old parameters
             next_lnPr = self.prev_lnPr
         else:
