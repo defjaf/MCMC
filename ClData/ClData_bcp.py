@@ -6,7 +6,7 @@ import string
 import copy
 
 from numpy import (array, exp, log, transpose, zeros, ones, 
-                   int32, float64, bool8, empty)
+                   int32, float64, bool8, empty, concatenate)
 import numpy.linalg as la
 
 import ClData_CosmoMC
@@ -155,10 +155,12 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
                 tmp_lis.append([float(e) for e in line.split()])
             except ValueError:
                 print "Possible syntax error; ignoring line:", line.strip()
-                
-            
-        tmp_mat=array(tmp_lis)
-        tmp_mat.reshape(file_points, file_points)
+
+        tmp_lis = concatenate(tmp_lis)
+        tmp_mat=array(tmp_lis).copy()
+        tmp_mat.shape = (file_points, file_points)
+        
+        print tmp_mat.shape
 
         # is this efficient?
         idx = [ used_bands ] * self.num_points   ## replicate, not multiply!
