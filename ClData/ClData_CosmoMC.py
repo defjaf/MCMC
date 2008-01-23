@@ -222,7 +222,10 @@ class ClData_CosmoMC(object):
 
         ## get the window min and max
         nz = where(win)[1]
-        self.win_min[i], self.win_max[i] = min(nz), max(nz)
+        if len(nz):
+            self.win_min[i], self.win_max[i] = min(nz), max(nz)
+        else:
+            self.win_min[i], self.win_max[i] = 0, 0
 
         if are_bandpowers:
             ###  include prefactor for sum_l C_l [W_l (2l+1)/4pi]

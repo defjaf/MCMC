@@ -7,7 +7,7 @@ data/VSAF.dataset
 data/B03_NA_21July05.newdat
 #data/dasi_pol_2004_EE_TE_otherps.newdat
 data/joint_Apr05_all_each_x80_2200_pol_ttsrc_windows.newdat
-#data/QUAD_pipeline1_2005.newdat
+data/QUAD_pipeline1_2005.newdat
 
 #old_data/ACBAR_lge800_.dataset
 #old_data/B03_NA_21July05.newdat
