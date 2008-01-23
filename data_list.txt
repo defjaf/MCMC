@@ -1,20 +1,20 @@
 #WMAP
 data/acbar2007.newdat
-#data/CBI2.0_2to14.dataset
-#data/DASI01.dataset
-#data/MAXI01.dataset
-#data/VSAF.dataset
-#data/B03_NA_21July05.newdat
+data/CBI2.0_2to14.dataset
+data/DASI01.dataset
+data/MAXI01.dataset
+data/VSAF.dataset
+data/B03_NA_21July05.newdat
 #data/dasi_pol_2004_EE_TE_otherps.newdat
-#data/joint_Apr05_all_each_x80_2200_pol_ttsrc_windows.newdat
+data/joint_Apr05_all_each_x80_2200_pol_ttsrc_windows.newdat
 #data/QUAD_pipeline1_2005.newdat
 
 #old_data/ACBAR_lge800_.dataset
-old_data/B03_NA_21July05.newdat
-old_data/CBI2.0_lge600.dataset
-old_data/DASI01.dataset
-old_data/MAXIMA.dataset
-old_data/VSAF.dataset
+#old_data/B03_NA_21July05.newdat
+#old_data/CBI2.0_lge600.dataset
+#old_data/DASI01.dataset
+#old_data/MAXIMA.dataset
+#old_data/VSAF.dataset
 
 #WMAP
 
