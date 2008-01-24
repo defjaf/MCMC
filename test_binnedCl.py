@@ -29,7 +29,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,)):
+def main(nMC=(1000,), gridPlot=True):
     #numarray.Error.pushMode(dividebyzero="warn")
     #numarray.Error.pushMode(all="raise")
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
@@ -108,7 +108,7 @@ def main(nMC=(1000,)):
     pylab.figure(0)
     
     fac = 2.4/sqrt(len(ell))   ## equiv to fac=None
-    fac*=3
+    fac*=6
     
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
@@ -122,8 +122,11 @@ def main(nMC=(1000,)):
     samples = cat([ s.samples for s in retval[0] ])
     for var in samples.transpose(): pylab.plot(var)     
     
-    pylab.figure(2)
-    getdist.histgrid(retval[0][-1])
+    if gridPlot:
+        pylab.figure(2)
+        getdist.histgrid(retval[0][-1])
+    else:
+        getdist.printvals(retval[0][-1])
     
     #numarray.Error.popMode()
     return retval

@@ -19,6 +19,26 @@ from itertools import islice, groupby
 def GaussPDF(x, mean=0, stdev=1):
     return numpy.exp(-0.5*(x-mean)**2/stdev**2)/numpy.sqrt(2*numpy.pi)/stdev
 
+def printvals(MCMC, params=None):
+    """ like loop over hist(), but don't plot """
+    
+    try:
+        s = MCMC.samples
+    except AttributeError:
+        s = MCMC
+        
+    if params is None:
+        params=xrange(s.shape[1])
+    
+    for param in params:
+        s1 = s.transpose()[param]
+        
+        mean = s1.mean()
+        stdv = s1.std()  ## stddev(s1)
+        print 'mean = %f +- %f' % (mean, stdv)        
+        
+    return
+    
 
 def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
     """

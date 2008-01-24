@@ -170,6 +170,7 @@ class MCMC(object):
     
     #        print >> debugf, prior, '|', next, '|', next_lnPr,
         
+        ### AHJ CHECK: is this quite right? Does it screw up when the *previous* prob was NaN?
         ### lnalpha<0 check short-circuits the exp(lnalpha)?
         #if prior<=0 or (lnalpha < 0 and exp(lnalpha)<uniform(0,1)):
         ## rewrite as not (not check) to catch NaNs if they appear
