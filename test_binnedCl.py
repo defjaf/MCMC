@@ -152,7 +152,7 @@ def main(nMC=(1000,), gridPlot=True):
 
         mean = mod.bandpowers(s1.mean())
         stdv = mod.bandpowers(s1.std())
-        print '%d %f %f' % (ell[params], mean, stdv)        
+        print '%d %f %f' % (ell[param], mean, stdv)        
     
     
     #numarray.Error.popMode()
@@ -193,7 +193,7 @@ def plotter(sampler):
 
     ### or replace with mod.plotmod if written...
     pylab.cla()
-    pylab.errorbar(mod.ellctr, vals, yerr=sigs)
+    pylab.errorbar(mod.ellctr, vals, yerr=sigs, fmt='bo')
     #m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
     #c = c1*ell*(ell+1)/(2*N.pi)
     #pylab.plot(ell, c)
