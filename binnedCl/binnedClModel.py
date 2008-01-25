@@ -6,12 +6,22 @@ from operator import isSequenceType
 from numpy import asarray, array, arange, float64, zeros, all
 import Proposal
 
-## add a function to convert from "parameters" to l(l+1)C_l/(2pi)?
-## or just cls.binnorm[] factors
+## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
+##   this is just __call__???
+## or just cls.binnorm[] factors??
+
+## need a function to go from parameters to C_b
+## precomputed binnorm might make sense here
+## carlo algorithm:
+##C_l = q_{b given l} * C_l^shape
+#{\cal C}_b = q_b (\sum_l (l+1/2)/l/(l+1)*{\cal C}_l)/(\sum_l (l+1/2)/l/(l+1))
+### nb AHJ shape here is defined for D_l = l(l+1)C_l/(2pi)
 
 # need to set fmtstring -- setBinning
 
 ### nb -- 
+
+
 
 class binnedClModel(object):
     """
