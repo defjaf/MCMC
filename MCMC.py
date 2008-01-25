@@ -10,7 +10,7 @@ from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    arange)
 from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
-from numpy import empty
+from numpy import empty, isnan
 
 from Likelihood import ZeroPosterior
 
@@ -160,7 +160,11 @@ class MCMC(object):
             ## don't accept, no matter what
             prior = 0
         else:
-            prior = self.like.model.prior(*next)
+            if isnan(next_lnPr):     ### AHJ CHECK -- is this really needed or is below better???
+                prior = 0
+            else:
+                prior = self.like.model.prior(*next)
+            
         
         # working with lnalpha eliminates some over/underflow errors
         if prior > 0:
