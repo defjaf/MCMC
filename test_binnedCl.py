@@ -146,7 +146,7 @@ def main(nMC=(1000,), gridPlot=True):
         getdist.printvals(s)
 
     
-    params=xrange(s.shape[1])    
+    params=xrange(s.samples.shape[1])    
     for param in params:
         s1 = s.transpose()[param]
 
