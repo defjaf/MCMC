@@ -137,7 +137,7 @@ class binnedClModel(object):
         #     so flat in l(l+1)Cl gives 1
         cls.BPnorm = empty(len(bins), dtype=float64)
         for i, bin in enumerate(bins):
-            ells = arange(bin[0], bin[1]+1)
+            ells = arange(bin[0], bin[1]+1, dtype=float64)
             llClshape = shapefun[bin[0]:bin[1]+1]
             num = (llClshape*(ells+0.5)/ells/(ells+1.0)).sum()
             denom = ((ells+0.5)/ells/(ells+1.0)).sum()
