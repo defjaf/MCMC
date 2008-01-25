@@ -35,16 +35,27 @@ def main(nMC=(1000,), gridPlot=True):
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
-    mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
-    mapd = pyfits.getdata(mapf)
+    #mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
+    #mapd = pyfits.getdata(mapf)
+    #ll = arange(mapd.shape[0])
+    #norm = 1e6
+    #ClTT = array(norm**2*mapd.field(0))
+    #llCl = ClTT*ll*(ll+1)/(2*math.pi)
 
-    ll = arange(mapd.shape[0])
-    norm = 1e6
-    ClTT = array(norm**2*mapd.field(0))
-    llCl = ClTT*ll*(ll+1)/(2*math.pi)
-    
-    max_ell = len(llCl)-1
+    #max_ell = len(llCl)-1
     #max_ell = 2100
+
+    tmp = numpy.fromfile("CarloClModel.dat", sep=" ")
+    tmp.shape = -1, 6
+    ells = tmp.T[0]  ## nb doesn't usually start at l=0
+    
+    max_ell = max(ells)
+    llClTT = N.zeros(lmax+1)
+    llClEE = N.zeros(lmax+1)
+    llClTE = N.zeros(lmax+1)
+    llClTT[ells] = tmp.T[1]
+    llClEE[ells] = tmp.T[2]
+    llClTE[ells] = tmp.T[3]
 
     manybins = True
     onebin = False
@@ -79,21 +90,21 @@ def main(nMC=(1000,), gridPlot=True):
         ell = [int((b[0]+b[1])/2) for b in bins]
         ## start at a reasonable model
         if not testshape:
-            Clbins = [b for b in ell if b<len(llCl) ]
+            Clbins = [b for b in ell if b<len(llClTT) ]
             start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
             start_params[0:len(Clbins)] = llCl[Clbins]
             shape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            shape = llCl
+            shape = llClTT
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.1
             
 
     elif onebin:
-        bins = [(2, len(llCl)//2), (len(llCl)//2+1,len(llCl)-1)]
+        bins = [(2, len(llClTT)//2), (len(llClTT)//2+1,len(llClTT)-1)]
         npar = len(bins)
-        shape = llCl
+        shape = llClTT
         start_params = ones(shape=(npar,), dtype=float64)
         prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
 
