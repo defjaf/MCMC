@@ -1,4 +1,6 @@
+
 from __future__ import division
+
 
 import math
 import string
@@ -18,7 +20,7 @@ from pylab import *
 from numpy.random import uniform
 from numpy import arange, array, float64, transpose, zeros, ones
 from numpy import concatenate as cat
-import numpy
+import numpy as N
 
 filename = "data_list.txt"
 
@@ -32,7 +34,7 @@ mapdir = '/'.join( (homedir, mapdir) )
 def main(nMC=(1000,), gridPlot=True):
     #numarray.Error.pushMode(dividebyzero="warn")
     #numarray.Error.pushMode(all="raise")
-    numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
+    N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
     #mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
@@ -45,14 +47,15 @@ def main(nMC=(1000,), gridPlot=True):
     #max_ell = len(llCl)-1
     #max_ell = 2100
 
-    tmp = numpy.fromfile("CarloClModel.dat", sep=" ")
+    tmp = N.fromfile("CarloClModel.dat", sep=" ")
     tmp.shape = -1, 6
-    ells = tmp.T[0]  ## nb doesn't usually start at l=0
+    ells = int_(tmp.T[0])  ## nb doesn't usually start at l=0
     
     max_ell = max(ells)
-    llClTT = N.zeros(lmax+1)
-    llClEE = N.zeros(lmax+1)
-    llClTE = N.zeros(lmax+1)
+    ll = arange(max_ell+1)
+    llClTT = N.zeros(max_ell+1)
+    llClEE = N.zeros(max_ell+1)
+    llClTE = N.zeros(max_ell+1)
     llClTT[ells] = tmp.T[1]
     llClEE[ells] = tmp.T[2]
     llClTE[ells] = tmp.T[3]
@@ -60,7 +63,7 @@ def main(nMC=(1000,), gridPlot=True):
     manybins = True
     onebin = False
 
-    testshape=False
+    testshape = True
 
     data = ClData.getClData(filename, no_pol=True)
     
@@ -92,7 +95,7 @@ def main(nMC=(1000,), gridPlot=True):
         if not testshape:
             Clbins = [b for b in ell if b<len(llClTT) ]
             start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
-            start_params[0:len(Clbins)] = llCl[Clbins]
+            start_params[0:len(Clbins)] = llClTT[Clbins]
             shape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
@@ -124,20 +127,33 @@ def main(nMC=(1000,), gridPlot=True):
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
                         
-    if testshape:
-        pylab.plot([ll[0], ll[-1]], [1, 1], hold='true')
-    else:
-        pylab.plot(ll, llCl, hold='true')
+    # if testshape:
+    #     pylab.plot([ll[0], ll[-1]], [1, 1], hold='true')
+    # else:
+
+    pylab.plot(ll, llClTT, hold='true')
         
     pylab.figure(1)
     samples = cat([ s.samples for s in retval[0] ])
-    for var in samples.transpose(): pylab.plot(var)     
+    for var in samples.transpose(): pylab.plot(var)
+    
+    s = retval[0][-1]
     
     if gridPlot:
         pylab.figure(2)
-        getdist.histgrid(retval[0][-1])
+        getdist.histgrid(s)
     else:
-        getdist.printvals(retval[0][-1])
+        getdist.printvals(s)
+
+    
+    params=xrange(s.shape[1])    
+    for param in params:
+        s1 = s.transpose()[param]
+
+        mean = mod.bandpowers(s1.mean())
+        stdv = mod.bandpowers(s1.std())
+        print '%d %f %f' % (ell[params], mean, stdv)        
+    
     
     #numarray.Error.popMode()
     return retval
@@ -161,6 +177,9 @@ def plotter(sampler):
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
     
+    vals = mod.bandpowers(vals)
+    sigs = mod.bandpowers(sigs)
+    
 ### need to take shape into account???
     
     #vals = vals*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
@@ -175,8 +194,8 @@ def plotter(sampler):
     ### or replace with mod.plotmod if written...
     pylab.cla()
     pylab.errorbar(mod.ellctr, vals, yerr=sigs)
-    m = mod(vals); c1 = m()[0]; ell = numpy.arange(c1.size)
-    c = c1*ell*(ell+1)/(2*numpy.pi)
+    m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
+    c = c1*ell*(ell+1)/(2*N.pi)
     pylab.plot(ell, c)
     
 
@@ -251,8 +270,8 @@ def getlike(ibin=1):
     
     #### plot the likelihood as a function of power in a single bin
     
-    bps = numpy.linspace(0, 100*start_params[ibin], 100)
-    likearr = numpy.empty_like(bps)
+    bps = N.linspace(0, 100*start_params[ibin], 100)
+    likearr = N.empty_like(bps)
     for i, bp in enumerate(bps):
         pars = start_params
         pars[ibin] = bp

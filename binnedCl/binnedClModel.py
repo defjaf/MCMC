@@ -3,7 +3,7 @@ from __future__ import division
 import math
 from operator import isSequenceType
 
-from numpy import asarray, array, arange, float64, zeros, all
+from numpy import asarray, array, arange, float64, zeros, all, empty
 import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
@@ -21,17 +21,24 @@ import Proposal
 
 ### nb -- 
 
+### should a generic model have a function like BP() or bandpowers()
+###    which gives "printable" parameters?
+### or use package/unpackage?
+
 
 
 class binnedClModel(object):
     """
     model for C_l in bins with specified "window functions"
     doesn't really deal with polarization yet.
+    
+    the parameters are really the q_b factors rather than bandpowers themselves.
+    see bandpowers() for conversion from q_b to C_b
     """
     
     def __init__(self, Cb):
         """
-        set the parameters to the C_bins = Cb [[bandpowers]]
+        set the parameters to the C_bins = Cb [[bandpowers]] 
         """
         self.Cb = asarray(Cb)
 
@@ -50,6 +57,23 @@ class binnedClModel(object):
             
         self.Cl[0] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
         return self.Cl
+
+    @classmethod
+    def bandpowers(cls, qb):
+        """return the bandpowers corresponding to a set of qb"""
+            
+        return qb*cls.BPnorm
+
+
+    def BP(self, qb=None):
+        """return the bandpowers corresponding to the current parameters or a set of qb"""
+        
+        if qb is None:
+            qb = self.Cb
+    
+        return self.bandpowers(qb)
+    
+    
 
     ## use (*C_b) so the list gets 'untupled'
     @staticmethod
@@ -97,7 +121,6 @@ class binnedClModel(object):
         ## bin centres
         cls.ellctr = asarray([(b[0]+b[1])/2 for b in bins])
 
-
         cls.nparam = len(bins)
         if doBlock:
             cls.paramBlocks = arange(cls.nparam)
@@ -106,6 +129,19 @@ class binnedClModel(object):
             cls.paramBlocks = None
             cls.nBlock = 0
             
+
+        ## conversion factors for qb->bandpowers
+        ## I_l[l(l+1)C_l[shape]]/I_l[1] where "logarithmic integral" is
+        #       I_l[f_l]=\sum_l[f_l(l+1/2)/l/(l+1)]
+        # (nb. shapefun is l(l+1)C_l[shape]), 
+        #     so flat in l(l+1)Cl gives 1
+        cls.BPnorm = empty(len(bins), dtype=float64)
+        for i, bin in enumerate(bins):
+            ells = arange(bin[0], bin[1]+1)
+            llClshape = shapefun[bin[0]:bin[1]+1]
+            num = (llClshape*(ells+0.5)/ells/(ells+1.0)).sum()
+            denom = ((ells+0.5)/ells/(ells+1.0)).sum()
+            cls.BPnorm[i] = num/denom
             
         print 'binning: %d... %d' % (cls.lmin, cls.lmax)
         print 'nparam: ', cls.nparam
