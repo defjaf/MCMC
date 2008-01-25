@@ -148,13 +148,18 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         self.N_inv = empty(dtype=float64, shape=(self.num_points, self.num_points))
 
         ### get the rest of the file into tmp_mat
+        nignore = 0
         lines = fp.readlines()
         tmp_lis=[]
         for line in lines:
             try:
                 tmp_lis.append([float(e) for e in line.split()])
             except ValueError:
-                print "Possible syntax error; ignoring line:", line.strip()
+                nignore += 1
+                #print "Possible syntax error; ignoring line:", line.strip()
+            
+        if nignore:
+            print "Ignored %d lines." % nignore
 
         tmp_lis = concatenate(tmp_lis)
         tmp_mat=array(tmp_lis).copy()
