@@ -240,7 +240,7 @@ class ClData_CosmoMC(object):
                 IW = sum(win[0,self.win_min[i]:self.win_max[i]+1]/(ellwin*(ellwin+1.0)))
                 win[0,self.win_min[i]:self.win_max[i]+1] /= IW
 
-            win[0,self.win_min[i]:self.win_max[i]+1] /= (2*math.pi) 
+            win[0,self.win_min[i]:self.win_max[i]+1] /= (2.0*math.pi) 
 
         if self.has_pol:
             self.inc_pol[i] = any(win[1,:] != 0)
@@ -248,7 +248,7 @@ class ClData_CosmoMC(object):
         fp.close()
         
         ## AHJ: remove small values
-        small_win = 0.0 #1.0e-2
+        small_win = 0.0
         maxw = max(fabs(win[0,:]))
         midx = where(logical_and(fabs(win[0,:])<maxw*small_win, fabs(win[0,:]>0.0)))
         if len(midx[0])>0: 
