@@ -160,7 +160,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         tmp_mat=array(tmp_lis).copy()
         tmp_mat.shape = (file_points, file_points)
         
-        print tmp_mat.shape
+        ##print tmp_mat.shape
 
         # is this efficient?
         idx = [ used_bands ] * self.num_points   ## replicate, not multiply!

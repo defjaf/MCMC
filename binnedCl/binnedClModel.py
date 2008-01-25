@@ -144,7 +144,7 @@ class binnedClModel(object):
             cls.BPnorm[i] = num/denom
             
         print 'binning: %d... %d' % (cls.lmin, cls.lmax)
-        print 'BPnorm:', cls.BPnorm
+        # print 'BPnorm:', cls.BPnorm
         print 'nparam: ', cls.nparam
 
     ## don't really need package/unpackage for this case since
