@@ -148,7 +148,7 @@ def main(nMC=(1000,), gridPlot=True):
     
     params=xrange(s.samples.shape[1])    
     for param in params:
-        s1 = s.transpose()[param]
+        s1 = s.samples.transpose()[param]
 
         mean = mod.bandpowers(s1.mean())
         stdv = mod.bandpowers(s1.std())
@@ -177,10 +177,10 @@ def plotter(sampler):
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
     
+    ### need to take shape into account
     vals = mod.bandpowers(vals)
     sigs = mod.bandpowers(sigs)
     
-### need to take shape into account???
     
     #vals = vals*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
     #sigs = sigs*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
@@ -194,9 +194,9 @@ def plotter(sampler):
     ### or replace with mod.plotmod if written...
     pylab.cla()
     pylab.errorbar(mod.ellctr, vals, yerr=sigs)
-    m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
-    c = c1*ell*(ell+1)/(2*N.pi)
-    pylab.plot(ell, c)
+    #m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
+    #c = c1*ell*(ell+1)/(2*N.pi)
+    #pylab.plot(ell, c)
     
 
 ########################################################
