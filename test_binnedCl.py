@@ -152,7 +152,7 @@ def main(nMC=(1000,), gridPlot=True):
 
         mean = mod.bandpowers(s1.mean())
         stdv = mod.bandpowers(s1.std())
-        print '%d %f %f' % (ell[param], mean, stdv)        
+        print '%d %f %f' % (ell[param], mean[param], stdv[param])        
     
     
     #numarray.Error.popMode()
