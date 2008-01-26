@@ -10,7 +10,7 @@ from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    arange)
 from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
-from numpy import empty, isnan
+from numpy import empty, isnan, isfinite
 
 from Likelihood import ZeroPosterior
 
@@ -156,14 +156,14 @@ class MCMC(object):
         
         try:
             next_lnPr = self.prob(next)
+            if isnan(next_lnPr):    ### AHJ CHECK -- is this really needed or is below better???
+                print 'got NaN'
+                raise ZeroPosterior
         except ZeroPosterior:
             ## don't accept, no matter what
             prior = 0
         else:
-            if isnan(next_lnPr):     ### AHJ CHECK -- is this really needed or is below better???
-                prior = 0
-            else:
-                prior = self.like.model.prior(*next)
+            prior = self.like.model.prior(*next)
             
         
         # working with lnalpha eliminates some over/underflow errors
@@ -171,6 +171,9 @@ class MCMC(object):
             next_lnPr += log(prior)
             lnalpha = next_lnPr-self.prev_lnPr
             lnalpha += self.prop.lndensityRatio(self.prev, next)
+            
+            if not isfinite(lnalpha):
+                print 'lnalpha: next_lnPr=%f, prev_lnPr=%f' % (next_lnPr, self.prev_lnPr)
     
     #        print >> debugf, prior, '|', next, '|', next_lnPr,
         

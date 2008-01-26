@@ -18,7 +18,7 @@ from pylab import *
 #from numarray.random_array import uniform
 #from numarray import arange, array, float64, Error, transpose, zeros, ones
 from numpy.random import uniform
-from numpy import arange, array, float64, transpose, zeros, ones
+from numpy import arange, array, float64, transpose, zeros, ones, exp
 from numpy import concatenate as cat
 import numpy as N
 
@@ -82,7 +82,7 @@ def main(nMC=(1000,), gridPlot=True):
 #                 701, 801, 1001, max_ell]
         bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1950, len(llClTT)-1]
+                1451, 1511, 1571, 1651, 1751, 1851, 1950] #, len(llClTT)-1]
 ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
@@ -203,36 +203,54 @@ def plotter(sampler):
 def getlike(ibin=1):
     mod = binnedClModel
 
-    mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
-    mapd = pyfits.getdata(mapf)
+    #mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
+    #mapd = pyfits.getdata(mapf)
+    #ll = arange(mapd.shape[0])
+    #norm = 1e6
+    #ClTT = array(norm**2*mapd.field(0))
+    #llCl = ClTT*ll*(ll+1)/(2*math.pi)
 
-    ll = arange(mapd.shape[0])
-    norm = 1e6
-    ClTT = array(norm**2*mapd.field(0))
-    llCl = ClTT*ll*(ll+1)/(2*math.pi)
+    #max_ell = len(llCl)-1
+    #max_ell = 2100
+
+    tmp = N.fromfile("CarloClModel.dat", sep=" ")
+    tmp.shape = -1, 6
+    ells = int_(tmp.T[0])  ## nb doesn't usually start at l=0
+
+    max_ell = max(ells)
+    ll = arange(max_ell+1)
+    llClTT = N.zeros(max_ell+1)
+    llClEE = N.zeros(max_ell+1)
+    llClTE = N.zeros(max_ell+1)
+    llClTT[ells] = tmp.T[1]
+    llClEE[ells] = tmp.T[2]
+    llClTE[ells] = tmp.T[3]
 
     manybins = True
     onebin = False
 
-    testshape=False
+    testshape = True
 
     data = ClData.getClData(filename, no_pol=True)
-    
-    for d in data:
-        d.beam_uncertain=False
-        d.calib_uncertainty = 0.0
-        #d.has_xfactors=False
+
+    # print "unsetting beam and calib uncertainty"
+    # for d in data:
+    #     d.beam_uncertain=False
+    #     d.calib_uncertainty = 0.0
+    #     #d.has_xfactors=False
 
     if manybins:
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
 #                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
-#                 651, 701, 801, 901, 1001,  len(llCl)-1]
-#        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
-#                 701, 801, 1001, len(llCl)-1]
-        #bins = [ 2, 21, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+#                 651, 701, 801, 901, 1001,  max_ell]
+##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+#        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+#                 701, 801, 1001, max_ell]
         bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1950]
+                1451, 1511, 1571, 1651, 1751, 1851, 1950, len(llClTT)-1]
+##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
             bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
         bins = bins[:-1]
@@ -241,22 +259,21 @@ def getlike(ibin=1):
         ell = [int((b[0]+b[1])/2) for b in bins]
         ## start at a reasonable model
         if not testshape:
-            Clbins = [b for b in ell if b<len(llCl) ]
+            Clbins = [b for b in ell if b<len(llClTT) ]
             start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
-            start_params[0:len(Clbins)] = llCl[Clbins]
-            start_params[where(start_params==0)]=2000.0
+            start_params[0:len(Clbins)] = llClTT[Clbins]
             shape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            shape = llCl
+            shape = llClTT
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.1
-            
+
 
     elif onebin:
-        bins = [(2, len(llCl)//2), (len(llCl)//2+1,len(llCl)-1)]
+        bins = [(2, len(llClTT)//2), (len(llClTT)//2+1,len(llClTT)-1)]
         npar = len(bins)
-        shape = llCl
+        shape = llClTT
         start_params = ones(shape=(npar,), dtype=float64)
         prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
 
@@ -270,12 +287,15 @@ def getlike(ibin=1):
     
     #### plot the likelihood as a function of power in a single bin
     
-    bps = N.linspace(0, 100*start_params[ibin], 100)
+    bps = N.linspace(0, 5*start_params[ibin], 100)
     likearr = N.empty_like(bps)
     for i, bp in enumerate(bps):
         pars = start_params
         pars[ibin] = bp
         likearr[i] = like.lnLike(pars)
+        
+    avg = (bps*exp(likearr)).sum()/(exp(likearr)).sum()
+    print '<par>=%f' % (avg)
         
     plot(bps, likearr-max(likearr))
     
