@@ -37,7 +37,7 @@ import numpy.linalg as la
 ### "static" variables for this whole module
 num_cls = 3   ### TT, TE, EE (change to 4 for BB)
 lmax = 3100
-halfsteps = 5
+halfsteps = 9
 
 def initNumericalMarge(halfsteps):
     """ initialize numerical integration """
@@ -319,7 +319,7 @@ class ClData_CosmoMC(object):
 
         chisq=empty(dtype=float64, shape=2*halfsteps+1)
         chisqcalib=empty(dtype=float64, shape=2*halfsteps+1)
-        low = -30.0 + zeros(2*halfsteps+1, float64)
+        low = -400.0 # + zeros(2*halfsteps+1, float64)
 
         hrange=range(-halfsteps, halfsteps+1)
         for ibeam in hrange:
@@ -334,7 +334,9 @@ class ClData_CosmoMC(object):
 
             minchisq = min(chisq)
             #### deal with underflow
-            exparg = array([max(z) for z in zip(low, -(chisq-minchisq)/2)])
+            ## exparg=array([max([low,z]) for z in  -(chisq-minchisq)/2))
+            exparg = -(chisq-minchisq)/2
+            ##exparg[where(exparg<low)] = low
             chisqcalib[ibeam+halfsteps] = -2*log(sum( \
                 margeweights*exp(exparg)/margenorm)) + minchisq
 
@@ -342,7 +344,9 @@ class ClData_CosmoMC(object):
                 return chisqcalib[ibeam+halfsteps]
 
         minchisq = min(chisqcalib)
-        exparg = array([max(z) for z in zip(low, -(chisqcalib-minchisq)/2)])
+        exparg = -(chisqcalib-minchisq)/2
+        ##exparg[where(exparg<low)] = low
+#        exparg = array([max(z) for z in zip(low, -(chisqcalib-minchisq)/2)])
         return  -2*log(sum(margeweights*exp(exparg)/margenorm)) + minchisq
 
 
