@@ -18,7 +18,7 @@ from pylab import *
 #from numarray.random_array import uniform
 #from numarray import arange, array, float64, Error, transpose, zeros, ones
 from numpy.random import uniform
-from numpy import arange, array, float64, transpose, zeros, ones, exp
+from numpy import arange, array, float64, transpose, zeros, ones, exp, logical_not
 from numpy import concatenate as cat
 import numpy as N
 
@@ -31,7 +31,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True):
+def main(nMC=(1000,), gridPlot=True, testshape=True):
     #numarray.Error.pushMode(dividebyzero="warn")
     #numarray.Error.pushMode(all="raise")
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
@@ -63,8 +63,6 @@ def main(nMC=(1000,), gridPlot=True):
     manybins = True
     onebin = False
 
-    testshape = True
-
     data = ClData.getClData(filename, no_pol=True)
     
     # print "unsetting beam and calib uncertainty"
@@ -82,7 +80,10 @@ def main(nMC=(1000,), gridPlot=True):
 #                 701, 801, 1001, max_ell]
         bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1950] #, len(llClTT)-1]
+                1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+        bins = [50, 1091, 1151, 1211, 1271, 1331, 1391,
+                1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
+        # bins = [50, 1851, 1951, len(llClTT)-1]
 ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
@@ -94,8 +95,9 @@ def main(nMC=(1000,), gridPlot=True):
         ## start at a reasonable model
         if not testshape:
             Clbins = [b for b in ell if b<len(llClTT) ]
-            start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
-            start_params[0:len(Clbins)] = llClTT[Clbins]
+            start_params = zeros(shape=(npar,), dtype=float64) + 200.0
+            #start_params[0:len(Clbins)] = llClTT[Clbins]
+            start_params = llClTT[int_(ell)]
             shape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
@@ -146,13 +148,16 @@ def main(nMC=(1000,), gridPlot=True):
         getdist.printvals(s)
 
     
-    params=xrange(s.samples.shape[1])    
+    params=xrange(s.samples.shape[1])  
+    mean = N.empty(s.samples.shape[1])
+    stdv = N.empty(s.samples.shape[1])
     for param in params:
-        s1 = s.samples.transpose()[param]
-
-        mean = mod.bandpowers(s1.mean())
-        stdv = mod.bandpowers(s1.std())
-        print '%d %f %f' % (ell[param], mean[param], stdv[param])        
+        s1 = s.samples.T[param]
+        mean[param] = s1.mean()
+        stdv[param] = s1.std()
+    
+    for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
+        print '%d %f %f' % (l,m,s)        
     
     
     #numarray.Error.popMode()
@@ -200,7 +205,7 @@ def plotter(sampler):
     
 
 ########################################################
-def getlike(ibin=1):
+def getlike(ibins=[1], data=None):
     mod = binnedClModel
 
     #mapf = '/'.join( (mapdir, 'models/cmb_04546021.fits') )
@@ -231,7 +236,7 @@ def getlike(ibin=1):
 
     testshape = True
 
-    data = ClData.getClData(filename, no_pol=True)
+    if data is None: data = ClData.getClData(filename, no_pol=True)
 
     # print "unsetting beam and calib uncertainty"
     # for d in data:
@@ -249,6 +254,9 @@ def getlike(ibin=1):
         bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
                 1451, 1511, 1571, 1651, 1751, 1851, 1950, len(llClTT)-1]
+        bins = [50, 1651, 1751, 1851, 1951, 3000] #, len(llClTT)-1]
+        bins = [1, 1851, 1951, len(llClTT)-1]
+        
 ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
         for i, b in enumerate(bins[:-1]):
@@ -260,9 +268,9 @@ def getlike(ibin=1):
         ## start at a reasonable model
         if not testshape:
             Clbins = [b for b in ell if b<len(llClTT) ]
-            start_params = zeros(shape=(npar,), dtype=float64) + 2000.0
-            start_params[0:len(Clbins)] = llClTT[Clbins]
-            shape = 1.0
+            #start_params = zeros(shape=(npar,), dtype=float64)
+            start_params = llClTT[int_(ell)]
+            shape = 100.
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
             shape = llClTT
@@ -276,6 +284,9 @@ def getlike(ibin=1):
         shape = llClTT
         start_params = ones(shape=(npar,), dtype=float64)
         prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
+    
+    print 'Start:'
+    print start_params
 
     mod.setBinning(bins, shapefun=shape)
 
@@ -286,20 +297,25 @@ def getlike(ibin=1):
     like = binnedClLikelihood(data=data, model=mod)
     
     #### plot the likelihood as a function of power in a single bin
-    
-    bps = N.linspace(0, 5*start_params[ibin], 100)
-    likearr = N.empty_like(bps)
-    for i, bp in enumerate(bps):
-        pars = start_params
-        pars[ibin] = bp
-        likearr[i] = like.lnLike(pars)
+    for ibin in ibins:
+        bps = N.linspace(0, 5*start_params[ibin], 100)
+        lnlikearr = N.zeros_like(bps)
+        for i, bp in enumerate(bps):
+            pars = start_params.copy()
+            pars[ibin] = bp
+            lnlikearr[i] =  like.lnLike(pars)
+            
+        lnlikearr[logical_not(isfinite(lnlikearr))] = min(lnlikearr[isfinite(lnlikearr)])-10.0
+        lnlikearr = lnlikearr-max(lnlikearr)
+        plot(bps, lnlikearr)
+
+        likearr = exp(lnlikearr)
+
+        avg = (bps*likearr).sum()/likearr.sum()
+        print '<par>=%f' % (avg)
         
-    avg = (bps*exp(likearr)).sum()/(exp(likearr)).sum()
-    print '<par>=%f' % (avg)
-        
-    plot(bps, likearr-max(likearr))
     
-    return like, likearr
+    return data, like, likearr
     
     
 ########################################################

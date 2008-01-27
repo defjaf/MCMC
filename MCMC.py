@@ -157,7 +157,7 @@ class MCMC(object):
         try:
             next_lnPr = self.prob(next)
             if isnan(next_lnPr):    ### AHJ CHECK -- is this really needed or is below better???
-                print 'got NaN'
+                #self.n_NaN += 1
                 raise ZeroPosterior
         except ZeroPosterior:
             ## don't accept, no matter what
@@ -172,12 +172,13 @@ class MCMC(object):
             lnalpha = next_lnPr-self.prev_lnPr
             lnalpha += self.prop.lndensityRatio(self.prev, next)
             
-            if not isfinite(lnalpha):
-                print 'lnalpha: next_lnPr=%f, prev_lnPr=%f' % (next_lnPr, self.prev_lnPr)
+            # if not isfinite(lnalpha):
+            #     print 'lnalpha: next_lnPr=%f, prev_lnPr=%f' % (next_lnPr, self.prev_lnPr)
     
     #        print >> debugf, prior, '|', next, '|', next_lnPr,
         
         ### AHJ CHECK: is this quite right? Does it screw up when the *previous* prob was NaN?
+        #### OK, since NaN is never saved as prev
         ### lnalpha<0 check short-circuits the exp(lnalpha)?
         #if prior<=0 or (lnalpha < 0 and exp(lnalpha)<uniform(0,1)):
         ## rewrite as not (not check) to catch NaNs if they appear

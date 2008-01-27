@@ -3,7 +3,7 @@ from __future__ import division
 import math
 from operator import isSequenceType
 
-from numpy import asarray, array, arange, float64, zeros, all, empty
+from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar
 import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
@@ -46,7 +46,9 @@ class binnedClModel(object):
         """
         get a full C_l spectrum for the parameters
         currently works for shapefun = scalar or shapefun=l(l+1)Cl shape
-
+        
+        nb. leaves C_l = shape (not 0) for any non-binned values of ell.
+        
         still need to deal with polarization if present
         """
         # can use the window-function methods from the CosmoMC likelihood?
@@ -103,6 +105,8 @@ class binnedClModel(object):
         
         cls.lmax = max(rng[1] for rng in bins)
         cls.lmin = min(rng[0] for rng in bins)
+        
+        #print 'lmin, lmax, len(shape)=', cls.lmin, cls.lmax, len(shapefun)
 
         if isSequenceType(shapefun) and len(shapefun)>cls.lmax:
             cls.shapefun=shapefun[:cls.lmax+1]
@@ -135,16 +139,13 @@ class binnedClModel(object):
         #       I_l[f_l]=\sum_l[f_l(l+1/2)/l/(l+1)]
         # (nb. shapefun is l(l+1)C_l[shape]), 
         #     so flat in l(l+1)Cl gives 1
-        cls.BPnorm = empty(len(bins), dtype=float64)
-        for i, bin in enumerate(bins):
-            ells = arange(bin[0], bin[1]+1, dtype=float64)
-            llClshape = shapefun[bin[0]:bin[1]+1]
-            num = (llClshape*(ells+0.5)/ells/(ells+1.0)).sum()
-            denom = ((ells+0.5)/ells/(ells+1.0)).sum()
-            cls.BPnorm[i] = num/denom
+        if isscalar(shapefun):
+            cls.BPnorm = cls.shapefun
+        else:
+            cls.BPnorm = bin_spectrum(bins, shapefun)
             
         print 'binning: %d... %d' % (cls.lmin, cls.lmax)
-        # print 'BPnorm:', cls.BPnorm
+        print 'BPnorm:', cls.BPnorm
         print 'nparam: ', cls.nparam
 
     ## don't really need package/unpackage for this case since
@@ -158,3 +159,15 @@ class binnedClModel(object):
 
     unpackage=staticmethod(unpackage)  
     package=staticmethod(package)
+    
+# make this a separate function so it can be called out of the model context
+def bin_spectrum(bins, llCl):
+    """ bin the spectrum Cl[] into bins given by bins (list of tuples)"""
+    binned_llCl = zeros(len(bins), dtype=float64)
+    for i, bin in enumerate(bins):
+        ells = arange(bin[0], bin[1]+1, dtype=float64)
+        llClbin = llCl[bin[0]:bin[1]+1]
+        num = (llClbin*(ells+0.5)/ells/(ells+1.0)).sum()
+        denom = ((ells+0.5)/ells/(ells+1.0)).sum()
+        binned_llCl[i] = num/denom
+    return binned_llCl
