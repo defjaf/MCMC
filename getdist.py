@@ -31,7 +31,7 @@ def printvals(MCMC, params=None):
         params=xrange(s.shape[1])
     
     for param in params:
-        s1 = s.transpose()[param]
+        s1 = s.T[param]
         
         mean = s1.mean()
         stdv = s1.std()  ## stddev(s1)
