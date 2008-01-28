@@ -361,11 +361,12 @@ class ClData_CosmoMC(object):
             idx = self.has_xfactor
             ndx = logical_not(idx)
             
-            zth = BP[idx] + self.xfactors[idx]
+            #zth = BP[idx] + self.xfactors[idx]
             #zth[where(zth<=0.0)] = 1.0e-10   ### AHJ Check
 
             with errstate(invalid='ignore'):
-                diffs[idx] = self.obs[idx] - log(zth)
+                diffs[idx] = self.obs[idx] - log(BP[idx] + self.xfactors[idx])
+                
             diffs[ndx] = self.obs[ndx] - BP[ndx]
         else:
             diffs = self.obs - BP

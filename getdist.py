@@ -19,7 +19,7 @@ from itertools import islice, groupby
 def GaussPDF(x, mean=0, stdev=1):
     return numpy.exp(-0.5*(x-mean)**2/stdev**2)/numpy.sqrt(2*numpy.pi)/stdev
 
-def printvals(MCMC, params=None):
+def printvals(MCMC, params=None, lnLike=None):
     """ like loop over hist(), but don't plot """
     
     try:
@@ -27,6 +27,15 @@ def printvals(MCMC, params=None):
     except AttributeError:
         s = MCMC
         
+    try:
+        if lnLike is None: lnLike = MCMC.lnPr
+    except AttributeError:
+        lnLike = None
+
+    if lnLike is not None: 
+        print 'Max ln likelihood %f at parameters:' % max(lnLike)
+        print s[lnLike.argmax()]
+
     if params is None:
         params=xrange(s.shape[1])
     
