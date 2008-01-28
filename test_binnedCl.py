@@ -65,11 +65,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
 
     data = ClData.getClData(filename, no_pol=True)
     
-    # print "unsetting beam and calib uncertainty"
-    # for d in data:
-    #     d.beam_uncertain=False
-    #     d.calib_uncertainty = 0.0
-    #     #d.has_xfactors=False
+    print "unsetting beam and calib uncertainty"
+    for d in data:
+     d.beam_uncertain=False
+     d.calib_uncertainty = 0.0
+     #d.has_xfactors=False
 
     if manybins:
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
@@ -80,9 +80,12 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
 #                 701, 801, 1001, max_ell]
         bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+                1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
         #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
-        bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
+        # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
+        # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 
+        #        1271, 1331, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, 2101, 
+        #        2301, 2501, 3000]
         # bins = [50, 1851, 1951, len(llClTT)-1]
 ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]

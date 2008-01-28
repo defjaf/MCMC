@@ -81,10 +81,12 @@ class binnedClModel(object):
     @staticmethod
     def prior(*C_b):
         
-        if all(asarray(C_b)>0):  #reduce(__and__, (c > 0 for c in C_b), True):
-            return 1
-        else:
-            return 0
+        return 1
+        
+        # if all(asarray(C_b)>0):  #reduce(__and__, (c > 0 for c in C_b), True):
+        #     return 1
+        # else:
+        #     return 0
 
     @classmethod
     def setBinning(cls, bins, shapefun=None, doBlock=True):
