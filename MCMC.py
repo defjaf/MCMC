@@ -10,7 +10,7 @@ from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    arange)
 from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
-from numpy import empty, isnan, isfinite
+from numpy import empty, isnan, isfinite, isneginf
 
 from Likelihood import ZeroPosterior
 
@@ -156,7 +156,7 @@ class MCMC(object):
         
         try:
             next_lnPr = self.prob(next)
-            if isnan(next_lnPr):    ### AHJ CHECK -- is this really needed or is below better???
+            if isnan(next_lnPr) or isneginf(next_lnPr):    ### AHJ CHECK -- is this really needed or is below better???
                 #self.n_NaN += 1
                 raise ZeroPosterior
         except ZeroPosterior:
