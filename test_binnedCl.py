@@ -65,11 +65,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
 
     data = ClData.getClData(filename, no_pol=True)
     
-    print "unsetting beam and calib uncertainty"
-    for d in data:
-     d.beam_uncertain=False
-     d.calib_uncertainty = 0.0
-     #d.has_xfactors=False
+    # print "unsetting beam and calib uncertainty"
+    # for d in data:
+    #  d.beam_uncertain=False
+    #  d.calib_uncertainty = 0.0
+    #  #d.has_xfactors=False
 
     if manybins:
 #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
