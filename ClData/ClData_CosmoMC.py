@@ -36,7 +36,7 @@ import numpy.linalg as la
 
 ### "static" variables for this whole module
 num_cls = 3   ### TT, TE, EE (change to 4 for BB)
-lmax = 3100
+lmax = 3500
 halfsteps = 5
 
 def initNumericalMarge(halfsteps):
@@ -317,28 +317,28 @@ class ClData_CosmoMC(object):
 
         bandpowers = array(bandpowers)
 
-        chisq=empty(dtype=float64, shape=2*halfsteps+1)
         chisqcalib=empty(dtype=float64, shape=2*halfsteps+1)
+        chisq=empty(dtype=float64, shape=2*halfsteps+1)
         low = -1400.0 # + zeros(2*halfsteps+1, float64)
 
         hrange=range(-halfsteps, halfsteps+1)
         for ibeam in hrange:
 
-            beambandpowers = bandpowers
+            beambandpowers = bandpowers.copy()
             if self.beam_uncertain:
                 beambandpowers *= 1+self.beam_err*ibeam*3/halfsteps
-
+                
             for i in hrange:
-                calib = 1+self.calib_uncertainty*i*3/halfsteps #Go out to 3 sigma
+                calib = 1+self.calib_uncertainty*i*3/halfsteps #Go out to 3 sigma                
                 chisq[i+halfsteps] = self.getchisq(calib*beambandpowers)
-
+            
             minchisq = min(chisq)
             #### deal with underflow
             ## exparg=array([max([low,z]) for z in  -(chisq-minchisq)/2))
             exparg = -(chisq-minchisq)/2
             #exparg[where(exparg<low)] = low
-            chisqcalib[ibeam+halfsteps] = -2*log(sum( \
-                margeweights*exp(exparg)/margenorm)) + minchisq
+            chisqcalib[ibeam+halfsteps] = \
+                -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
 
             if not self.beam_uncertain:
                 return chisqcalib[ibeam+halfsteps]
@@ -347,7 +347,7 @@ class ClData_CosmoMC(object):
         exparg = -(chisqcalib-minchisq)/2
         #exparg[where(exparg<low)] = low
 #        exparg = array([max(z) for z in zip(low, -(chisqcalib-minchisq)/2)])
-        return  -2*log(sum(margeweights*exp(exparg)/margenorm)) + minchisq
+        return  -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
 
 
     ## modified to deal with BP+x<0
