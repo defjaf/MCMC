@@ -1,4 +1,3 @@
-
 from __future__ import division
 
 
@@ -13,10 +12,9 @@ import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
 from binnedCl.binnedClModel import binnedClModel
 from ClData import ClData
+
 from pylab import *
-#import numarray
-#from numarray.random_array import uniform
-#from numarray import arange, array, float64, Error, transpose, zeros, ones
+
 from numpy.random import uniform
 from numpy import arange, array, float64, transpose, zeros, ones, exp, logical_not
 from numpy import concatenate as cat
@@ -32,8 +30,6 @@ if not os.path.exists(homedir):
 mapdir = '/'.join( (homedir, mapdir) )
 
 def main(nMC=(1000,), gridPlot=True, testshape=True):
-    #numarray.Error.pushMode(dividebyzero="warn")
-    #numarray.Error.pushMode(all="raise")
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -132,10 +128,6 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
                         
-    # if testshape:
-    #     pylab.plot([ll[0], ll[-1]], [1, 1], hold='true')
-    # else:
-
     pylab.plot(ll, llClTT, hold='true')
         
     pylab.figure(1)
@@ -162,9 +154,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
         print '%d %f %f' % (l,m,s)        
     
-    
-    #numarray.Error.popMode()
     return retval
+
 
 def plotter(sampler):
     """
