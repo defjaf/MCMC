@@ -3,7 +3,7 @@ from __future__ import division
 import math
 from operator import isSequenceType
 
-from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar
+from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max
 import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
@@ -47,24 +47,32 @@ class binnedClModel(object):
         get a full C_l spectrum for the parameters
         currently works for shapefun = scalar or shapefun=l(l+1)Cl shape
         
-        nb. leaves C_l = shape (not 0) for any non-binned values of ell.
+        nb. leaves C_l = shape (not 0) for any non-binned values of ell.   ???
         
         still need to deal with polarization if present
         """
+        
+        ## add loop over = i = {TT, EE, TE, etc}... check order. have class or instance-level has_pol for speed?
+        
         # can use the window-function methods from the CosmoMC likelihood?
-        self.Cl[0] = self.shapefun
-        for Cb, rng in zip(self.Cb, self.bins):
-            ## nb. bins are (beginning, end) so need the +1 for python
-            self.Cl[0, rng[0]:rng[1]+1] *= Cb
+        ibin = 0
+        for iCl in range(self.nCl):
+            self.Cl[iCl] = self.shapefun[iCl].copy()
+            Cb = self.Cb[ibin:ibin+self.nbins[iCl]]
+            for Cb, rng in zip(Cb,self.bins[iCl]):
+                ## nb. bins are (beginning, end) so need the +1 for python
+                self.Cl[iCl, rng[0]:rng[1]+1] *= Cb
             
-        self.Cl[0] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
+            self.Cl[iCl] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
+            
         return self.Cl
 
     @classmethod
     def bandpowers(cls, qb):
-        """return the bandpowers corresponding to a set of qb"""
+        """return list of arrays of the bandpowers corresponding to a set of qb"""
             
-        return qb*cls.BPnorm
+        return [qb[i]*cls.BPnorm[i] for i in range(cls.nCl)]
+        
 
 
     def BP(self, qb=None):
@@ -89,7 +97,7 @@ class binnedClModel(object):
         #     return 0
 
     @classmethod
-    def setBinning(cls, bins, shapefun=None, doBlock=True):
+    def setBinning(cls, bins, shapefun=None, doBlock=True, nCl=None):
         """
         set up the binning and shape functions
         binning is a sequence [(lmin0, lmax0), (lmin1, lmax1), ...]
@@ -99,19 +107,50 @@ class binnedClModel(object):
         if shapefun=None, flat in l(l+1)C_l/2pi (with amplitude 1)
         if shapefun=Scalar, flat in l(l+1)C_l/(2pi)=scalar
 
-        polarization?
+        polarization: 
         """
+        
+        if nCl is None:
+            if len(bins)==len(shapefun):
+                nCl = len(bins)
+        if nCl>3:
+            raise Exception("Error in shapes of bins, shapefun, giving nCl=%d" % nCl)
+
+        if nCl==1:
+            if N.isarray(bins):
+                if bins.ndim==2: 
+                    bins = [bins]
+                    
+        cls.nCl = nCl
+                
+        ## so bins is now bins[iCl][ibin, 0:1]
+                                
 
         cls.bins = bins # should probably allow just a single sequence
                         # of the start of all bins, followed by lmax
         
-        cls.lmax = max(rng[1] for rng in bins)
-        cls.lmin = min(rng[0] for rng in bins)
+        ## gotta be a better way to do this...
+        lmax = []
+        lmin = []
+        for bin in bins:
+            lmax.append(array(bin).max())
+            lmin.append(array(bin).min())
+        cls.lmax=max(lmax)
+        cls.lmin=min(lmin)
+        #cls.lmax = max([b[1] for b in x for x in bins])
+        #cls.lmin = min([b[0] for b in x for x in bins])
+        # cls.lmax = max(rng[1] for rng in b for b in bins)
+        # cls.lmin = min(rng[0] for rng in b for b in bins)
+        #cls.lmax = max(rng[1] for rng in b for b in bin for bin in bins)
+        #cls.lmax = min(rng[0] for rng in b for b in bin for bin in bins)
+
         
-        #print 'lmin, lmax, len(shape)=', cls.lmin, cls.lmax, len(shapefun)
+        print 'lmin, lmax, len(shape)=', cls.lmin, cls.lmax, len(shapefun)
 
         if isSequenceType(shapefun) and len(shapefun)>cls.lmax:
             cls.shapefun=shapefun[:cls.lmax+1]
+        elif isSequenceType(shapefun) and len(shapefun[0])>cls.lmax:
+            cls.shapefun=shapefun[:,:cls.lmax+1]
         elif shapefun is None:
             cls.shapefun = 1.0
         else:
@@ -125,16 +164,19 @@ class binnedClModel(object):
         cls.ellnorm[0] = 0.0
 
         ## bin centres
-        cls.ellctr = asarray([(b[0]+b[1])/2 for b in bins])
+        cls.ellctr = [array(b).mean(axis=1) for b in bins]
+        
+        #cls.ellctr = [asarray([(b[0]+b[1])/2 for b in bin]) for bin in bins]
 
-        cls.nparam = len(bins)
+        cls.nbins = [len(bin) for b in bins]
+        cls.nparam = sum(cls.nbins)
         if doBlock:
             cls.paramBlocks = arange(cls.nparam)
             cls.nBlock = cls.nparam
         else:
             cls.paramBlocks = None
             cls.nBlock = 0
-            
+        
 
         ## conversion factors for qb->bandpowers
         ## I_l[l(l+1)C_l[shape]]/I_l[1] where "logarithmic integral" is
@@ -144,7 +186,7 @@ class binnedClModel(object):
         if isscalar(shapefun):
             cls.BPnorm = cls.shapefun
         else:
-            cls.BPnorm = bin_spectrum(bins, shapefun)
+            cls.BPnorm = [bin_spectrum(b, s) for (b, s) in zip(bins, shapefun)]
             
         print 'binning: %d... %d' % (cls.lmin, cls.lmax)
         print 'BPnorm:', cls.BPnorm
@@ -152,6 +194,7 @@ class binnedClModel(object):
 
     ## don't really need package/unpackage for this case since
     ## parameters are pretty naturally a list (but what about polarization?)
+    ### for polz, this is probably more efficient, but needs to deal with the different structures in __call__()
     def package(Cb): return asarray(Cb)
     def unpackage(Cb): return asarray(Cb)
     

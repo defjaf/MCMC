@@ -22,7 +22,6 @@ import numpy as N
 
 filename = "data_list.txt"
 
-
 mapdir = 'cmb/misc-data/MAP'
 homedir = os.path.expandvars('${HOME}/home')
 if not os.path.exists(homedir):
@@ -74,9 +73,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
 ##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
 #        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
 #                 701, 801, 1001, max_ell]
-        bins = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
+        binsTT = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+                1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
         #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
         # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
         # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 
@@ -85,22 +84,32 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
         # bins = [50, 1851, 1951, len(llClTT)-1]
 ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
 ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
-        for i, b in enumerate(bins[:-1]):
-            bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
-        bins = bins[:-1]
-        npar = len(bins)
+        binsTE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974, 
+                  1055, 1136, 1217, 1298, 1379, 1460, 1540]
+        binsEE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974,
+                  1055, 1136, 1217, 1298, 1379, 1460, 1540]
+        
+        ells = []
+        for bins in [binsTT, binsTE, binsEE]:
+            for i, b in enumerate(bins[:-1]):
+                bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
+        bins = [binsTT[:-1], binsTE[:-1], binsEE[:-1]]
+        nbins = [len(b) for b in bins]
+        npar = sum(nbins)
 
-        ell = [int((b[0]+b[1])/2) for b in bins]
+        #ell = [int((b[0]+b[1])/2) for b in bins]
+        ells = [array(b).mean(axis=1) for b in bins]
+        
         ## start at a reasonable model
         if not testshape:
             Clbins = [b for b in ell if b<len(llClTT) ]
             start_params = zeros(shape=(npar,), dtype=float64) + 200.0
             #start_params[0:len(Clbins)] = llClTT[Clbins]
             start_params = llClTT[int_(ell)]
-            shape = 1.0
+            llClshape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            shape = llClTT
+            llClshape = array([llClTT, llClTE, llClEE])
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.1
             
@@ -108,13 +117,15 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     elif onebin:
         bins = [(2, len(llClTT)//2), (len(llClTT)//2+1,len(llClTT)-1)]
         npar = len(bins)
-        shape = llClTT
+        llClshape = llClTT
         start_params = ones(shape=(npar,), dtype=float64)
         prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
 
-    mod.setBinning(bins, shapefun=shape)
+    mod.setBinning(bins, shapefun=llClshape)
 
-    ell = [(b[0]+b[1])/2 for b in bins]
+    ell = [array(b).mean(axis=1) for b in bins]
+
+    #ell = [(b[0]+b[1])/2 for b in bins]
     print 'bins:'
     print ell
     
@@ -127,8 +138,13 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
-                        
+    
+    pylab.subplot(2,2,0)
     pylab.plot(ll, llClTT, hold='true')
+    pylab.subplot(2,2,1)
+    pylab.plot(ll, llClTE, hold='true')
+    pylab.subplot(2,2,2)
+    pylab.plot(ll, llClEE, hold='true')
         
     pylab.figure(1)
     samples = cat([ s.samples for s in retval[0] ])
@@ -191,8 +207,17 @@ def plotter(sampler):
     
 
     ### or replace with mod.plotmod if written...
-    pylab.cla()
-    pylab.errorbar(mod.ellctr, vals, yerr=sigs, fmt='bo')
+    if data.nbins != data.nparam:
+        ibin0 = 0
+        for iplot, ibins in enumerate(xrange(data.nbins)):
+            pylab.subplot(2,2,iplot)
+            pylab.cla()
+            pylab.errorbar(mod.ellctr[iplot], vals[ibin0:ibin0+ibins], yerr=sigs[ibin0:ibin0+ibins], fmt='bo')
+            ibin0 += ibins
+    else:
+        pylab.cla()
+        pylab.errorbar(mod.ellctr, vals, yerr=sigs, fmt='bo')
+        
     #m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
     #c = c1*ell*(ell+1)/(2*N.pi)
     #pylab.plot(ell, c)

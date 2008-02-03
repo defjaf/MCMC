@@ -266,6 +266,9 @@ class ClData_CosmoMC(object):
         """
         compute -ln(likelihood(data | Cl));  (yes, negative)
         do numerical or analytic marginalization over beam and calibration uncertainty
+        
+        Cl is a [nCl, n_ell] array (or could be a [Cl1, Cl2, Cl3, ...] list?)
+        ... only used in getWinBandpower
         """
 
         if self.all_l_exact:

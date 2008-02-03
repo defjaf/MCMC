@@ -19,7 +19,7 @@ def ClData(file):
     else:
         return ClData_CosmoMC.ClData_CosmoMC(file)
 
-def getClData(listfile, verbose=True, no_pol=True):
+def getClData(listfile, verbose=True, no_pol=False):
     """
     get a list of (CosmoMC format) ClData objects as listed in the file
     blank lines and those beginning with '#' are ignored
