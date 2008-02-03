@@ -58,7 +58,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     manybins = True
     onebin = False
 
-    data = ClData.getClData(filename, no_pol=True)
+    data = ClData.getClData(filename, no_pol=False)
     
     # print "unsetting beam and calib uncertainty"
     # for d in data:
@@ -129,6 +129,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     print 'bins:'
     print ell
     
+    print mod.nbins
+    
     like = binnedClLikelihood(data=data, model=mod)
 
     pylab.figure(0)
@@ -139,11 +141,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
     
-    pylab.subplot(2,2,0)
-    pylab.plot(ll, llClTT, hold='true')
     pylab.subplot(2,2,1)
-    pylab.plot(ll, llClTE, hold='true')
+    pylab.plot(ll, llClTT, hold='true')
     pylab.subplot(2,2,2)
+    pylab.plot(ll, llClTE, hold='true')
+    pylab.subplot(2,2,3)
     pylab.plot(ll, llClEE, hold='true')
         
     pylab.figure(1)
@@ -168,6 +170,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
         stdv[param] = s1.std()
     
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
+        for l1, m1, s1 in zip(l, m, s)
         print '%d %f %f' % (l,m,s)        
     
     return retval
@@ -207,13 +210,12 @@ def plotter(sampler):
     
 
     ### or replace with mod.plotmod if written...
-    if data.nbins != data.nparam:
-        ibin0 = 0
-        for iplot, ibins in enumerate(xrange(data.nbins)):
-            pylab.subplot(2,2,iplot)
+    ## nb. bandpowers(vals) makes into 3*n list if polarized
+    if mod.nbins != mod.nparam:
+        for iplot, (l, v, s) in enumerate(zip(mod.ellctr, vals, sigs)):
+            pylab.subplot(2,2,iplot+1)
             pylab.cla()
-            pylab.errorbar(mod.ellctr[iplot], vals[ibin0:ibin0+ibins], yerr=sigs[ibin0:ibin0+ibins], fmt='bo')
-            ibin0 += ibins
+            pylab.errorbar(l, v, yerr=s, fmt='bo')
     else:
         pylab.cla()
         pylab.errorbar(mod.ellctr, vals, yerr=sigs, fmt='bo')

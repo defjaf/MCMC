@@ -417,9 +417,9 @@ class ClData_CosmoMC(object):
         bandpower = dot(ClTT[self.win_min[i]:maxl],
                         self.window[i, 0, self.win_min[i]:maxl])
         if self.has_pol and rank(Cl)==2 and self.inc_pol[i]:
-            bandpower += (Cl[1:num_cls, win_min[i], maxl+1]*
-                          self.window[i, 1:num_cls, win_min[i], maxl+1]).sum()
-            print 'Accessing polarization getWinBandpower: band', i
+            bandpower += (Cl[1:num_cls, self.win_min[i]:maxl]*
+                          self.window[i, 1:num_cls, self.win_min[i]:maxl]).sum()
+            #print 'Accessing polarization getWinBandpower: band', i
             #for l in xrange(self.win_min[i], maxl):
             #    bandpower += dot(Cl[1:num_cls, l], self.window[i, 1:num_cls, l])            
         return bandpower

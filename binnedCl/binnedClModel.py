@@ -59,9 +59,9 @@ class binnedClModel(object):
         for iCl in range(self.nCl):
             self.Cl[iCl] = self.shapefun[iCl].copy()
             Cb = self.Cb[ibin:ibin+self.nbins[iCl]]
-            for Cb, rng in zip(Cb,self.bins[iCl]):
+            for Cbin, rng in zip(Cb,self.bins[iCl]):
                 ## nb. bins are (beginning, end) so need the +1 for python
-                self.Cl[iCl, rng[0]:rng[1]+1] *= Cb
+                self.Cl[iCl, rng[0]:rng[1]+1] *= Cbin
             
             self.Cl[iCl] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
             
@@ -168,7 +168,7 @@ class binnedClModel(object):
         
         #cls.ellctr = [asarray([(b[0]+b[1])/2 for b in bin]) for bin in bins]
 
-        cls.nbins = [len(bin) for b in bins]
+        cls.nbins = [len(b) for b in bins]
         cls.nparam = sum(cls.nbins)
         if doBlock:
             cls.paramBlocks = arange(cls.nparam)
