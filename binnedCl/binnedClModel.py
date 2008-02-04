@@ -108,7 +108,8 @@ class binnedClModel(object):
         if shapefun=None, flat in l(l+1)C_l/2pi (with amplitude 1)
         if shapefun=Scalar, flat in l(l+1)C_l/(2pi)=scalar
 
-        polarization: 
+        polarization: shapefun is a sequence of D[l]: shapefune[I]=D^I[l]
+                      I = TT, TE, EE, BB in that order
         """
         
         if nCl is None:

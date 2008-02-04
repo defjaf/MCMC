@@ -43,7 +43,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
             fisher_T_cmb=True
             self.name = fp.readline().strip()
 
-        line = string.split(fp.readline())
+        line = string.split(fp.readline())  # number of points in TT EE BB ?? TE ??
         npol = [int(nstr) for nstr in line]
         self.has_pol = (sum(npol[1:]) > 0)
 
@@ -116,11 +116,11 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         
         inpol = [k for k in xrange(6) if npol[k]!=0]
         ## maps from all 6 polz types to the ones actually present
-        for j, k in enumerate(inpol):
+        for k in inpol:
             ch_type = fp.readline().strip()[0:2]
             self.Clpol_idx[ch_type] = [use_i, use_i]
             print '  ch_type=%s' % ch_type
-            for i in xrange(npol[k]):   ### AHJ CHECK on zero or one-base!!!
+            for i in xrange(npol[k]):
                 line = fp.readline().split()
                 if i>=minmax[0,k] and i<=minmax[1,k]:
                     self.Clpol_idx[ch_type][1] += 1
@@ -132,6 +132,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
                         self.has_xfactor[use_i] = int(line[7])
 
                     # print 'getting window array[%d], file[%d], global[%d])' % (use_i, file_i, i)
+                    ## nb. the window functions are always W[iCl, l] for iCl=[TT,TE,EE[,BB]]
                     self.readWindow('data/windows', use_i, file_i, \
                                                     windows_are_bare, \
                                                     windows_are_bandpowers, \

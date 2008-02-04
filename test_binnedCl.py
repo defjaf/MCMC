@@ -1,6 +1,5 @@
 from __future__ import division
 
-
 import math
 import string
 import os.path
@@ -109,7 +108,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
             llClshape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            llClshape = array([llClTT, llClTE, llClEE])
+            llClshape = array([llClTT, llClTE, llClEE])      ### switched order
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64)+0.1
             prop_sigmas[nbins[0]:]=1.0
@@ -133,7 +132,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     print mod.nbins
     
     like = binnedClLikelihood(data=data, model=mod)
-
+    
     pylab.figure(0)
     
     fac = 2.4/sqrt(len(ell))   ## equiv to fac=None
