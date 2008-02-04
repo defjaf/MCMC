@@ -111,7 +111,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
         else:
             llClshape = array([llClTT, llClTE, llClEE])
             start_params = ones(shape=(npar,), dtype=float64)
-            prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.1
+            prop_sigmas = zeros(shape=(npar,), dtype=float64)
+            prop_sigmas[0]+=0.1
+            prop_sigmas[1:3]+=1.0
             
 
     elif onebin:
@@ -170,8 +172,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
         stdv[param] = s1.std()
     
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
-        for l1, m1, s1 in zip(l, m, s)
-        print '%d %f %f' % (l,m,s)        
+        for l1, m1, s1 in zip(l, m, s):
+            print '%d %f %f' % (int(l),m,s)        
     
     return retval
 
