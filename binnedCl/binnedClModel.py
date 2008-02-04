@@ -62,6 +62,7 @@ class binnedClModel(object):
             for Cbin, rng in zip(Cb,self.bins[iCl]):
                 ## nb. bins are (beginning, end) so need the +1 for python
                 self.Cl[iCl, rng[0]:rng[1]+1] *= Cbin
+            ibin += self.nbins[iCl]
             
             self.Cl[iCl] *= self.ellnorm  # convert to C_l from l(l+1)Cl/2pi
             
