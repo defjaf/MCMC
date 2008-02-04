@@ -46,7 +46,8 @@ def initNumericalMarge(halfsteps):
     margenorm = sum(margeweights)
     return margenorm, margeweights
 
-margenorm, margeweights = initNumericalMarge(halfsteps)  # make these 'static'        
+margenorm, margeweights = initNumericalMarge(halfsteps)  # make these 'static'
+
 class ClData_CosmoMC(object):
     """
     Data in CosmoMC format
@@ -322,7 +323,7 @@ class ClData_CosmoMC(object):
 
         chisqcalib=empty(dtype=float64, shape=2*halfsteps+1)
         chisq=empty(dtype=float64, shape=2*halfsteps+1)
-        low = -1400.0 # + zeros(2*halfsteps+1, float64)
+        low = -1400.0 # + zeros(2*halfsteps+1, float64)   ## NO LONGER USED (was -30 in cosmoMC)
 
         hrange=range(-halfsteps, halfsteps+1)
         for ibeam in hrange:
