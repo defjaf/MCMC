@@ -108,7 +108,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
             llClshape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            llClshape = array([llClTT, llClTE, llClEE])      ### switched order
+            llClshape = array([llClTT, llClTE, llClEE])
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64)+0.1
             prop_sigmas[nbins[0]:]=1.0

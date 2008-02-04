@@ -52,7 +52,7 @@ class binnedClModel(object):
         still need to deal with polarization if present
         """
         
-        ## add loop over = i = {TT, EE, TE, etc}... check order. have class or instance-level has_pol for speed?
+        ##  loop over = i = {TT, TE, EE [, BB]}...  have class or instance-level has_pol for speed?
         
         # can use the window-function methods from the CosmoMC likelihood?
         ibin = 0
@@ -70,9 +70,20 @@ class binnedClModel(object):
 
     @classmethod
     def bandpowers(cls, qb):
-        """return list of arrays of the bandpowers corresponding to a set of qb"""
+        """return list of arrays of the bandpowers corresponding to a set of qb
+        
+           *** assume qb is a FLAT sequence of the parameters *** 
+               -- could use some package/unpackage here???
+        """
             
-        return [qb[i]*cls.BPnorm[i] for i in range(cls.nCl)]
+        ret = []
+        ibin = 0
+        for i in range(cls.nCl):
+            ret.append(qb[ibin:ibin+cls.nbins[i]]*cls.BPnorm[i])
+            ibin += cls.nbins[i]
+        return ret
+        
+        #return [qb[nbins[]]*cls.BPnorm[i] for i in range(cls.nCl)]
         
 
 
