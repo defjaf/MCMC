@@ -10,7 +10,7 @@ from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    arange)
 from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
-from numpy import empty, isnan, isfinite, isneginf
+from numpy import empty, isnan, isfinite, isneginf, isinf
 
 from Likelihood import ZeroPosterior
 

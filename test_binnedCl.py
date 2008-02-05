@@ -143,10 +143,13 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     
     pylab.subplot(2,2,1)
     pylab.plot(ll, llClTT, hold='true')
+    pylab.xlim(0,2000)
     pylab.subplot(2,2,2)
     pylab.plot(ll, llClTE, hold='true')
+    pylab.xlim(0,2000)
     pylab.subplot(2,2,3)
     pylab.plot(ll, llClEE, hold='true')
+    pylab.xlim(0,2000)
         
     pylab.figure(1)
     samples = cat([ s.samples for s in retval[0] ])

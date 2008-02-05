@@ -30,7 +30,7 @@ import copy
 
 from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, ndim,
                    reshape, log, exp, transpose, fabs, dot, arange, any, 
-                   logical_not, where, logical_and, errstate)
+                   logical_not, where, logical_and, errstate, inf, isinf)
 import numpy.linalg as la
 
 ### "static" variables for this whole module
@@ -233,14 +233,12 @@ class ClData_CosmoMC(object):
             ellwin = arange(self.win_min[i], self.win_max[i]+1)
             #for l in ellwin:
             #    win[:,l] *= (l+0.5)
-            win[:, self.win_min[i]:self.win_max[i]+1] *= (ellwin+0.5)
+            win[:, self.win_min[i]:self.win_max[i]+1] *= (ellwin+0.5)/(2.0*math.pi)
 
             if not are_normalized:
                 ## normalize to 1 = sum_l W_l (l+1/2)/(l(l+1)) 
                 IW = sum(win[0,self.win_min[i]:self.win_max[i]+1]/(ellwin*(ellwin+1.0)))
                 win[0,self.win_min[i]:self.win_max[i]+1] /= IW
-
-            win[0,self.win_min[i]:self.win_max[i]+1] /= (2.0*math.pi) 
 
         if self.has_pol:
             self.inc_pol[i] = any(win[1:,:] != 0)
@@ -338,19 +336,28 @@ class ClData_CosmoMC(object):
             minchisq = min(chisq)
             #### deal with underflow
             ## exparg=array([max([low,z]) for z in  -(chisq-minchisq)/2))
-            exparg = -(chisq-minchisq)/2
-            #exparg[where(exparg<low)] = low
-            chisqcalib[ibeam+halfsteps] = \
-                -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
+            with errstate(invalid='ignore'):
+                if isinf(minchisq):
+                    chisqcalib[ibeam+halfsteps] = inf
+                #exparg[where(exparg<low)] = low
+                else:
+                    exparg = -(chisq-minchisq)/2
+                    chisqcalib[ibeam+halfsteps] = \
+                        -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
 
             if not self.beam_uncertain:
                 return chisqcalib[ibeam+halfsteps]
 
+
         minchisq = min(chisqcalib)
-        exparg = -(chisqcalib-minchisq)/2
+        with errstate(invalid='ignore'):    
+            if isinf(minchisq):
+                return inf
+            else:
+                exparg = -(chisqcalib-minchisq)/2
         #exparg[where(exparg<low)] = low
 #        exparg = array([max(z) for z in zip(low, -(chisqcalib-minchisq)/2)])
-        return  -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
+                return  -2*log(sum(margeweights*exp(exparg))/margenorm) + minchisq
 
 
     ## modified to deal with BP+x<0
