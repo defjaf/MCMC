@@ -27,7 +27,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True, testshape=True):
+def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -57,7 +57,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
     manybins = True
     onebin = False
 
-    data = ClData.getClData(filename, no_pol=False)
+    if data is None:
+        data = ClData.getClData(filename, no_pol=no_pol)
     
     # print "unsetting beam and calib uncertainty"
     # for d in data:
@@ -89,10 +90,19 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
                   1055, 1136, 1217, 1298, 1379, 1460, 1540]
         
         ells = []
-        for bins in [binsTT, binsTE, binsEE]:
+        if not no_pol:
+            binlist = [binsTT, binsTE, binsEE]
+            shapelist = array([llClTT, llClTE, llClEE])
+        else:
+            binlist = [binsTT]
+            shapelist = array([llClTT])
+            
+        for bins in binlist:
             for i, b in enumerate(bins[:-1]):
                 bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
-        bins = [binsTT[:-1], binsTE[:-1], binsEE[:-1]]
+            
+        bins = [b[:-1] for b in binlist]
+        
         nbins = [len(b) for b in bins]
         npar = sum(nbins)
 
@@ -108,7 +118,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True):
             llClshape = 1.0
             prop_sigmas = zeros(npar, float64) + 100.0
         else:
-            llClshape = array([llClTT, llClTE, llClEE])
+            llClshape = shapelist.copy()
             start_params = ones(shape=(npar,), dtype=float64)
             prop_sigmas = zeros(shape=(npar,), dtype=float64)+0.1
             prop_sigmas[nbins[0]:]=1.0

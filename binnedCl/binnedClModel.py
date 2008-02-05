@@ -25,6 +25,8 @@ import Proposal
 ###    which gives "printable" parameters?
 ### or use package/unpackage?
 
+### maybe set up a mapping index-list from a 1-d sequence to 2-d TT TE EE
+
 
 
 class binnedClModel(object):
@@ -100,6 +102,7 @@ class binnedClModel(object):
     
 
     ## use (*C_b) so the list gets 'untupled'
+    ## could enforce positivity but then will need to know which are cross-spectra
     @staticmethod
     def prior(*C_b):
         
@@ -131,15 +134,20 @@ class binnedClModel(object):
         if nCl>3:
             raise Exception("Error in shapes of bins, shapefun, giving nCl=%d" % nCl)
 
-        if nCl==1:
-            if N.isarray(bins):
-                if bins.ndim==2: 
-                    bins = [bins]
+        #if nCl==1:
+        #    bins = [bins]
+            # try:
+            #     if bins.ndim==2: 
+            #         bins = [bins]
+            # except AttributeError:
+            #     pass
                     
         cls.nCl = nCl
                 
         ## so bins is now bins[iCl][ibin, 0:1]
-                                
+        print 'nCl:', nCl
+        print 'bins:'
+        print bins
 
         cls.bins = bins # should probably allow just a single sequence
                         # of the start of all bins, followed by lmax
