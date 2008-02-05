@@ -34,6 +34,8 @@ class binnedClModel(object):
     
     the parameters are really the q_b factors rather than bandpowers themselves.
     see bandpowers() for conversion from q_b to C_b
+    
+    nb. a single vector with all of the values
     """
     
     def __init__(self, Cb):
