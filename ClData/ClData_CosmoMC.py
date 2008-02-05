@@ -1,5 +1,4 @@
-"""
-module/classes for CMB power spectrum data.
+"""module/classes for CMB power spectrum data.
 
 Initialize from COSMOMC data files -- see cosmomc/source/getdata.f90
 """
@@ -29,7 +28,7 @@ import math
 import operator
 import copy
 
-from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, rank,
+from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, ndim,
                    reshape, log, exp, transpose, fabs, dot, arange, any, 
                    logical_not, where, logical_and, errstate)
 import numpy.linalg as la
@@ -244,7 +243,7 @@ class ClData_CosmoMC(object):
             win[0,self.win_min[i]:self.win_max[i]+1] /= (2.0*math.pi) 
 
         if self.has_pol:
-            self.inc_pol[i] = any(win[1,:] != 0)
+            self.inc_pol[i] = any(win[1:,:] != 0)
 
         fp.close()
         
@@ -407,9 +406,9 @@ class ClData_CosmoMC(object):
         and i just numbers band; doesn't distinguish between TT/TE/EE
         """
 
-        if rank(Cl)==2:
+        if ndim(Cl)==2:
             ClTT = Cl[0]
-        elif rank(Cl)==1:
+        elif ndim(Cl)==1:
             ClTT=Cl
         else:
             raise MyErr('Cl shape wrong in getWinBandpower:', Cl.shape)
@@ -417,9 +416,10 @@ class ClData_CosmoMC(object):
         maxl = min([len(ClTT), self.win_max[i]+1])
         bandpower = dot(ClTT[self.win_min[i]:maxl],
                         self.window[i, 0, self.win_min[i]:maxl])
-        if self.has_pol and rank(Cl)==2 and self.inc_pol[i]:
-            bandpower += (Cl[1:num_cls, self.win_min[i]:maxl]*
-                          self.window[i, 1:num_cls, self.win_min[i]:maxl]).sum()
+        if self.has_pol and self.inc_pol[i]:
+            for iCl in range(1,num_cls):
+                bandpower += dot(Cl[iCl, self.win_min[i]:maxl],
+                                 self.window[i, iCl, self.win_min[i]:maxl])
             #print 'Accessing polarization getWinBandpower: band', i
             #for l in xrange(self.win_min[i], maxl):
             #    bandpower += dot(Cl[1:num_cls, l], self.window[i, 1:num_cls, l])            
