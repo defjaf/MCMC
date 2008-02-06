@@ -27,7 +27,7 @@ import Proposal
 
 ### maybe set up a mapping index-list from a 1-d sequence to 2-d TT TE EE
 
-
+positive_corr = True
 
 class binnedClModel(object):
     """
@@ -103,10 +103,20 @@ class binnedClModel(object):
 
     ## use (*C_b) so the list gets 'untupled'
     ## could enforce positivity but then will need to know which are cross-spectra
-    @staticmethod
-    def prior(*C_b):
+    if positive_corr:
+        @classmethod
+        def prior(*C_b):
+            Cb = asarray(C_b)
+            if any(Cb[cls.Cltype!=1]<0):   ## Cltype==1 is <TE>
+                return 0
+            else:
+                return 1
+            
+    else:
+        @staticmethod
+        def prior(*C_b):
         
-        return 1
+            return 1
         
         # if all(asarray(C_b)>0):  #reduce(__and__, (c > 0 for c in C_b), True):
         #     return 1
@@ -193,6 +203,11 @@ class binnedClModel(object):
 
         cls.nbins = [len(b) for b in bins]
         cls.nparam = sum(cls.nbins)
+        
+        cls.Cltype = []
+        for i, nb in enumerate(nbins): 
+            cls.Cltype.extend([i]*nb)
+        
         if doBlock:
             cls.paramBlocks = arange(cls.nparam)
             cls.nBlock = cls.nparam
