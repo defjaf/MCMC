@@ -105,7 +105,7 @@ class binnedClModel(object):
     ## could enforce positivity but then will need to know which are cross-spectra
     if positive_corr:
         @classmethod
-        def prior(*C_b):
+        def prior(cls,*C_b):
             Cb = asarray(C_b)
             if any(Cb[cls.Cltype!=1]<0):   ## Cltype==1 is <TE>
                 return 0
@@ -205,8 +205,9 @@ class binnedClModel(object):
         cls.nparam = sum(cls.nbins)
         
         cls.Cltype = []
-        for i, nb in enumerate(nbins): 
+        for i, nb in enumerate(cls.nbins): 
             cls.Cltype.extend([i]*nb)
+        cls.Cltype = array(cls.Cltype)
         
         if doBlock:
             cls.paramBlocks = arange(cls.nparam)
