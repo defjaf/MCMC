@@ -279,7 +279,7 @@ class MCMC(object):
         except ZeroDivisionError:
             ### want to allow stdev=0 for fixed parameters!
             pstdev = self.like.model.unpackage(stdevs)
-            pstdev[where(stdevs<=0.0)] = 1.e-4
+            pstdev[stdevs<=0.0] = 1.e-4
             covar = self.covar(burn, stride, stdevs=pstdev, params=params)
         
         npar = self.like.model.nparam

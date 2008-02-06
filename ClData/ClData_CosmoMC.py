@@ -385,7 +385,7 @@ class ClData_CosmoMC(object):
             
             zth = BP[idx] + self.xfactors[idx]
             #zth[where(zth<=0.0)] = 1.0e-10   ### AHJ Check
-            zth[where(zth<=0.0)] = 0   ### this will force -Inf rather than NaN
+            zth[zth<=0.0] = 0   ### this will force -Inf rather than NaN
 
             with errstate(invalid='ignore', divide='ignore'):
                 diffs[idx] = self.obs[idx] - log(zth)
