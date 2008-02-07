@@ -255,3 +255,18 @@ def bin_spectrum(bins, llCl):
         denom = ((ells+0.5)/ells/(ells+1.0)).sum()
         binned_llCl[i] = num/denom
     return binned_llCl
+    
+def plotcorrmat(corrmat, bins=None):
+    pylab.matshow(corrmat)
+    ntot = corrmat.shape[0]-0.5
+    if bins is not None:
+        xy = bins[0]-0.5
+        for b in bins[1:]:
+            pylab.plot([-0.5,ntot],[xy, xy])
+            pylab.plot([xy, xy],[-0.5,ntot])
+            xy+=b
+        pylab.xlim(-0.5, ntot-0.5)
+        pylab.ylim(ntot-0.5, -0.5)
+    pylab.colorbar()
+    
+    
