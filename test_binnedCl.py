@@ -20,6 +20,7 @@ from numpy import concatenate as cat
 import numpy as N
 
 filename = "data_list.txt"
+filename = "wang_dat.txt"
 
 mapdir = 'cmb/misc-data/MAP'
 homedir = os.path.expandvars('${HOME}/home')
@@ -27,7 +28,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None):
+def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -76,6 +77,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None):
         binsTT = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
                 1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+                
+        binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
+                        751, 851, 951, 1051, 1500]  
         #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
         # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
         # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 
@@ -96,6 +100,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None):
         else:
             binlist = [binsTT]
             shapelist = array([llClTT])
+            
+        if bins is not None:
+            binlist=bins
             
         for bins in binlist:
             for i, b in enumerate(bins[:-1]):
@@ -151,15 +158,19 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None):
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)
     
-    pylab.subplot(2,2,1)
-    pylab.plot(ll, llClTT, hold='true')
-    pylab.xlim(0,2000)
-    pylab.subplot(2,2,2)
-    pylab.plot(ll, llClTE, hold='true')
-    pylab.xlim(0,2000)
-    pylab.subplot(2,2,3)
-    pylab.plot(ll, llClEE, hold='true')
-    pylab.xlim(0,2000)
+    if no_pol:
+        pylab.plot(ll, llClTT, hold='true')
+        pylab.xlim(0,2000)
+    else:
+        pylab.subplot(2,2,1)
+        pylab.plot(ll, llClTT, hold='true')
+        pylab.xlim(0,2000)
+        pylab.subplot(2,2,2)
+        pylab.plot(ll, llClTE, hold='true')
+        pylab.xlim(0,2000)
+        pylab.subplot(2,2,3)
+        pylab.plot(ll, llClEE, hold='true')
+        pylab.xlim(0,2000)
         
     pylab.figure(1)
     samples = cat([ s.samples for s in retval[0] ])
@@ -224,9 +235,11 @@ def plotter(sampler):
 
     ### or replace with mod.plotmod if written...
     ## nb. bandpowers(vals) makes into 3*n list if polarized
+    nrc = 1
+    if len(vals)>1: nrc=2
     if mod.nbins != mod.nparam:
         for iplot, (l, v, s) in enumerate(zip(mod.ellctr, vals, sigs)):
-            pylab.subplot(2,2,iplot+1)
+            pylab.subplot(nrc,nrc,iplot+1)
             pylab.cla()
             pylab.errorbar(l, v, yerr=s, fmt='bo')
     else:

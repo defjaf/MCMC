@@ -3,6 +3,8 @@ from __future__ import division
 import math
 from operator import isSequenceType
 
+import pylab 
+
 from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max
 import Proposal
 
