@@ -258,7 +258,9 @@ def bin_spectrum(bins, llCl):
         binned_llCl[i] = num/denom
     return binned_llCl
     
+    
 def plotcorrmat(corrmat, bins=None):
+    """ plot a correlation matrix, with a colorbar, optionally with lines to mark different sets of bins"""
     pylab.matshow(corrmat)
     ntot = corrmat.shape[0]-0.5
     if bins is not None:
@@ -270,5 +272,21 @@ def plotcorrmat(corrmat, bins=None):
         pylab.xlim(-0.5, ntot-0.5)
         pylab.ylim(ntot-0.5, -0.5)
     pylab.colorbar()
+    
+    
+def orthobin(Cb, corrmat):
+    """ 
+         rebin bandpowers C_b with corr. mat. <dCb dCb'>=M_bb' 
+         to D_p s.t. <dDp dDp'> = diag(sig_p)
+         
+         nb. Cb not qb
+             should be full corr'n matrix not normalized matrix with M_bb=1
+    """
+    
+    v, R = N.linalg.eigh(corrmat)
+    newbins =  N.dot(N.diag(N.sqrt(v)), R.T)   ## very ineffecient?
+    newcorr = N.dot(R, newbins)
+    
+    ## make weights out of newbins
     
     
