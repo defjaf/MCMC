@@ -153,7 +153,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     pylab.figure(0)
     
     fac = 2.4/sqrt(len(ell))   ## equiv to fac=None
-    fac*=3
+    #fac*=3
     
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
                         fac=fac, noCorrelations=True, doBlock=True)

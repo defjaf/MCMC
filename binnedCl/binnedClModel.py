@@ -259,6 +259,9 @@ def bin_spectrum(bins, llCl):
     return binned_llCl
     
     
+    
+    ### should all of these live here or somewhere else?
+    
 def plotcorrmat(corrmat, bins=None):
     """ plot a correlation matrix, with a colorbar, optionally with lines to mark different sets of bins"""
     pylab.matshow(corrmat)
@@ -289,4 +292,15 @@ def orthobin(Cb, corrmat):
     
     ## make weights out of newbins
     
+    ## AHJ: NOT FINISHED
+    
+    
+def fitOffsetLognormal(samples):
+    """
+    fit an offset lognormal [gaussian in z=ln(C+x)] for <z>, x, sig_z
+    
+    need to allow for case when C>0 enforced
+    """
+    
+    ## AHJ: NOT FINISHED
     
