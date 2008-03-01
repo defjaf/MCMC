@@ -284,6 +284,8 @@ def orthobin(Cb, corrmat):
          
          nb. Cb not qb
              should be full corr'n matrix not normalized matrix with M_bb=1
+             
+        AHJ: how to deal with polarization? want to be separately local in ell and XY <- (T, E, B)**2
     """
     
     v, R = N.linalg.eigh(corrmat)
