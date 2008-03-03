@@ -306,3 +306,21 @@ def fitOffsetLognormal(samples):
     
     ## AHJ: NOT FINISHED
     
+    
+    pass
+    
+def FisherWindows(F, bins=None, isCovar=False):
+    """ 
+        calculate the effective bandpower window functions from the inverse covariance matrix F=C^{-1}
+        so WB_l/l = \sum_{l' in B} F_ll'/\sum_{l,l' in B} F_{ll'}
+        
+        if bins is not present, just return W_B as a function of bin number, otherwise return full W_Bl
+        
+    """
+    
+    if isCovar:
+        fish = F.inverse()
+    else:
+        fish = F
+    
+    
