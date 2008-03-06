@@ -143,8 +143,7 @@ def GenericGaussianProposal(package=None, unpackage=None):
             self.newParams = copy(self.unpackage(prevParams))
                 
             if self.rotateParams:
-                print "rotating params..."
-                assert block is not None and self.sqrtMatrix is not None
+                #assert block is not None and self.sqrtMatrix is not None
                 offset = sum(self.sqrtMatrix[:,j]*normal(0,1) for j in block)
                 self.newParams += offset*self.sigmas
             else:
