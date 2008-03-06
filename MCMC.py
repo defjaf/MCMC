@@ -148,7 +148,7 @@ class MCMC(object):
         
         accepted = False
         if self.doBlock:
-            block = where(asarray(self.like.model.paramBlocks) == self.iBlock)
+            block = where(asarray(self.like.model.paramBlocks) == self.iBlock)[0] # nb. where() returns a tuple
         else:
             block = None
         
@@ -252,8 +252,7 @@ class MCMC(object):
                 for j in params:
                     self.covars[i,j] = (
                         ((chain[:,i]-means[i])*(chain[:,j]-means[j])).mean())
-        
-        
+                
         return self.covars
     
     
@@ -274,17 +273,19 @@ class MCMC(object):
         
         """
         
-        params = where(self.prop.sigmas>0)
+        params = where(self.prop.sigmas>0)[0]  # where returns a tuple
         
         newStart = self.mean(burn, stride)
         stdevs = self.stdev(burn, stride)
         try:
             covar = self.covar(burn, stride, params=params)
         except ZeroDivisionError:
+            print "newMCMC: ZeroDivisionError"
             ### want to allow stdev=0 for fixed parameters!
             pstdev = self.like.model.unpackage(stdevs)
             pstdev[stdevs<=0.0] = 1.e-4
             covar = self.covar(burn, stride, stdevs=pstdev, params=params)
+            
         
         npar = self.like.model.nparam
         if fac is None:
@@ -296,8 +297,10 @@ class MCMC(object):
         startP = self.like.model.package(fac*array(self.like.model.unpackage(stdevs)))
         newSampler = MCMC(self.like, startProposal=startP, startParams=newStart,
                           doBlock=doBlock)
-        
-        if not noCorrelations or rotateParams:
+
+        if rotateParams or not noCorrelations:
+            newSampler.prop.rotateParams = rotateParams
+            noCorrelations = False
             try:
                 newSampler.prop.setNormalizedMatrix(covar)
             except AttributeError:
@@ -311,7 +314,6 @@ class MCMC(object):
                 print covar
                 raise
         
-            newSampler.prop.rotateParams = rotateParams
             
         
         if nMC is not None:
@@ -404,6 +406,9 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
     data = like.data
     sampler = []
     
+    if rotateParams: 
+        noCorrelations = False
+    noCorr1 = noCorrelations
     
     params = where(like.model.unpackage(prop_sigmas)>0)[0]  # where returns a tuple
     

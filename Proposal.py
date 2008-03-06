@@ -70,6 +70,7 @@ class GenericGaussianProposal(object):
             self.sqrtMatrix = None
             
         self.rotateParams=rotateParams
+        
 
     def setNormalizedMatrix(self, matrix):
         """ set the Normalized correlation matrix
@@ -78,22 +79,23 @@ class GenericGaussianProposal(object):
         ## needs to excise the rows/cols with sigmas==0 before the cholesky
         #### COULD DO THIS WITH A MASK!!!???
 
-        np = len(self.which)
+        np = len(self.subset)
         if self.n == np:
             mat2 = matrix
         else:
-            mat2 = [matrix[i,j] for i in self.which for j in self.which]
+            mat2 = [matrix[i,j] for i in self.subset for j in self.subset]
             mat2 = asarray(mat2).reshape((np, np))
 
-        sqrtMatrix=la.cholesky_decomposition(mat2)
 
+        sqrtMatrix=la.cholesky(mat2)
+        
         self.sqrtMatrix = zeros((self.n, self.n), dtype=float64)
-        for i in range(np):
+        for i in range(np):   ### there's certainly a fancy-indexing version of this which works...
             for j in range(np):
-                self.sqrtMatrix[self.which[i],self.which[j]] = sqrtMatrix[i,j]
+                self.sqrtMatrix[self.subset[i],self.subset[j]] = sqrtMatrix[i,j]
                 
-#        # DEBUG
-#        print "set sqrtMatrix=", self.sqrtMatrix
+        # DEBUG
+#        print "set sqrtMatrix=\n", self.sqrtMatrix
 
     def setNormalizedMatrixFromSqrt(self, matrix):
         """ set the Normalized correlation matrix from the sqrt
@@ -106,12 +108,12 @@ class GenericGaussianProposal(object):
     def setSigmas(self, sigmas):
         self.sigmas = asarray(self.unpackage(sigmas))
         self.n = len(self.sigmas)
-        self.which = where(self.sigmas>0)
+        self.subset = where(self.sigmas>0)[0]    # nb. where() returns a tuple
         
         ## DEBUG
 #        print "set self.sigmas=", self.sigmas
 #        print "    self.n=", self.n
-#        print "    self.which=", self.which
+#        print "    self.subset=", self.subset
 
     def getSigmas(self):
         return self.package(self.sigmas)
@@ -132,10 +134,12 @@ class GenericGaussianProposal(object):
 
         self.newParams = copy(self.unpackage(prevParams))
         
+        ### need to check shape of block
+        
         if self.rotateParams:
-            assert block is not None and rotateParams is not None
-            offset = sum(self.sqrtMatrix[:,j]*normal(0,1) for j in block)*self.sigmas
-            self.newParams += offset            
+            assert block is not None and self.sqrtMatrix is not None
+            offset = sum(self.sqrtMatrix[:,j]*normal(0,1) for j in block)
+            self.newParams += offset*self.sigmas
         else:
             if self.sqrtMatrix is None:
                 offset = normal(0,1, self.n)*self.sigmas
