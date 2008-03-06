@@ -46,6 +46,8 @@ class MCMC(object):
                     = [int for each param giving block (0...nBlock-1)]
             save acceptance stats per block!
             
+        if rotateParams, try to rotate to an orthogonal parameter basis
+            
             TODO:   problem with single params with sig=0 (or NAN)?
                     problem with blocks with all params with sig==0.
                       (latter fixed by explicitly leaving these parameters out of
@@ -258,7 +260,7 @@ class MCMC(object):
     
     
     def newMCMC(self, burn=0, stride=1, fac=None, nMC=None, noCorrelations=False,
-                      doBlock=None):
+                      doBlock=None, rotateParams=False):
         """
         start a new chain based on the mean and variances of the present one.
         
@@ -293,7 +295,7 @@ class MCMC(object):
         newSampler = MCMC(self.like, startProposal=startP, startParams=newStart,
                           doBlock=doBlock)
         
-        if not noCorrelations:
+        if not noCorrelations or rotateParams:
             try:
                 newSampler.prop.setNormalizedMatrix(covar)
             except AttributeError:
@@ -306,6 +308,9 @@ class MCMC(object):
                 print "shouldn't be here; matrix is:"
                 print covar
                 raise
+        
+            newSampler.prop.rotateParams = rotateParams
+            
         
         if nMC is not None:
             newSampler.MC_append(nMC)
@@ -380,7 +385,7 @@ def chain_analyze(chain, params=None):
     return means, stdevs, covar
 
 def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
-            noCorrelations=False, doBlock=False):
+            noCorrelations=False, doBlock=False, rotateParams=False):
     """
     sample from the likelihood with a series of MCMC runs given by the
     sequence nMC, using the endpoint of one as the start of the
@@ -401,13 +406,13 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
     params = where(like.model.unpackage(prop_sigmas)>0)[0]  # where returns a tuple
     
     for isamp, nMC1 in enumerate(nMC):
-        if isamp==0:
+        if isamp==0:  ## first MCMC has uncorrelated paramters, proposal width given by prop_sigmas 
             new_s = MCMC(like, startProposal=prop_sigmas, nMC=0,
-                              startParams=start_params, doBlock=doBlock)
+                              startParams=start_params, doBlock=doBlock, rotateParams=False)
         else:
             new_s = sampler[isamp-1].newMCMC(burn=nMC[isamp-1]//burnfrac,
                                              stride=stride, nMC=0, fac=fac,
-                                             noCorrelations=noCorr1)
+                                             noCorrelations=noCorr1, rotateParams=rotateParams)
         
         burnfrac = nMC1
         
