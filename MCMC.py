@@ -1,7 +1,14 @@
 from __future__ import division
 
-### modify (here or Proposal.py?) to go along eigenvectors of the
-###    observed correlation matrix
+##### PROBLEM
+
+####### THE FOLLOWING IS NO LONGER RELAVENT
+#### self.mod is the *class* of the model, but self.mod.proposal is an actual instance
+#### this means that there is only one instance of the proposal per python run!!!
+###### could be fixed by re-initing self.proposal in the model constructor, but this is much slower
+###### better solution would be a factory function or metaclass which creates a *class* with the appropriate package/unpackage
+
+###### currently, self.mod.proposal is indeed a class, but the package and unpackage methods are set by a factory function.
 
 import math
 
@@ -77,9 +84,9 @@ class MCMC(object):
         seed(seed=None)
         
         if proposal is None:
-            self.prop = self.mod.proposal
+            self.prop = self.mod.proposal()  ### nb. proposal is a class so this initializes it.
         else:
-            self.prop = proposal
+            self.prop = proposal()
         
         if startProposal is not None:
             self.prop.setSigmas(startProposal)

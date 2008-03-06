@@ -46,6 +46,7 @@ class binnedClModel(object):
         """
         set the parameters to the C_bins = Cb [[bandpowers]] 
         """
+                
         self.Cb = asarray(Cb)
 
     def __call__(self):
@@ -239,7 +240,6 @@ class binnedClModel(object):
     def package(Cb): return asarray(Cb)
     def unpackage(Cb): return asarray(Cb)
     
-    ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
                                                 unpackage=unpackage)
 
