@@ -45,9 +45,7 @@ class MCMC(object):
             model class must define nBlock, paramBlocks
                     = [int for each param giving block (0...nBlock-1)]
             save acceptance stats per block!
-            
-        if rotateParams, try to rotate to an orthogonal parameter basis
-            
+                        
             TODO:   problem with single params with sig=0 (or NAN)?
                     problem with blocks with all params with sig==0.
                       (latter fixed by explicitly leaving these parameters out of
@@ -270,6 +268,10 @@ class MCMC(object):
         covariance.  The latter is likely only applicable to gaussian
         or gaussian-like densities (and even stdev may not be
         applicable)
+        
+        if rotateParams, try to rotate to an orthogonal parameter basis, determined by the previous covariance matrix
+        [[ TODO: allow setting the rotation explicitly?? ]]
+        
         """
         
         params = where(self.prop.sigmas>0)
@@ -408,7 +410,7 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
     for isamp, nMC1 in enumerate(nMC):
         if isamp==0:  ## first MCMC has uncorrelated paramters, proposal width given by prop_sigmas 
             new_s = MCMC(like, startProposal=prop_sigmas, nMC=0,
-                              startParams=start_params, doBlock=doBlock, rotateParams=False)
+                              startParams=start_params, doBlock=doBlock)
         else:
             new_s = sampler[isamp-1].newMCMC(burn=nMC[isamp-1]//burnfrac,
                                              stride=stride, nMC=0, fac=fac,

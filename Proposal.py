@@ -36,7 +36,7 @@ class GenericGaussianProposal(object):
     """
 
     def __init__(self, sigmas=None, package=None, unpackage=None,
-                 matrix=None, isSqrt=False):
+                 matrix=None, isSqrt=False, rotateParams=False):
         """
         initialize proposal based on appropriate variances
 
@@ -68,6 +68,8 @@ class GenericGaussianProposal(object):
                 self.setNormalizedMatrixFromSqrt(matrix)
         else:
             self.sqrtMatrix = None
+            
+        self.rotateParams=rotateParams
 
     def setNormalizedMatrix(self, matrix):
         """ set the Normalized correlation matrix
@@ -129,16 +131,22 @@ class GenericGaussianProposal(object):
         ###      need another flag? still use 'block'? how to randomize directions?
 
         self.newParams = copy(self.unpackage(prevParams))
-        if self.sqrtMatrix is None:
-            offset = normal(0,1, self.n)*self.sigmas
+        
+        if self.rotateParams:
+            assert block is not None and rotateParams is not None
+            offset = sum(self.sqrtMatrix[:,j]*normal(0,1) for j in block)*self.sigmas
+            self.newParams += offset            
         else:
-            offset = dot(self.sqrtMatrix,
-                         normal(0,1, self.n))*self.sigmas
-                                     
-        if block is None:
-            self.newParams += offset
-        else:
-            self.newParams[block] += offset[block]
+            if self.sqrtMatrix is None:
+                offset = normal(0,1, self.n)*self.sigmas
+            else:
+                offset = dot(self.sqrtMatrix,
+                             normal(0,1, self.n))*self.sigmas                           
+
+            if block is None:
+                self.newParams += offset
+            else:
+                self.newParams[block] += offset[block]
             
         ## DEBUG
 #        print >> debugf, block, offset

@@ -156,7 +156,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     #fac*=3
     
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
-                        fac=fac, noCorrelations=True, doBlock=True)
+                        fac=fac, noCorrelations=True, doBlock=True, rotateParams=True)
     
     if no_pol:
         pylab.plot(ll, llClTT, hold='true')
