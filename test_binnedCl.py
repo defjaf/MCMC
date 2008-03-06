@@ -28,7 +28,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None):
+def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -156,7 +156,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     #fac*=3
     
     retval = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=plotter,
-                        fac=fac, noCorrelations=True, doBlock=True, rotateParams=True)
+                        fac=fac, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
     
     if no_pol:
         pylab.plot(ll, llClTT, hold='true')
