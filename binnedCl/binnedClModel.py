@@ -322,5 +322,11 @@ def FisherWindows(F, bins=None, isCovar=False):
         fish = F.inverse()
     else:
         fish = F
+        
+    Wbb = fish.sum(axis=0)/N.diag(fish)  ## careful of 1/ell????
     
+    if bins is not None:
+        ### return W_Bl in three arrays at each B: TT, TE, EE
+        pass
     
+    ## AHJ: NOT FINISHED
