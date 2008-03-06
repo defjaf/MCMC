@@ -123,14 +123,16 @@ class GenericGaussianProposal(object):
         get a new set of parameters based on the previous
         - allow 'fixed' parameters via sigma=0 proposal density
         - only change parameters where the index is in block
+        
+        if rotateParams is set, sample from orthogonal parameters (but output "physical" parameters)
+        
+        if block is set, sample the specific parameter[s] in the block
+        (nb. this is true even when rotateParams is set)
+        
         """
 
         ### nb. copy crucial here otherwise you just change the prevParams
         ### when unpackage doesn't create a new object (e.g., the identity)!
-
-        ###TODO: sample a single parameter in the "rotated" direction
-        ###      *should* just require changing normal(0,1,n) to normal(0,1)*e_i
-        ###      need another flag? still use 'block'? how to randomize directions?
 
         self.newParams = copy(self.unpackage(prevParams))
         
