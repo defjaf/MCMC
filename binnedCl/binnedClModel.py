@@ -167,18 +167,16 @@ class binnedClModel(object):
         cls.bins = bins # should probably allow just a single sequence
                         # of the start of all bins, followed by lmax
         
-        cls.lmax = max([bin[0][1] for bin in (spec for spec in bins)])
-        cls.lmin = min([bin[0][0] for bin in (spec for spec in bins)])
         
-        # 
-        # ## gotta be a better way to do this...
-        # lmax = []
-        # lmin = []
-        # for bin in bins:
-        #     lmax.append(array(bin).max())
-        #     lmin.append(array(bin).min())
-        # cls.lmax=max(lmax)
-        # cls.lmin=min(lmin)
+        
+        ## gotta be a better way to do this...
+        lmax = []
+        lmin = []
+        for bin in bins:
+            lmax.append(array(bin).max())
+            lmin.append(array(bin).min())
+        cls.lmax=max(lmax)
+        cls.lmin=min(lmin)
         
         #cls.lmax = max([b[1] for b in x for x in bins])
         #cls.lmin = min([b[0] for b in x for x in bins])
@@ -319,7 +317,7 @@ def fitOffsetLognormal(samples):
 def FisherWindows(F, bins=None, isCovar=False):
     """ 
         calculate the effective bandpower window functions from the inverse covariance matrix F=C^{-1}
-        so WB_l/l = \sum_{l' in B} F_ll'/\sum_{l,l' in B} F_{ll'}
+        so WB_l/l = \sum_{l' in B} F_ll'/\sum_{{all l},{l' in B}} F_{ll'}
         
         if bins is not present, just return W_B as a function of bin number, otherwise return full W_Bl
         
@@ -330,7 +328,9 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         fish = F
         
-    Wbb = fish/fish.sum(axis=0)  ### need transpose???
+    Wbb = (fish/fish.sum(axis=0)).T   ## nb. transpose to make each *row* normalized
+    # Wbb = fish.copy()
+    # for row in Wbb: row /= row.sum()
     
     nbin = Wbb.shape[0]
     
@@ -339,8 +339,14 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         ### return W_Bl in three arrays at each B: TT, TE, EE
         nspec = len(bins)
-        maxell = max([bin[0][1] for bin in (spec for spec in bins)])
-        WBl = zeros((nbin, 3, maxell+1), dtype=float64)
+        
+        lmax = []
+        for bin in bins: lmax.append(array(bin).max())
+        lmax=max(lmax)
+        
+        ##maxell = max([bin[0][1] for bin in (spec for spec in bins)])
+        
+        WBl = zeros((nbin, 3, lmax+1), dtype=float64)
         for ibin in xrange(nbin):    ### there must be a more numpyish way to do this...
             jbin = 0
             for ispec, spec in enumerate(bins):
@@ -348,4 +354,4 @@ def FisherWindows(F, bins=None, isCovar=False):
                     WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]
                     jbin += 1
                 
-        return Wbl
+        return WBl

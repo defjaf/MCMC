@@ -208,9 +208,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         pylab.figure(5+ifig)
         nrc = sqrt(len(binlist))+1
         for ipanel, bin in enumerate(binlist): ## loop over panels
-            pylab.subplot(nrc, nrc, iwin)
+            pylab.subplot(nrc, nrc, iwin+1)
             for ispec in xrange(nspec):  ## loop over spectrum types 
-                plot(Wbl[iwin, ispec])
+                plot(WBl[iwin, ispec])
             iwin += 1
     
     return retval
