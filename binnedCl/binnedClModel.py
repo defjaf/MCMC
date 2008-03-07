@@ -5,7 +5,9 @@ from operator import isSequenceType
 
 import pylab 
 
-from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max, invert
+from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max
+from numpy import linalg as la
+
 import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
@@ -319,7 +321,7 @@ def FisherWindows(F, bins=None, isCovar=False):
     """
     
     if isCovar:
-        fish = invert(F)
+        fish = la.inv(F)
     else:
         fish = F
         
