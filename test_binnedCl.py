@@ -210,7 +210,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         if nr*nc<len(binlist): nr+=1
         if nr*nc<len(binlist): nc+=1
         for ipanel, bin in enumerate(binlist): ## loop over panels
-            pylab.subplot(nrc, nrc, ipanel+1)
+            pylab.subplot(nr, nc, ipanel+1)
             for ispec in xrange(nspec):  ## loop over spectrum types 
                 plot(WBl[iwin, ispec])
             iwin += 1
