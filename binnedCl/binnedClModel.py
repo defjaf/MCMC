@@ -5,7 +5,7 @@ from operator import isSequenceType
 
 import pylab 
 
-from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max
+from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max, dot, min
 from numpy import linalg as la
 
 import Proposal
@@ -167,14 +167,19 @@ class binnedClModel(object):
         cls.bins = bins # should probably allow just a single sequence
                         # of the start of all bins, followed by lmax
         
-        ## gotta be a better way to do this...
-        lmax = []
-        lmin = []
-        for bin in bins:
-            lmax.append(array(bin).max())
-            lmin.append(array(bin).min())
-        cls.lmax=max(lmax)
-        cls.lmin=min(lmin)
+        cls.lmax = max([bin[0][1] for bin in (spec for spec in bins)])
+        cls.lmin = min([bin[0][0] for bin in (spec for spec in bins)])
+        
+        # 
+        # ## gotta be a better way to do this...
+        # lmax = []
+        # lmin = []
+        # for bin in bins:
+        #     lmax.append(array(bin).max())
+        #     lmin.append(array(bin).min())
+        # cls.lmax=max(lmax)
+        # cls.lmin=min(lmin)
+        
         #cls.lmax = max([b[1] for b in x for x in bins])
         #cls.lmin = min([b[0] for b in x for x in bins])
         # cls.lmax = max(rng[1] for rng in b for b in bins)
@@ -290,9 +295,9 @@ def orthobin(Cb, corrmat):
         AHJ: how to deal with polarization? want to be separately local in ell and XY <- (T, E, B)**2
     """
     
-    v, R = N.linalg.eigh(corrmat)
-    newbins =  N.dot(N.diag(N.sqrt(v)), R.T)   ## very ineffecient?
-    newcorr = N.dot(R, newbins)
+    v, R = la.eigh(corrmat)
+    newbins =  dot(N.diag(N.sqrt(v)), R.T)   ## very ineffecient?
+    newcorr = dot(R, newbins)
     
     ## make weights out of newbins
     
@@ -325,7 +330,7 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         fish = F
         
-    Wbb = fish/fish.sum(axis=0)
+    Wbb = fish/fish.sum(axis=0)  ### need transpose???
     
     nbin = Wbb.shape[0]
     
@@ -334,13 +339,13 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         ### return W_Bl in three arrays at each B: TT, TE, EE
         nspec = len(bins)
-        maxell = max(bin[1] for bin in spec for spec in bins)
-        WBl = N.zeros((nbin, 3, maxell+1), dtype=float64)
+        maxell = max([bin[0][1] for bin in (spec for spec in bins)])
+        WBl = zeros((nbin, 3, maxell+1), dtype=float64)
         for ibin in xrange(nbin):    ### there must be a more numpyish way to do this...
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:
-                    Wbl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]
+                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]
                     jbin += 1
                 
         return Wbl
