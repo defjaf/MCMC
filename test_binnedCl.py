@@ -20,7 +20,7 @@ from numpy import concatenate as cat
 import numpy as N
 
 filename = "data_list.txt"
-filename = "wang_dat.txt"
+#filename = "wang_dat.txt"
 
 mapdir = 'cmb/misc-data/MAP'
 homedir = os.path.expandvars('${HOME}/home')
@@ -209,7 +209,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         nrc = int(sqrt(len(binlist)))
         if nrc*nrc<len(binlist): nrc+=1
         for ipanel, bin in enumerate(binlist): ## loop over panels
-            pylab.subplot(nrc, nrc, iwin+1)
+            pylab.subplot(nrc, nrc, ipanel+1)
             for ispec in xrange(nspec):  ## loop over spectrum types 
                 plot(WBl[iwin, ispec])
             iwin += 1
