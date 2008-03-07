@@ -5,7 +5,7 @@ from operator import isSequenceType
 
 import pylab 
 
-from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max
+from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max, invert
 import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
@@ -319,14 +319,26 @@ def FisherWindows(F, bins=None, isCovar=False):
     """
     
     if isCovar:
-        fish = F.inverse()
+        fish = invert(F)
     else:
         fish = F
         
-    Wbb = fish.sum(axis=0)/N.diag(fish)  ## careful of 1/ell????
+    Wbb = fish/fish.sum(axis=0)
     
-    if bins is not None:
+    nbin = Wbb.shape[0]
+    
+    if bins is None:
+        return Wbb
+    else:
         ### return W_Bl in three arrays at each B: TT, TE, EE
-        pass
-    
-    ## AHJ: NOT FINISHED
+        nspec = len(bins)
+        maxell = max(bin[1] for bin in spec for spec in bins)
+        WBl = N.zeros((nbin, 3, maxell+1), dtype=float64)
+        for ibin in xrange(nbin):    ### there must be a more numpyish way to do this...
+            jbin = 0
+            for ispec, spec in enumerate(bins):
+                for bin in spec:
+                    Wbl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]
+                    jbin += 1
+                
+        return Wbl

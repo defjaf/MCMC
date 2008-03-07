@@ -9,7 +9,7 @@ import pyfits
 import MCMC
 import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
-from binnedCl.binnedClModel import binnedClModel
+from binnedCl.binnedClModel import binnedClModel, FisherWindows
 from ClData import ClData
 
 from pylab import *
@@ -183,19 +183,35 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         getdist.histgrid(s)
     else:
         getdist.printvals(s)
+    
+    # params=xrange(s.samples.shape[1])  
+    # mean = N.empty(s.samples.shape[1])
+    # stdv = N.empty(s.samples.shape[1])
+    # for param in params:
+    #     s1 = s.samples.T[param]
+    #     mean[param] = s1.mean()
+    #     stdv[param] = s1.std()
+    
+    mean = s.mean()
+    stdv = s.stdev()
+    covar = s.covar()
+    WBl = FisherWindows(covar, bins=bins, isCovar=True)
+    
 
-    
-    params=xrange(s.samples.shape[1])  
-    mean = N.empty(s.samples.shape[1])
-    stdv = N.empty(s.samples.shape[1])
-    for param in params:
-        s1 = s.samples.T[param]
-        mean[param] = s1.mean()
-        stdv[param] = s1.std()
-    
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
         for l1, m1, s1 in zip(l, m, s):
-            print '%d %f %f' % (int(l1),m1,s1)        
+            print '%d %f %f' % (int(l1),m1,s1)       
+
+    nspec = len(bins)
+    iwin = 0
+    for ifig, binlist in enumerate(bins):  ## loop over figures
+        pylab.figure(5+ifig)
+        nrc = sqrt(len(binlist))+1
+        for ipanel, bin in enumerate(binlist): ## loop over panels
+            pylab.subplot(nrc, nrc, iwin)
+            for ispec in xrange(nspec):  ## loop over spectrum types 
+                plot(Wbl[iwin, ispec])
+            iwin += 1
     
     return retval
 
