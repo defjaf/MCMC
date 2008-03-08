@@ -95,7 +95,6 @@ class binnedClModel(object):
         #return [qb[nbins[]]*cls.BPnorm[i] for i in range(cls.nCl)]
         
 
-
     def BP(self, qb=None):
         """return the bandpowers corresponding to the current parameters or a set of qb"""
         
@@ -104,7 +103,14 @@ class binnedClModel(object):
     
         return self.bandpowers(qb)
     
-    
+    @classmethod
+    def ClCovar(cls, covar):
+        """
+        convert a <qb qb'> covariance to <Cb Cb'> using the shapefun
+        """
+        norm = asarray(cls.BPnorm)
+        return asarray(covar)*norm*norm.reshape(1,cls.nCl)
+        
 
     ## use (*C_b) so the list gets 'untupled'
     ## could enforce positivity but then will need to know which are cross-spectra
@@ -338,7 +344,6 @@ def FisherWindows(F, bins=None, isCovar=False):
         return Wbb
     else:
         ### return W_Bl in three arrays at each B: TT, TE, EE
-        nspec = len(bins)
         
         lmax = []
         for bin in bins: lmax.append(array(bin).max())

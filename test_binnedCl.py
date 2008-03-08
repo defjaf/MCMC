@@ -195,7 +195,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     mean = s.mean()
     stdv = s.stdev()
     covar = s.covar()
-    WBl = FisherWindows(covar, bins=bins, isCovar=True)
+    WBl = FisherWindows(mod.ClCovar(covar), bins=bins, isCovar=True)
     
 
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
