@@ -5,7 +5,8 @@ from operator import isSequenceType
 
 import pylab 
 
-from numpy import asarray, array, arange, float64, zeros, all, empty, isscalar, max, dot, min
+from numpy import (asarray, array, arange, float64, zeros, all, empty, 
+                  isscalar, max, dot, min, concatenate)
 from numpy import linalg as la
 
 import Proposal
@@ -108,8 +109,8 @@ class binnedClModel(object):
         """
         convert a <qb qb'> covariance to <Cb Cb'> using the shapefun
         """
-        norm = asarray(cls.BPnorm)
-        return asarray(covar)*norm*norm.reshape(1,cls.nCl)
+        norm = asarray(concatenate(cls.BPnorm))
+        return asarray(covar)*norm*norm.reshape(1,cls.nparam)
         
 
     ## use (*C_b) so the list gets 'untupled'
@@ -349,6 +350,8 @@ def FisherWindows(F, bins=None, isCovar=False):
         for bin in bins: lmax.append(array(bin).max())
         lmax=max(lmax)
         
+        print "FisherWindows: lmax=", lmax
+        
         ##maxell = max([bin[0][1] for bin in (spec for spec in bins)])
         
         WBl = zeros((nbin, 3, lmax+1), dtype=float64)
@@ -356,7 +359,7 @@ def FisherWindows(F, bins=None, isCovar=False):
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:
-                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0]+1)
+                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin] * 0.5*(bin[0]+bin[1])/(bin[1]-bin[0]+1)
                     jbin += 1
                 
         return WBl
