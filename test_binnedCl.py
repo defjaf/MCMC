@@ -19,8 +19,8 @@ from numpy import arange, array, float64, transpose, zeros, ones, exp, logical_n
 from numpy import concatenate as cat
 import numpy as N
 
-#filename = "data_list.txt"
-filename = "wang_dat.txt"
+filename = "data_list.txt"
+#filename = "wang_dat.txt"
 
 mapdir = 'cmb/misc-data/MAP'
 homedir = os.path.expandvars('${HOME}/home')
@@ -78,8 +78,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
                 1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
                 
-        binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
-                        751, 851, 951, 1051, 1500]  
+        #binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
+        #                751, 851, 951, 1051, 1500]  
         #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
         # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
         # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 

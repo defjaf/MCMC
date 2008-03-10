@@ -359,7 +359,7 @@ def FisherWindows(F, bins=None, isCovar=False):
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:
-                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin] * 0.5*(bin[0]+bin[1])/(bin[1]-bin[0]+1)
+                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0]+1)# * 0.5*(bin[0]+bin[1])
                     jbin += 1
                 
         return WBl
