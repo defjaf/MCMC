@@ -321,6 +321,8 @@ def fitOffsetLognormal(samples):
     
     pass
     
+    
+    ### TODO NEED TO CONVERT FROM q_B FISHER MATRIX TO C_B MATRIX!!!!!
 def FisherWindows(F, bins=None, isCovar=False):
     """ 
         calculate the effective bandpower window functions from the inverse covariance matrix F=C^{-1}
@@ -335,7 +337,8 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         fish = F
         
-    Wbb = (fish/fish.sum(axis=0)).T   ## nb. transpose to make each *row* normalized
+    #Wbb = (fish/fish.sum(axis=0)).T   ## nb. transpose to make each *row* normalized
+    Wbb = (fish/fish.diagonal()).T   ## nb. transpose to make each *row* normalized
     # Wbb = fish.copy()
     # for row in Wbb: row /= row.sum()
     
