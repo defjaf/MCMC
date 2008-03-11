@@ -110,7 +110,7 @@ class binnedClModel(object):
         convert a <qb qb'> covariance to <Cb Cb'> using the shapefun
         """
         norm = asarray(concatenate(cls.BPnorm))
-        return asarray(covar)*norm*norm.reshape(1,cls.nparam)
+        return asarray(covar)*norm*norm.reshape(cls.nparam,1)
         
 
     ## use (*C_b) so the list gets 'untupled'
@@ -361,7 +361,7 @@ def FisherWindows(F, bins=None, isCovar=False):
         
         print "FisherWindows: lmax=", lmax
         
-        ##maxell = max([bin[0][1] for bin in (spec for spec in bins)])
+        ##lmax = max([bin[0][1] for bin in (spec for spec in bins)])
         
         WBl = zeros((nbin, 3, lmax+1), dtype=float64)
         for ibin in xrange(nbin):    ### there must be a more numpyish way to do this...
