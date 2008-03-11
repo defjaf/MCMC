@@ -281,8 +281,10 @@ def plotcorrmat(corrmat, bins=None):
     if bins is not None:
         xy = bins[0]-0.5
         for b in bins[1:]:
-            pylab.plot([-0.5,ntot],[xy, xy])
-            pylab.plot([xy, xy],[-0.5,ntot])
+            pylab.axvline(xy)
+            pylab.axhline(xy)
+            #pylab.plot([-0.5,ntot],[xy, xy])
+            #pylab.plot([xy, xy],[-0.5,ntot])
             xy+=b
         pylab.xlim(-0.5, ntot-0.5)
         pylab.ylim(ntot-0.5, -0.5)

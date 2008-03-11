@@ -213,7 +213,6 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             pylab.subplot(nr, nc, ipanel+1)
             for ispec in xrange(nspec):  ## loop over spectrum types 
                 plot(WBl[iwin, ispec])
-            yy = ylim(); xx = xlim()
             axvspan(bin[0], bin[1],  facecolor='g', alpha=0.25)
             axhline(0, color='k')
             iwin += 1
