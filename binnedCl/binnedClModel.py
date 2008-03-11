@@ -330,6 +330,15 @@ def FisherWindows(F, bins=None, isCovar=False):
         
         if bins is not present, just return W_B as a function of bin number, otherwise return full W_Bl
         
+        wbl=0.d0
+        do i=1,num_bins
+           do j=1,num_bins
+              sumfish = fisherbb(i,i)
+              do l=lbin(j,1),lbin(j,2)
+                 wbl(i,type(j),l) =fisherbb(j,i)/(lbin(j,2)-lbin(j,1))/sumfish
+              enddo
+           enddo
+        enddo
     """
     
     if isCovar:
@@ -337,10 +346,7 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         fish = F
         
-    #Wbb = (fish/fish.sum(axis=0)).T   ## nb. transpose to make each *row* normalized
-    Wbb = (fish/fish.diagonal()).T   ## nb. transpose to make each *row* normalized
-    # Wbb = fish.copy()
-    # for row in Wbb: row /= row.sum()
+    Wbb = (fish/fish.diagonal()).T  ## transpose to apply the same factor to each row.
     
     nbin = Wbb.shape[0]
     
@@ -362,7 +368,7 @@ def FisherWindows(F, bins=None, isCovar=False):
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:
-                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0]+1)# * 0.5*(bin[0]+bin[1])
+                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0])
                     jbin += 1
                 
         return WBl
