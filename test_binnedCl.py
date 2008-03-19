@@ -9,7 +9,7 @@ import pyfits
 import MCMC
 import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
-from binnedCl.binnedClModel import binnedClModel, FisherWindows
+from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat
 from ClData import ClData
 
 from pylab import *
@@ -225,7 +225,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             iwin += 1
             
     figure(8)
-    mod.plotcorrmat(covar)
+    plotcorrmat(s.covar())
     
     return retval
 

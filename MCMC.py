@@ -132,6 +132,7 @@ class MCMC(object):
         return self.like.model.package(self.samples[0])
     
     
+    ## could add a progress bar here?
     def MC_append(self, nMC=1):
         """ add nMC more MCMC iterations to the chain. """
         ### store alpha, probability, accepted or not?
