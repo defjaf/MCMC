@@ -12,6 +12,8 @@ from __future__ import division
 
 import math
 
+from progressbar import ProgressBar
+
 from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
                    reshape, sqrt, identity, where, asarray, ones, int32,
                    arange)
@@ -142,9 +144,13 @@ class MCMC(object):
         newsamples = empty(shape=(nMC, self.nparams), dtype=float64)
         newlnPr = empty(shape=nMC, dtype=float64)
         newaccepted = empty(shape=nMC, dtype=bool8)
+        pbar = ProgressBar().start()
+        
         for i in xrange(nMC):  ## do with comprehension?
             samples, newlnPr[i], newaccepted[i] = self.sample()
             newsamples[i] = self.like.model.unpackage(samples)
+            pbar.update(100.0*(i+1)/nMC)
+        pbar.finish()
         
         self.samples = concatenate((self.samples, newsamples))
         self.lnPr = concatenate((self.lnPr, newlnPr))
