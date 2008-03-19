@@ -204,8 +204,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
 
-    for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
-        for l1, m1, s1 in zip(l, m, s):
+    for l, m, e in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
+        for l1, m1, s1 in zip(l, m, e):
             print '%d %f %f' % (int(l1),m1,s1)       
 
     ## split this off into mod.plotWin?
