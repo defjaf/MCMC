@@ -77,6 +77,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         binsTT = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
                 751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
                 1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+        binsTT = [101, 201, 301, 401, 501, 601, 701, 
+                  801, 901, 1031, 1151, 1271, 1391, 
+                  1511, 1651, 1851, 2051] #, len(llClTT)-1]
                 
         #binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
         #                751, 851, 951, 1051, 1500]  
@@ -92,6 +95,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
                   1055, 1136, 1217, 1298, 1379, 1460, 1540]
         binsEE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974,
                   1055, 1136, 1217, 1298, 1379, 1460, 1540]
+        binsTE = [164, 326, 488, 650, 812, 974, 1136, 1540]
+        binsEE = [164, 326, 488, 650, 812, 974, 1136, 1540]
         
         ells = []
         if not no_pol:
@@ -194,14 +199,16 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     mean = s.mean()
     stdv = s.stdev()
-    covar = s.covar()
-    WBl = FisherWindows(mod.ClCovar(covar), bins=bins, isCovar=True)
+    covar = s.covar(unNormalized=True)
+    Clcovar = mod.ClCovar(covar)
+    WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
 
     for l, m, s in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
         for l1, m1, s1 in zip(l, m, s):
             print '%d %f %f' % (int(l1),m1,s1)       
 
+    ## split this off into mod.plotWin?
     nspec = len(bins)
     iwin = 0
     for ifig, binlist in enumerate(bins):  ## loop over figures
@@ -216,6 +223,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             axvspan(bin[0], bin[1],  facecolor='g', alpha=0.25)
             axhline(0, color='k')
             iwin += 1
+            
+    figure(8)
+    mod.plotcorrmat(covar)
     
     return retval
 
