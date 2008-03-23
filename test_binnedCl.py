@@ -1,4 +1,5 @@
 from __future__ import division
+from __future__ import with_statement
 
 import math
 import string
@@ -11,6 +12,7 @@ import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
 from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat
 from ClData import ClData
+from ClData.readbins import readbins
 
 from pylab import *
 
@@ -28,7 +30,7 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True):
+def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True, binfile=None):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -68,52 +70,61 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     #  #d.has_xfactors=False
 
     if manybins:
-#        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
-#                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
-#                 651, 701, 801, 901, 1001,  max_ell]
-##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
-#        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
-#                 701, 801, 1001, max_ell]
-        binsTT = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
-                751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
-                1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
-        binsTT = [101, 201, 301, 401, 501, 601, 701, 
-                  801, 901, 1031, 1151, 1271, 1391, 
-                  1511, 1651, 1851, 2051] #, len(llClTT)-1]
+        if binfile is None:
+    #        bins = [ 2, 11, 21, 31, 41, 51, 61, 81, 101, 121, 141, 161, 181, 201,
+    #                 221, 241, 261, 281, 301, 351, 401, 451, 501, 551, 601,
+    #                 651, 701, 801, 901, 1001,  max_ell]
+    ##        bins = [ 2, 21, 41, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+    #        bins = [ 45, 61, 101, 141, 181, 221,  261, 301, 401, 501, 601,
+    #                 701, 801, 1001, max_ell]
+            binsTT = [50, 101, 151, 201, 251, 301, 351, 401, 451, 501, 551, 601, 651, 701, 
+                    751, 801, 851, 901, 971, 1031, 1091, 1151, 1211, 1271, 1331, 1391, 
+                    1451, 1511, 1571, 1651, 1751, 1851, 1951] #, len(llClTT)-1]
+            binsTT = [101, 201, 301, 401, 501, 601, 701, 
+                      801, 901, 1031, 1151, 1271, 1391, 
+                      1511, 1651, 1851, 2051] #, len(llClTT)-1]
                 
-        #binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
-        #                751, 851, 951, 1051, 1500]  
-        #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
-        # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
-        # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 
-        #        1271, 1331, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, 2101, 
-        #        2301, 2501, 3000]
-        # bins = [50, 1851, 1951, len(llClTT)-1]
-##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
-##        bins = [ 2, 61, 221, 501, 1001, max_ell]
-        binsTE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974, 
-                  1055, 1136, 1217, 1298, 1379, 1460, 1540]
-        binsEE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974,
-                  1055, 1136, 1217, 1298, 1379, 1460, 1540]
-        binsTE = [164, 326, 488, 650, 812, 974, 1136, 1540]
-        binsEE = [164, 326, 488, 650, 812, 974, 1136, 1540]
+            #binsTT = [2,5,10,20,30,51,101,151, 251, 351, 451, 551, 651, 
+            #                751, 851, 951, 1051, 1500]  
+            #bins = [50, 1031, 1091, 1151, 1211, 1271, 1331,
+            # bins = [50, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, len(llClTT)-1]
+            # bins =[101, 351, 551, 651, 731, 791, 851, 911, 971, 1031, 1091, 1151, 1211, 
+            #        1271, 1331, 1391, 1451, 1511, 1571, 1651, 1751, 1851, 1951, 2101, 
+            #        2301, 2501, 3000]
+            # bins = [50, 1851, 1951, len(llClTT)-1]
+    ##        bins = [ 50, 61, 141, 221, 301, 501, 701, 1001, len(llCl)-1]
+    ##        bins = [ 2, 61, 221, 501, 1001, max_ell]
+            binsTE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974, 
+                      1055, 1136, 1217, 1298, 1379, 1460, 1540]
+            binsEE = [164, 245, 326, 407, 488, 569, 650, 731, 812, 893, 974,
+                      1055, 1136, 1217, 1298, 1379, 1460, 1540]
+            binsTE = [164, 326, 488, 650, 812, 974, 1136, 1540]
+            binsEE = [164, 326, 488, 650, 812, 974, 1136, 1540]
         
-        ells = []
+            ells = []
+            if not no_pol:
+                binlist = [binsTT, binsTE, binsEE]
+            else:
+                binlist = [binsTT]
+            
+            if bins is not None:
+                binlist=bins
+
+            for bins in binlist:
+                for i, b in enumerate(bins[:-1]):
+                    bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
+
+            bins = [b[:-1] for b in binlist]
+
+
+        else:
+            bins = readbins(binfile)
+        
         if not no_pol:
-            binlist = [binsTT, binsTE, binsEE]
             shapelist = array([llClTT, llClTE, llClEE])
         else:
-            binlist = [binsTT]
             shapelist = array([llClTT])
-            
-        if bins is not None:
-            binlist=bins
-            
-        for bins in binlist:
-            for i, b in enumerate(bins[:-1]):
-                bins[i] = (b, bins[i+1]-1)  ## nb. non-pythonic: beginning and end
-            
-        bins = [b[:-1] for b in binlist]
+        
         
         nbins = [len(b) for b in bins]
         npar = sum(nbins)

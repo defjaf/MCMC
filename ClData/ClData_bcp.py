@@ -73,7 +73,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
         else:
             #use all bands in file
             for i in range(6):
-                minmax[0:1,i] = [1, npol[i]]
+                minmax[:,i] = [1, npol[i]]
 
         minmax -= 1  ## convert to 0-based indexing
 
