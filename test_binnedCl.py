@@ -195,18 +195,18 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     s = retval[0][-1]
     
-    mean = s.mean()
-    stdv = s.stdev()
+    mean = mod.bandpowers(s.mean())
+    stdv = mod.bandpowers(s.stdev())
     covar = s.covar(unNormalized=True)
     Clcovar = mod.ClCovar(covar)
     corr = s.covar()
     
     WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
+    nTT = len(ell[0])
+    nTE = len(ell[1])
+    nEE = len(ell[2])
     if prefix is not None:        
-        nTT = len(ell[0])
-        nTE = len(ell[1])
-        nEE = len(ell[2])
         with open(prefix+".bp", "w") as f:
             for ell1, mean1, stdv1 in zip(ell[0], mean[0:nTT], stdv[0:nTT]):
                 print >> f, ell1, mean1, stdv1, stdv1
@@ -244,7 +244,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     
 
-    for l, m, e in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
+    for l, m, e in zip(ell, mean, stdv):
         for l1, m1, s1 in zip(l, m, e):
             print '%d %f %f' % (int(l1),m1,s1)       
 
@@ -264,7 +264,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             axhline(0, color='k')
             iwin += 1
             
-    plotcorrmat(corr, bins=bins)
+    plotcorrmat(corr, bins=[nTT, nTE, nEE])
     
     return retval
 
