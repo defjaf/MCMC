@@ -214,7 +214,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         with open(prefix+".corr", "w") as f:
             N.savetxt(f, corr, fmt="%f")
             
-        for ibin, win in WBl:
+        for ibin, win in enumerate(WBl):
             with open(prefix+str(ibin+1), "w") as f:
                 for l, Wl in enumerate(win):
                     print >> f, l, Wl 
