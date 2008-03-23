@@ -30,7 +30,8 @@ if not os.path.exists(homedir):
     homedir = os.path.expandvars('${HOME}')
 mapdir = '/'.join( (homedir, mapdir) )
 
-def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True, binfile=None):
+def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True, 
+         binfile=None, prefix=None):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
@@ -194,6 +195,30 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     s = retval[0][-1]
     
+    mean = s.mean()
+    stdv = s.stdev()
+    covar = s.covar(unNormalized=True)
+    Clcovar = mod.ClCovar(covar)
+    corr = s.covar()
+    
+    WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
+    
+    if prefix is not None:        
+        with open(prefix+".ps", "w") as f:
+            for ell1, mean1, stdv1 in zip(ell, mean, stdv):
+                print >> f, ell1, mean1, stdv1, stdv1
+                
+        with open(prefix+".covar", "w") as f:
+            N.savetxt(f, Clcovar, fmt="%f")
+            
+        with open(prefix+".corr", "w") as f:
+            N.savetxt(f, corr, fmt="%f")
+            
+        for ibin, win in WBl:
+            with open(prefix+str(ibin+1), "w") as f:
+                for l, Wl in enumerate(win):
+                    print >> f, l, Wl 
+                
     if gridPlot:
         pylab.figure(2)
         getdist.histgrid(s)
@@ -208,11 +233,6 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     #     mean[param] = s1.mean()
     #     stdv[param] = s1.std()
     
-    mean = s.mean()
-    stdv = s.stdev()
-    covar = s.covar(unNormalized=True)
-    Clcovar = mod.ClCovar(covar)
-    WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
 
     for l, m, e in zip(ell, mod.bandpowers(mean), mod.bandpowers(stdv)):
@@ -236,7 +256,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             iwin += 1
             
     figure(8)
-    plotcorrmat(s.covar())
+    plotcorrmat(corr)
     
     return retval
 
