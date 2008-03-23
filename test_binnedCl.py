@@ -204,8 +204,17 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
     if prefix is not None:        
-        with open(prefix+".ps", "w") as f:
-            for ell1, mean1, stdv1 in zip(ell, mean, stdv):
+        nTT = len(ell[0])
+        nTE = len(ell[1])
+        nEE = len(ell[2])
+        with open(prefix+".bp", "w") as f:
+            for ell1, mean1, stdv1 in zip(ell[0], mean[0:nTT], stdv[0:nTT]):
+                print >> f, ell1, mean1, stdv1, stdv1
+        with open(prefix+".bpte", "w") as f:
+            for ell1, mean1, stdv1 in zip(ell[1], mean[nTT:nTT+nTE], stdv[nTT:nTT+nTE]):
+                print >> f, ell1, mean1, stdv1, stdv1
+        with open(prefix+".bpee", "w") as f:
+            for ell1, mean1, stdv1 in zip(ell[2], mean[nTT+nTE:nTT+nTE+nEE], stdv[nTT+nTE:nTT+nTE+nEE]):
                 print >> f, ell1, mean1, stdv1, stdv1
                 
         with open(prefix+".covar", "w") as f:
@@ -255,8 +264,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             axhline(0, color='k')
             iwin += 1
             
-    figure(8)
-    plotcorrmat(corr)
+    plotcorrmat(corr, bins=bins)
     
     return retval
 
