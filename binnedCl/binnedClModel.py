@@ -241,7 +241,7 @@ class binnedClModel(object):
             cls.BPnorm = [bin_spectrum(b, s) for (b, s) in zip(bins, shapefun)]
             
         print 'nparam: ', cls.nparam
-        print 'BPnorm:', cls.BPnorm
+        #print 'BPnorm:', cls.BPnorm
 
     ## don't really need package/unpackage for this case since
     ## parameters are pretty naturally a list (but what about polarization?)
