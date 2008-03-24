@@ -345,13 +345,15 @@ def FisherWindows(F, bins=None, isCovar=False):
     else:
         fish = F
         
-    Wbb = (fish.T/fish.diagonal()).T  ## transpose to apply the same factor to each row.
-    
-    nbin = Wbb.shape[0]
+    nbin = fish.shape[0]
     
     if bins is None:
+        
+        Wbb = (fish.T/fish.diagonal()).T  ## transpose to apply the same factor to each row.
         return Wbb
+        
     else:
+        
         ### return W_Bl in three arrays at each B: TT, TE, EE
         
         lmax = []
@@ -365,7 +367,8 @@ def FisherWindows(F, bins=None, isCovar=False):
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:
-                    WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0])
+                    #WBl[ibin, ispec, bin[0]:bin[1]+1]=Wbb[ibin, jbin]/(bin[1]-bin[0])
+                    WBl[ibin, ispec, bin[0]:bin[1]+1]=fish[ibin, jbin]/(bin[1]-bin[0])/fish[ibin, ibin]
                     jbin += 1
                 
         return WBl
