@@ -357,9 +357,7 @@ def FisherWindows(F, bins=None, isCovar=False):
         lmax = []
         for bin in bins: lmax.append(array(bin).max())
         lmax=max(lmax)
-        
-        print "FisherWindows: lmax=", lmax
-        
+                
         ##lmax = max([bin[0][1] for bin in (spec for spec in bins)])
         
         WBl = zeros((nbin, 3, lmax+1), dtype=float64)
