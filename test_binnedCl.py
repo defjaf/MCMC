@@ -206,16 +206,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     nTT = len(ell[0])
     nTE = len(ell[1])
     nEE = len(ell[2])
-    if prefix is not None:        
-        with open(prefix+".bp", "w") as f:
-            for ell1, mean1, stdv1 in zip(ell[0], mean[0:nTT], stdv[0:nTT]):
-                print >> f, ell1, mean1, stdv1, stdv1
-        with open(prefix+".bpte", "w") as f:
-            for ell1, mean1, stdv1 in zip(ell[1], mean[nTT:nTT+nTE], stdv[nTT:nTT+nTE]):
-                print >> f, ell1, mean1, stdv1, stdv1
-        with open(prefix+".bpee", "w") as f:
-            for ell1, mean1, stdv1 in zip(ell[2], mean[nTT+nTE:nTT+nTE+nEE], stdv[nTT+nTE:nTT+nTE+nEE]):
-                print >> f, ell1, mean1, stdv1, stdv1
+    if prefix is not None:
+        for es, ms, ss, suf in zip(ell, mean, stdv, [".bp", ".bpte", ".bpee"]):            
+            with open(prefix+suf, "w") as f:
+                for ell1, mean1, stdv1 in zip(es, ms, ss):
+                    print >> f, ell1, mean1, stdv1, stdv1
                 
         with open(prefix+".covar", "w") as f:
             N.savetxt(f, Clcovar, fmt="%f")
@@ -225,8 +220,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             
         for ibin, win in enumerate(WBl):
             with open(prefix+str(ibin+1), "w") as f:
-                for l, Wl in enumerate(win):
-                    print >> f, l, Wl 
+                for l, Wl in enumerate(win.T):
+                    print >> f, l, Wl[0], Wl[1], Wl[2]
                 
     if gridPlot:
         pylab.figure(2)

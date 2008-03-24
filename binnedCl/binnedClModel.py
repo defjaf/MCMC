@@ -193,8 +193,6 @@ class binnedClModel(object):
         #cls.lmax = min(rng[0] for rng in b for b in bin for bin in bins)
 
         
-        print 'lmin, lmax, len(shape)=', cls.lmin, cls.lmax, len(shapefun)
-
         if isSequenceType(shapefun) and len(shapefun)>cls.lmax:
             cls.shapefun=shapefun[:cls.lmax+1]
         elif isSequenceType(shapefun) and len(shapefun[0])>cls.lmax:
@@ -242,9 +240,8 @@ class binnedClModel(object):
         else:
             cls.BPnorm = [bin_spectrum(b, s) for (b, s) in zip(bins, shapefun)]
             
-        print 'binning: %d... %d' % (cls.lmin, cls.lmax)
-        print 'BPnorm:', cls.BPnorm
         print 'nparam: ', cls.nparam
+        print 'BPnorm:', cls.BPnorm
 
     ## don't really need package/unpackage for this case since
     ## parameters are pretty naturally a list (but what about polarization?)
