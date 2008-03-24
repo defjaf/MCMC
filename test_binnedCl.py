@@ -197,7 +197,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     mean = mod.bandpowers(s.mean())
     stdv = mod.bandpowers(s.stdev())
-    covar = s.covar(unNormalized=True)
+    covar = s.covar(unNormalized=True)  #, stride=5*mod.nparam)
     Clcovar = mod.ClCovar(covar)
     corr = s.covar()
     
