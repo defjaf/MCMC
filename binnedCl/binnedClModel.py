@@ -339,7 +339,8 @@ def fitOffsetLognormal(samples, full_output=0):
     sigz2_0 = (log(samples+x_0)**2).mean() - zbar_0**2
     par_0 = array([zbar_0, sigz2_0, x_0])
         
-    f = So.fmin_cg(BJKlike, par_0, fprime=derivs, args =(samples,), full_output = full_output)
+    f = So.fmin_l_bfgs_b(BJKlike, par_0, fprime=derivs, args =(samples,)) #, full_output = full_output)
+    #f = So.fmin(BJKlike, par_0, args =(samples,), full_output = full_output)
     
     return f
         
