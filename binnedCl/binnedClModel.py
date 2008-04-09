@@ -6,8 +6,10 @@ from operator import isSequenceType
 import pylab 
 
 from numpy import (asarray, array, arange, float64, zeros, all, empty, 
-                  isscalar, max, dot, min, concatenate)
+                  isscalar, max, dot, min, concatenate, log, pi)
 from numpy import linalg as la
+
+import scipy.optimize as So
 
 import Proposal
 
@@ -308,7 +310,8 @@ def orthobin(Cb, corrmat):
     ## AHJ: NOT FINISHED
     
     
-def fitOffsetLognormal(samples):
+    
+def fitOffsetLognormal(samples, full_output=0):
     """
     fit an offset lognormal [gaussian in z=ln(C+x)] for <z>, x, sig_z
     
@@ -316,10 +319,30 @@ def fitOffsetLognormal(samples):
     """
     
     ## AHJ: NOT FINISHED
+    def chi2(zbar, sigz2, x, C):
+        return ((log(C+x)-zbar)**2).mean()/sigz2
+        
+    def BJKlike(par, C):
+        (zbar, sigz2, x) = par
+        return log(2*pi*sigz2)+chi2(zbar, sigz2, x, C)
+        
+    def derivs(par, C):
+        (zbar, sigz2, x) = par
+        dL_dsigz2 = (1/sigz2)*(1-chi2(zbar, sigz2, x, C))
+        dL_dzbar = (2/sigz2)*(zbar - (log(C+x)).mean())
+        dL_dx = (2/sigz2)*((log(C+x)-zbar)/(C+x)).mean()
+        return array([dL_dsigz2, dL_dzbar, dL_dx])
+        
+    #x_0 = max(0,-1.1*min(samples))
+    x_0 = 1.1*abs(min(samples))
+    zbar_0 = (log(samples+x_0)).mean()
+    sigz2_0 = (log(samples+x_0)**2).mean() - zbar_0**2
+    par_0 = array([zbar_0, sigz2_0, x_0])
+        
+    f = So.fmin_cg(BJKlike, par_0, fprime=derivs, args =(samples,), full_output = full_output)
     
-    
-    pass
-    
+    return f
+        
     
     ### nb. NEED TO CONVERT FROM q_B FISHER MATRIX TO C_B MATRIX!!!!!
 def FisherWindows(F, bins=None, isCovar=False):
