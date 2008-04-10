@@ -427,7 +427,12 @@ def getlike(ibins=[1], data=None):
         
     
     return data, like, likearr
-    
+
+def getsamples(res):
+    """ convert the result of a main() run to samples [would be better to make a view of something there?] """
+
+    return (cat([ s.samples for s in res[0]])).T
+
     
 ########################################################
 

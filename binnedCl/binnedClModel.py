@@ -328,9 +328,9 @@ def fitOffsetLognormal(samples, full_output=0):
         
     def derivs(par, C):
         (zbar, sigz2, x) = par
-        dL_dsigz2 = (1/sigz2)*(1-chi2(zbar, sigz2, x, C))
-        dL_dzbar = (2/sigz2)*(zbar - (log(C+x)).mean())
-        dL_dx = (2/sigz2)*((log(C+x)-zbar)/(C+x)).mean()
+        dL_dsigz2 = (1.0/sigz2)*(1.0-chi2(zbar, sigz2, x, C))
+        dL_dzbar = (2.0/sigz2)*(zbar - (log(C+x)).mean())
+        dL_dx = (2.0/sigz2)*((log(C+x)-zbar)/(C+x)).mean()
         return array([dL_dsigz2, dL_dzbar, dL_dx])
         
     #x_0 = max(0,-1.1*min(samples))
@@ -339,6 +339,10 @@ def fitOffsetLognormal(samples, full_output=0):
     sigz2_0 = (log(samples+x_0)**2).mean() - zbar_0**2
     par_0 = array([zbar_0, sigz2_0, x_0])
         
+    print 'Starting values:', par_0
+    print 'Starting chi2:', chi2(zbar_0, sigz2_0, x_0, samples)
+    print 'Starting derivs:', derivs(par_0, samples)
+    
     f = So.fmin_l_bfgs_b(BJKlike, par_0, fprime=derivs, args =(samples,)) #, full_output = full_output)
     #f = So.fmin(BJKlike, par_0, args =(samples,), full_output = full_output)
     
