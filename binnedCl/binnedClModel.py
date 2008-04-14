@@ -324,7 +324,13 @@ def fitOffsetLognormal(samples, full_output=0):
         
     def BJKlike(par, C):
         (zbar, sigz2, x) = par
-        return log(2*pi*sigz2)+chi2(zbar, sigz2, x, C)
+        ### need to check that sigz2>0, C+x>0?
+        nsamp = len(C)
+        if sigz2<0 or x+min(C)<0: 
+            # raise unphys(par)  ## no way to catch this in So.fmin()
+            return N.inf
+        else:
+            return log(2*pi*sigz2)+chi2(zbar, sigz2, x, C)
         
     def derivs(par, C):
         (zbar, sigz2, x) = par
@@ -400,3 +406,8 @@ def FisherWindows(F, bins=None, isCovar=False):
                     jbin += 1
                 
         return WBl
+
+
+
+class unphys(Exception):
+    pass
