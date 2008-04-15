@@ -6,7 +6,7 @@ from operator import isSequenceType
 import pylab 
 
 from numpy import (asarray, array, arange, float64, zeros, all, empty, 
-                  isscalar, max, dot, min, concatenate, log, pi)
+                  isscalar, max, dot, min, concatenate, log, pi, inf, abs)
 from numpy import linalg as la
 
 import scipy.optimize as So
@@ -308,7 +308,7 @@ def orthobin(Cb, corrmat):
     ## make weights out of newbins
     
     ## AHJ: NOT FINISHED
-    
+
     
     
 def fitOffsetLognormal(samples, full_output=0):
@@ -320,7 +320,7 @@ def fitOffsetLognormal(samples, full_output=0):
     
     ## AHJ: NOT FINISHED
     def chi2(zbar, sigz2, x, C):
-        return ((log(C+x)-zbar)**2).mean()/sigz2
+        return ((log(C+x)/zbar-1)**2).mean()*zbar**2/sigz2
         
     def BJKlike(par, C):
         (zbar, sigz2, x) = par
@@ -328,7 +328,7 @@ def fitOffsetLognormal(samples, full_output=0):
         nsamp = len(C)
         if sigz2<0 or x+min(C)<0: 
             # raise unphys(par)  ## no way to catch this in So.fmin()
-            return N.inf
+            return inf
         else:
             return log(2*pi*sigz2)+chi2(zbar, sigz2, x, C)
         
@@ -349,8 +349,10 @@ def fitOffsetLognormal(samples, full_output=0):
     print 'Starting chi2:', chi2(zbar_0, sigz2_0, x_0, samples)
     print 'Starting derivs:', derivs(par_0, samples)
     
-    f = So.fmin_l_bfgs_b(BJKlike, par_0, fprime=derivs, args =(samples,)) #, full_output = full_output)
-    #f = So.fmin(BJKlike, par_0, args =(samples,), full_output = full_output)
+    #f = So.fmin_l_bfgs_b(BJKlike, par_0, fprime=derivs, args =(samples,))
+    f = So.fmin_cg(BJKlike, par_0, fprime=derivs, args =(samples,), full_output = full_output)
+    #f = So.fmin_cg(BJKlike, par_0, fprime=None, args =(samples,), full_output = full_output)
+    #f = So.fmin(BJKlike, par_0, args =(samples,), full_output = full_output, maxfun=100000, maxiter=100000)
     
     return f
         
