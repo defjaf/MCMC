@@ -342,7 +342,7 @@ def fitOffsetLognormal(samples, full_output=0):
     #x_0 = max(0,-1.1*min(samples))
     x_0 = 1.1*abs(min(samples))
     zbar_0 = (log(samples+x_0)).mean()
-    sigz2_0 = (log(samples+x_0)**2).mean() - zbar_0**2
+    sigz2_0 = ((log(samples+x_0)-zbar_0)**2).mean()
     par_0 = array([zbar_0, sigz2_0, x_0])
         
     print 'Starting values:', par_0
