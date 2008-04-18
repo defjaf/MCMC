@@ -3,11 +3,13 @@ from __future__ import division
 import math
 from operator import isSequenceType
 
-import pylab 
+import matplotlib.pyplot as plt
 
 from numpy import (asarray, array, arange, float64, zeros, all, empty, 
-                  isscalar, max, dot, min, concatenate, log, pi, inf, abs)
+                  isscalar, max, dot, min, concatenate, log, pi, inf, abs, sqrt)
 from numpy import linalg as la
+
+import numpy as N
 
 import scipy.optimize as So
 import scipy.special as Ss
@@ -331,6 +333,11 @@ class oln(object):
     def chi2(self, zbar, sigz2, x):
         return ((log(self.C+x)/zbar-1)**2).mean()*zbar**2/sigz2
     
+    @staticmethod
+    def like1(par, C):
+        (zbar, sigz2, x) = par
+        return log(2*pi*sigz2)+(log(C+x)/zbar-1)**2*zbar**2/sigz2 + 2*log(C+x)
+    
     def like(self, par):
         """ return -2lnP(par|samples)"""
         (zbar, sigz2, x) = par
@@ -360,7 +367,7 @@ class oln(object):
         
         if bins is None:
             bins = N.sort(self.C)
-        else if N.isscalar(bins):
+        elif N.isscalar(bins):
             bins = N.arange(self.C.min(), self.C.max(),bins)
         
         # like = log(2*pi*sigz2)+(log(bins+x)/zbar-1)**2*zbar**2/sigz2 + 2*log(bins+x)  ## last term from 1/(C+x)
@@ -370,15 +377,40 @@ class oln(object):
         
         ## analytic form!
         
-        return 0.5*(Ss.erf((zbar-log(x))/sqrt(2*sigz2))-Ss.erf((zbar-log(CC+x))/sqrt(2*sigz2)))
+        return 0.5*(Ss.erf((zbar-log(x))/sqrt(2*sigz2))-Ss.erf((zbar-log(bins+x))/sqrt(2*sigz2)))
         
     def KSnorm(self, par):
-        return max(abs(self.cum(par)-linspace(0,1,len(self.C))))
+        return max(abs(self.cum(par)-N.linspace(0,1,len(self.C))))
 
 
-def fitOffsetLognormal_cum(samples, full_output=0): 
+def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1): 
     """minimize the difference between the actual cumulative sample distribution and the offset lognormal"""
+    o = oln(samples)
+
+    #x_0 = max(0,-1.1*min(samples))
+    x_0 = 1.1*abs(min(samples))
+    zbar_0 = (log(samples+x_0)).mean()
+    sigz2_0 = ((log(samples+x_0)-zbar_0)**2).mean()
+    par_0 = array([zbar_0, sigz2_0, x_0])
+        
+    print 'Starting values:', par_0
+    print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
+    print 'Starting derivs:', o.derivs(par_0)
     
+    
+    f = So.fmin(o.KSnorm, par_0, maxfun=100000, maxiter=100000)
+    if do_plot==1:
+        bins = N.sort(samples)
+        plt.plot(bins, o.cum(f))
+        plt.plot(bins, N.linspace(0,1,len(samples)))
+    elif do_plot==2:
+        bins = N.linspace(samples.min(), samples.max(),100)
+        o2 = oln(bins)
+        plt.plot(bins,N.exp(-0.5*o2.like1(f, bins)))
+        hh = N.histogram(samples, bins=bins, normed=True)
+        plt.plot(hh[1], hh[0] )
+        
+    return f
     
     
 def fitOffsetLognormal_like(samples, full_output=0):
