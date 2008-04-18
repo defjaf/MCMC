@@ -10,6 +10,7 @@ from numpy import (asarray, array, arange, float64, zeros, all, empty,
 from numpy import linalg as la
 
 import scipy.optimize as So
+import scipy.special as Ss
 
 import Proposal
 
@@ -310,35 +311,86 @@ def orthobin(Cb, corrmat):
     ## AHJ: NOT FINISHED
 
     
+### HKE: fit to cumulative distributions
+### (and more generally don't use particular functional form, but smoothed "best" transformation to cumulative Gaussian) 
+### to get cumulative dist:
+###    s = samples[i].sort(); plot(s, range(len(s)))
+###    h = histogram(samples, bins=10000); plot(h[1], h[0].cumsum())
+### so histogram(samples)[0].cumsum() gives the actual (unnormalized) distribution over 10000 equally-spaced points
+### or samples.sort() gives the positions for the unnormalized dist given by range(len(samples))
+        
     
-def fitOffsetLognormal(samples, full_output=0):
+class oln(object):
+    """offset lognormal likelihood
+       this is really just to package it up so it has its own namespace
+    """
+    
+    def __init__(self, C):
+        self.C = C
+
+    def chi2(self, zbar, sigz2, x):
+        return ((log(self.C+x)/zbar-1)**2).mean()*zbar**2/sigz2
+    
+    def like(self, par):
+        """ return -2lnP(par|samples)"""
+        (zbar, sigz2, x) = par
+        ### need to check that sigz2>0, C+x>0?
+        
+        #### HAVE I LEFT OFF THE 1/(C+x) factor????
+        
+        nsamp = len(self.C)
+        if sigz2<0 or x+min(self.C)<0: 
+            # raise unphys(par)  ## no way to catch this in So.fmin()
+            return inf
+        else:
+            return log(2*pi*sigz2)+self.chi2(zbar, sigz2, x) + 2*(log(self.C+x)).mean()  ## last term from 1/(C+x)
+    
+    def derivs(self, par):
+        ### need to effect of ln(C+x) term
+        (zbar, sigz2, x) = par
+        dL_dsigz2 = (1.0/sigz2)*(1.0-self.chi2(zbar, sigz2, x))
+        dL_dzbar = (2.0/sigz2)*(zbar - (log(self.C+x)).mean())
+        dL_dx = (2.0/sigz2)*((log(self.C+x)-zbar)/(self.C+x)).mean() + (2.0/(self.C+x)).mean()  ## last term from 1/(C+x)
+        return array([dL_dsigz2, dL_dzbar, dL_dx])
+
+    def cum(self, par, bins=None):
+        """ cumululative OLN """
+        
+        (zbar, sigz2, x) = par
+        
+        if bins is None:
+            bins = N.sort(self.C)
+        else if N.isscalar(bins):
+            bins = N.arange(self.C.min(), self.C.max(),bins)
+        
+        # like = log(2*pi*sigz2)+(log(bins+x)/zbar-1)**2*zbar**2/sigz2 + 2*log(bins+x)  ## last term from 1/(C+x)
+        # like = exp(-0.5*like)
+        
+        ### now need cum sum of like * (delta bin)
+        
+        ## analytic form!
+        
+        return 0.5*(Ss.erf((zbar-log(x))/sqrt(2*sigz2))-Ss.erf((zbar-log(CC+x))/sqrt(2*sigz2)))
+        
+    def KSnorm(self, par):
+        return max(abs(self.cum(par)-linspace(0,1,len(self.C))))
+
+
+def fitOffsetLognormal_cum(samples, full_output=0): 
+    """minimize the difference between the actual cumulative sample distribution and the offset lognormal"""
+    
+    
+    
+def fitOffsetLognormal_like(samples, full_output=0):
     """
     fit an offset lognormal [gaussian in z=ln(C+x)] for <z>, x, sig_z
     
     need to allow for case when C>0 enforced
     """
+
+    o = oln(samples)
     
-    ## AHJ: NOT FINISHED
-    def chi2(zbar, sigz2, x, C):
-        return ((log(C+x)/zbar-1)**2).mean()*zbar**2/sigz2
-        
-    def BJKlike(par, C):
-        (zbar, sigz2, x) = par
-        ### need to check that sigz2>0, C+x>0?
-        nsamp = len(C)
-        if sigz2<0 or x+min(C)<0: 
-            # raise unphys(par)  ## no way to catch this in So.fmin()
-            return inf
-        else:
-            return log(2*pi*sigz2)+chi2(zbar, sigz2, x, C)
-        
-    def derivs(par, C):
-        (zbar, sigz2, x) = par
-        dL_dsigz2 = (1.0/sigz2)*(1.0-chi2(zbar, sigz2, x, C))
-        dL_dzbar = (2.0/sigz2)*(zbar - (log(C+x)).mean())
-        dL_dx = (2.0/sigz2)*((log(C+x)-zbar)/(C+x)).mean()
-        return array([dL_dsigz2, dL_dzbar, dL_dx])
-        
+
     #x_0 = max(0,-1.1*min(samples))
     x_0 = 1.1*abs(min(samples))
     zbar_0 = (log(samples+x_0)).mean()
@@ -346,13 +398,14 @@ def fitOffsetLognormal(samples, full_output=0):
     par_0 = array([zbar_0, sigz2_0, x_0])
         
     print 'Starting values:', par_0
-    print 'Starting chi2:', chi2(zbar_0, sigz2_0, x_0, samples)
-    print 'Starting derivs:', derivs(par_0, samples)
+    print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
+    print 'Starting derivs:', o.derivs(par_0)
     
-    #f = So.fmin_l_bfgs_b(BJKlike, par_0, fprime=derivs, args =(samples,))
-    f = So.fmin_cg(BJKlike, par_0, fprime=derivs, args =(samples,), full_output = full_output)
-    #f = So.fmin_cg(BJKlike, par_0, fprime=None, args =(samples,), full_output = full_output)
-    #f = So.fmin(BJKlike, par_0, args =(samples,), full_output = full_output, maxfun=100000, maxiter=100000)
+    
+    f = So.fmin_l_bfgs_b(o.like, par_0, fprime=o.derivs)
+    #f = So.fmin_cg(o.like, par_0, fprime=o.derivs, full_output = full_output)
+    #f = So.fmin_cg(o.like, par_0, fprime=None, full_output = full_output)
+    #f = So.fmin(o.like, par_0, full_output = full_output, maxfun=100000, maxiter=100000)
     
     return f
         
