@@ -5,6 +5,8 @@ from operator import isSequenceType
 
 import matplotlib.pyplot as plt
 
+import pylab
+
 from numpy import (asarray, array, arange, float64, zeros, all, empty, 
                   isscalar, max, dot, min, concatenate, log, pi, inf, abs, sqrt)
 from numpy import linalg as la
@@ -278,19 +280,19 @@ def bin_spectrum(bins, llCl):
     
 def plotcorrmat(corrmat, bins=None):
     """ plot a correlation matrix, with a colorbar, optionally with lines to mark different sets of bins"""
-    pylab.matshow(corrmat)
+    plt.matshow(corrmat)
     ntot = corrmat.shape[0]-0.5
     if bins is not None:
         xy = bins[0]-0.5
         for b in bins[1:]:
-            pylab.axvline(xy)
-            pylab.axhline(xy)
-            #pylab.plot([-0.5,ntot],[xy, xy])
-            #pylab.plot([xy, xy],[-0.5,ntot])
+            plt.axvline(xy)
+            plt.axhline(xy)
+            #plt.plot([-0.5,ntot],[xy, xy])
+            #plt.plot([xy, xy],[-0.5,ntot])
             xy+=b
-        pylab.xlim(-0.5, ntot-0.5)
-        pylab.ylim(ntot-0.5, -0.5)
-    pylab.colorbar()
+        plt.xlim(-0.5, ntot-0.5)
+        plt.ylim(ntot-0.5, -0.5)
+    plt.colorbar()
     
     
 def orthobin(Cb, corrmat):
@@ -412,6 +414,7 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
         
     return f
     
+fitOffsetLognormal = fitOffsetLognormal_cum
     
 def fitOffsetLognormal_like(samples, full_output=0):
     """
