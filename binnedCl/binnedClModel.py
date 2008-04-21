@@ -397,8 +397,7 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
         
     print 'Starting values:', par_0
     print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
-    print 'Starting derivs:', o.derivs(par_0)
-    
+    print 'Starting KSnorm: ', o.KSnorm(par_0)
     
     f = So.fmin(o.KSnorm, par_0, maxfun=100000, maxiter=100000)
     if do_plot==1:
@@ -412,6 +411,10 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
         hh = N.histogram(samples, bins=bins, normed=True)
         plt.plot(hh[1], hh[0] )
         
+    zbar_f, sigz2_f, x_f = f
+    print 'Final chi2:', o.chi2(zbar_f, sigz2_f, x_f)
+    print 'Final KSnorm: ', o.KSnorm(f)
+
     return f
     
 fitOffsetLognormal = fitOffsetLognormal_cum
