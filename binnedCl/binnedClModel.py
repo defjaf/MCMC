@@ -399,7 +399,7 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
     print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
     print 'Starting KSnorm: ', o.KSnorm(par_0)
     
-    f = So.fmin_powell(o.KSnorm, par_0, maxfun=100000, maxiter=100000)
+    f = So.fmin(o.KSnorm, par_0, maxfun=100000, maxiter=100000, xtol=0.00001, ftol=0.00001)
     if do_plot==1:
         bins = N.sort(samples)
         plt.plot(bins, o.cum(f))
