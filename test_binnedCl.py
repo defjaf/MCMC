@@ -21,8 +21,8 @@ from numpy import arange, array, float64, transpose, zeros, ones, exp, logical_n
 from numpy import concatenate as cat
 import numpy as N
 
-filename = "data_list.txt"
-#filename = "wang_dat.txt"
+#filename = "data_list.txt"
+filename = "wang_dat.txt"
 
 mapdir = 'cmb/misc-data/MAP'
 homedir = os.path.expandvars('${HOME}/home')
@@ -120,6 +120,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
 
         else:
             bins = readbins(binfile)
+            if no_pol:
+                bins = [bins[0]]
         
         if not no_pol:
             shapelist = array([llClTT, llClTE, llClEE])
