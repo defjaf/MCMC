@@ -206,8 +206,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
     nTT = len(ell[0])
-    nTE = len(ell[1])
-    nEE = len(ell[2])
+    if not no_pol:
+        nTE = len(ell[1])
+        nEE = len(ell[2])
+    else:
+        nTE = nEE = 0
     if prefix is not None:
         for es, ms, ss, suf in zip(ell, mean, stdv, [".bp", ".bpte", ".bpee"]):            
             with open(prefix+suf, "w") as f:
@@ -259,6 +262,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
                 plot(WBl[iwin, ispec])
             axvspan(bin[0], bin[1],  facecolor='g', alpha=0.25)
             axhline(0, color='k')
+            #print 'lims:', ipanel, ispec, (WBl[iwin, :].min(),WBl[iwin, :].max())
+            ylim(WBl[iwin, :].min(),WBl[iwin, :].max())
             iwin += 1
             
     plotcorrmat(corr, bins=[nTT, nTE, nEE])
