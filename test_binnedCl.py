@@ -31,7 +31,7 @@ if not os.path.exists(homedir):
 mapdir = '/'.join( (homedir, mapdir) )
 
 def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bins=None, rotateParams=True, 
-         binfile=None, prefix=None):
+         binfile=None, prefix=None, filename=filename):
     N.set_printoptions(precision=4, linewidth=150, suppress=True)
     mod = binnedClModel
 
