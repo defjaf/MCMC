@@ -205,17 +205,30 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     WBl = FisherWindows(Clcovar, bins=bins, isCovar=True)
     
+    if get_x:
+        x = []            
+        for samples in s:
+            x.append(mod.fitOffsetLognormal_cum(samples, full_output=0, do_plot=0)
+        
+
     nTT = len(ell[0])
     if not no_pol:
         nTE = len(ell[1])
         nEE = len(ell[2])
     else:
         nTE = nEE = 0
+        
+    ibin=0
     if prefix is not None:
         for es, ms, ss, suf in zip(ell, mean, stdv, [".bp", ".bpte", ".bpee"]):            
             with open(prefix+suf, "w") as f:
-                for ell1, mean1, stdv1 in zip(es, ms, ss):
-                    print >> f, ell1, mean1, stdv1, stdv1
+                if get_x:
+                    for ell1, mean1, stdv1 in zip(es, ms, ss):
+                        print >> f, ell1, mean1, stdv1, stdv1, x[ibin]   ## check that x is in tt, te, ee order
+                        ibin += 1
+                else:
+                    for ell1, mean1, stdv1 in zip(es, ms, ss):
+                        print >> f, ell1, mean1, stdv1, stdv1
                 
         with open(prefix+".covar", "w") as f:
             N.savetxt(f, Clcovar, fmt="%f")
@@ -227,6 +240,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             with open(prefix+str(ibin+1), "w") as f:
                 for l, Wl in enumerate(win.T):
                     print >> f, l, Wl[0], Wl[1], Wl[2]
+                    
                 
     if gridPlot:
         pylab.figure(2)
