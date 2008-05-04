@@ -37,25 +37,30 @@ def figs(rel=True):
     
     sym =    ".xo+s^"
     colors = "bgrcmy"
-    l = []; C = []; e = []
+    l = []; C = []; e = []; chi2 = []
     for i, pre in enumerate(prefix):
         with open(pre+".bp") as f:
-           dat = N.loadtxt(f,unpack=True)
-           l.append(N.array(dat[0], dtype=int))
-           C.append(dat[1])
-           e.append(dat[2])
-           if rel:
-               C[-1][:] /= llClTT[l[-1]]
-               e[-1][:] /= llClTT[l[-1]]
-           plt.plot(l[-1],C[-1],colors[i]+sym[i], label=labels[i])
-           plt.errorbar(l[-1],C[-1],e[-1],fmt=colors[i]+sym[i])
-           if rel:
-               plt.axhline(1)
-               plt.ylim(0,4)
-           else:
-               plt.plot(ll, llClTT)
-           plt.legend()
-              
+            dat = N.loadtxt(f,unpack=True)
+            l.append(N.array(dat[0], dtype=int))
+            C.append(dat[1])
+            e.append(dat[2])
+            if rel:
+                C[-1][:] /= llClTT[l[-1]]
+                e[-1][:] /= llClTT[l[-1]]
+                chi2.append((((C[-1]-1)/e[-1])**2).mean())
+                print labels[i]+":", chi2[-1]
+                lab = "%s [%4.2f]" % (labels[i],chi2[-1])
+            else:
+                lab = labels[i]
+            plt.plot(l[-1],C[-1],colors[i]+sym[i], label=lab)
+            plt.errorbar(l[-1],C[-1],e[-1],fmt=colors[i]+sym[i])
+    if rel:
+        plt.axhline(1)
+        plt.ylim(0,4)
+    else:
+        plt.plot(ll, llClTT)
+    plt.legend()
+
 
 def main():
 	pass
