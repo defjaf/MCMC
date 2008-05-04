@@ -13,9 +13,10 @@ from pylab import *
 
 from numpy import arange, array, float64, transpose, zeros
 
-def Cl_nsigma(WMAP=False):
+filename = "data_list.txt"
 
-    filename = "data_list.txt"
+def Cl_nsigma(WMAP=False, filename = filename):
+
     
     mapdir = 'cmb/misc-data/MAP/'
     homedir = os.path.expandvars('${HOME}/home')
@@ -51,19 +52,22 @@ def Cl_nsigma(WMAP=False):
             continue
             
         exptname.append(set.name)
-        rng = set.Clpol_idx['TT']
-        BP = array([set.getWinBandpower(j, Cl) for j in range(set.num_points)])
+        try:
+            rng = set.Clpol_idx['TT']
+            BP = array([set.getWinBandpower(j, Cl) for j in range(set.num_points)])
 
-        diffs = set.getdelta(BP)/sqrt(set.var)
-        diffs = diffs[rng[0]:rng[1]]
-        nsig.extend(diffs)
+            diffs = set.getdelta(BP)/sqrt(set.var)
+            diffs = diffs[rng[0]:rng[1]]
+            nsig.extend(diffs)
 
-        ell1 =  set.ell[rng[0]:rng[1]]
-        ell.extend(ell1)
+            ell1 =  set.ell[rng[0]:rng[1]]
+            ell.extend(ell1)
 
-        expt.extend( (rng[1]-rng[0])*[iset] )
+            expt.extend( (rng[1]-rng[0])*[iset] )
 
-        plot(ell1, diffs, colorstring[iset]+'o', label=set.name)
+            plot(ell1, diffs, colorstring[iset]+'o', label=set.name)
+        except:
+            print "Failure at %s" % set.name
 
     ### this only works for the current ordering (WMAP first)
     if WMAP:
