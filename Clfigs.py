@@ -52,6 +52,8 @@ def figs(rel=True):
            if rel:
                plt.axhline(1)
                plt.ylim(0,4)
+           else:
+               plt.plot(ll, llClTT)
            plt.legend()
               
 
