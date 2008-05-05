@@ -208,7 +208,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     if get_x:
         x = []            
         for samples in s:
-            x.append(mod.fitOffsetLognormal_cum(samples, full_output=0, do_plot=0)
+            x.append(mod.fitOffsetLognormal_cum(samples, full_output=0, do_plot=0))
         
 
     nTT = len(ell[0])
