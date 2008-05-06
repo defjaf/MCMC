@@ -10,7 +10,7 @@ import pyfits
 import MCMC
 import getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
-from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat
+from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat, fitOffsetLognormal
 from ClData import ClData
 from ClData.readbins import readbins
 
@@ -207,8 +207,8 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     
     if get_x:
         x = []            
-        for samples in s:
-            x.append(mod.fitOffsetLognormal_cum(samples, full_output=0, do_plot=0))
+        for samples in s.samples:
+            x.append(fitOffsetLognormal(samples, full_output=0, do_plot=0))
         
 
     nTT = len(ell[0])
