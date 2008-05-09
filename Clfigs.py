@@ -16,7 +16,12 @@ import pylab
 import matplotlib.pyplot as plt
 
 
-def figs(rel=True, single=False):
+def figs(rel=True, single=False, wmap=False):
+    
+    wmapfile = "/Users/jaffe/Desktop/Projects/GUS/wmap_binned_tt_spectrum_5yr_v3.txt"
+    
+    wm = N.loadtxt(wmapfile, unpack=True)
+    
     
     prefix = ["bolo/bolo", "interf/interf", "radiometer/rad", "wang1/wang2","ground.2/ground"]
     labels = ['Bolometers','Interferometers','Radiometers','Wang et al', 'sub-orbital']
@@ -58,6 +63,9 @@ def figs(rel=True, single=False):
                 lab = labels[i]
             plt.plot(l[-1],C[-1],colors[i]+sym[i], label=lab)
             plt.errorbar(l[-1],C[-1],e[-1],fmt=colors[i]+sym[i])
+            if single:
+                plt.plot(wm[0], wm[3], 'xk', label='WMAP')
+                plt.errorbar(wm[0], wm[3], wm[4], fmt='xk')
             plt.xlim(0,2500)
             plt.ylim(0,10000)
             if single:
@@ -67,6 +75,9 @@ def figs(rel=True, single=False):
         plt.ylim(0,4)
         plt.legend()
     elif not single:
+        if wmap:
+            plt.plot(wm[0], wm[3], 'xk', label='WMAP')
+            plt.errorbar(wm[0], wm[3], wm[4], fmt='xk')
         plt.plot(ll, llClTT)
         plt.legend()
         plt.xlim(0,2500)
