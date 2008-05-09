@@ -409,7 +409,7 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
         o2 = oln(bins)
         plt.plot(bins,N.exp(-0.5*o2.like1(f, bins)))
         hh = N.histogram(samples, bins=bins, normed=True)
-        plt.plot(hh[1], hh[0] )
+        plt.plot(hh[1], hh[0], ls='steps' )
         
     zbar_f, sigz2_f, x_f = f
     print 'Final chi2:', o.chi2(zbar_f, sigz2_f, x_f)

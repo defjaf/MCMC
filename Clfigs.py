@@ -16,7 +16,7 @@ import pylab
 import matplotlib.pyplot as plt
 
 
-def figs(rel=True):
+def figs(rel=True, single=False):
     
     prefix = ["bolo/bolo", "interf/interf", "radiometer/rad", "wang1/wang2","ground.2/ground"]
     labels = ['Bolometers','Interferometers','Radiometers','Wang et al', 'sub-orbital']
@@ -39,6 +39,10 @@ def figs(rel=True):
     colors = "bgrcmy"
     l = []; C = []; e = []; chi2 = []
     for i, pre in enumerate(prefix):
+        if single:
+            plt.figure()
+            if not rel:
+                plt.plot(ll, llClTT)
         with open(pre+".bp") as f:
             dat = N.loadtxt(f,unpack=True)
             l.append(N.array(dat[0], dtype=int))
@@ -54,12 +58,19 @@ def figs(rel=True):
                 lab = labels[i]
             plt.plot(l[-1],C[-1],colors[i]+sym[i], label=lab)
             plt.errorbar(l[-1],C[-1],e[-1],fmt=colors[i]+sym[i])
+            plt.xlim(0,2500)
+            plt.ylim(0,10000)
+            if single:
+                plt.legend()
     if rel:
         plt.axhline(1)
         plt.ylim(0,4)
-    else:
+        plt.legend()
+    elif not single:
         plt.plot(ll, llClTT)
-    plt.legend()
+        plt.legend()
+        plt.xlim(0,2500)
+        plt.ylim(0,10000)
 
 
 def main():

@@ -4,6 +4,8 @@ with respect to some model
 """
 
 from __future__ import division
+from __future__ import with_statement
+
 from ClData import ClData
 import string
 import os.path
@@ -11,12 +13,21 @@ import math
 import pyfits
 from pylab import *
 
-from numpy import arange, array, float64, transpose, zeros
+from numpy import arange, array, float64, transpose, zeros, logical_and
 
 filename = "data_list.txt"
 
-def Cl_nsigma(WMAP=False, filename = filename):
+def Cl_nsigma(WMAP=False, filename = filename, lmin=0,lmax=1500):
 
+    names = {}
+    namef = "data_names.txt"
+    print "NAMES:"
+    with open(namef, "r") as f:
+        for line in f:
+            name, fil = string.split(line)
+            names[fil]=name
+            print fil, names[fil]
+    
     
     mapdir = 'cmb/misc-data/MAP/'
     homedir = os.path.expandvars('${HOME}/home')
@@ -42,7 +53,8 @@ def Cl_nsigma(WMAP=False, filename = filename):
     expt = []
     exptname = []
     colorstring='bgrcmyk'
-   
+    ncol = len(colorstring)
+    symstring = 'o+s*'
     figure(1)
     hold(True)
     for (iset, set) in enumerate(data):
@@ -54,26 +66,36 @@ def Cl_nsigma(WMAP=False, filename = filename):
         exptname.append(set.name)
         try:
             rng = set.Clpol_idx['TT']
-            BP = array([set.getWinBandpower(j, Cl) for j in range(set.num_points)])
+        except KeyError:
+            continue
+            
+        BP = array([set.getWinBandpower(j, Cl) for j in range(set.num_points)])
 
-            diffs = set.getdelta(BP)/sqrt(set.var)
-            diffs = diffs[rng[0]:rng[1]]
-            nsig.extend(diffs)
+        diffs = set.getdelta(BP)/sqrt(set.var)
+        diffs = diffs[rng[0]:rng[1]]
 
-            ell1 =  set.ell[rng[0]:rng[1]]
-            ell.extend(ell1)
+        ell1 =  set.ell[rng[0]:rng[1]]
+        lidx = logical_and(ell1<lmax, ell1>lmin)
+        ell.extend(ell1[lidx])
 
-            expt.extend( (rng[1]-rng[0])*[iset] )
+        nsig.extend(diffs[lidx])
 
-            plot(ell1, diffs, colorstring[iset]+'o', label=set.name)
+        #expt.extend( (rng[1]-rng[0])*[iset] )
+        expt.extend( len(lidx)*[iset] )
+
+        try:
+            lab=names[set.name]
         except:
-            print "Failure at %s" % set.name
+            lab=set.name
+        print lab, set.name
+        plot(ell1[lidx], diffs[lidx], colorstring[iset%ncol]+symstring[iset//ncol], label=lab)
 
-    ### this only works for the current ordering (WMAP first)
-    if WMAP:
-        legend([string.split(set.name, '_')[0] for set in data[0]])
-    else:
-        legend([string.split(set.name, '_')[0] for set in data[1:]])
+    # ### this only works for the current ordering (WMAP first)
+    # if WMAP:
+    #     legend([string.split(set.name, '_')[0] for set in data[0]])
+    # else:
+    #     legend([string.split(set.name, '_')[0] for set in data[1:]])
+    legend()
         
     hold(False)
 
