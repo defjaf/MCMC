@@ -1,7 +1,7 @@
 """ 
-	read and process 2d beam data (from MAXIPOL) 
-	probably need to "duplicate" this module for any significantly different data format and layout
-	(e.g., not just different detectors a la MAXIPOL)
+    read and process 2d beam data (from MAXIPOL) 
+    probably need to "duplicate" this module for any significantly different data format and layout
+    (e.g., not just different detectors a la MAXIPOL)
 """
 
 from __future__ import division
@@ -117,8 +117,8 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 
 ##MAXI   split from original setup_sampler
 def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=(2,3)):
-	"""
-	read the data needed for the sampler for a single beam with data in directory 'dir',
+    """
+    read the data needed for the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
     'num'.
     
@@ -170,7 +170,7 @@ def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=
                 for fil, d in zip(files, day) ]
         xyrange = data[0]   ### set from the zeroth dataset
 
-	return data, xyrange
+    return data, xyrange
 
 
 ## this is probably specific to ##MAXI -- just the very inner loop is generic
@@ -217,8 +217,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 ax.cla()
 
-			## need to explicitly read the data here, now -- how to make generic?
-			data, xyrange = read_data_MAXI(num=det, DayNight=DayNight)
+            ## need to explicitly read the data here, now -- how to make generic?
+            data, xyrange = read_data_MAXI(num=det, DayNight=DayNight)
             like, prop_sigmas, start_params = setup_sampler(data, xyrange,
                                                             useNormalizedBeam=useNormalizedBeam)
             
@@ -305,16 +305,16 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
             fig=pylab.figure(0)
             ax=fig.add_subplot(nrow, ncol, ib+1)
             ax.cla()
-			
-			## this inner part of the loop is probably generic ##MAXI
+            
+            ## this inner part of the loop is probably generic ##MAXI
 
             try:
                 if startCols is not None:
                     if neg is None: neg1 = (dfac[tuple(startCols)][det]<0)
 
-					data, xyrange = read_data_MAXI(files=[fil],cols=startCols)
+                    data, xyrange = read_data_MAXI(files=[fil],cols=startCols)
                     like, prop_sigmas, start_params = setup_sampler(
-               			data, xyrange,
+                        data, xyrange,
                         useNormalizedBeam=useNormalizedBeam,
                         nhits=nhits, neg=neg1,
                         rangeScale=rangeScale)
@@ -336,7 +336,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 ##   therefore may need to adjust prior ranges
 
                 if neg is None: neg1 = (dfac[tuple(cols)][det]<0)
-				data, xyrange = read_data_MAXI(files=[fil],cols=cols)
+                data, xyrange = read_data_MAXI(files=[fil],cols=cols)
                 like, prop_sigmas, start_params = setup_sampler(
                     data, xyrange,
                     useNormalizedBeam=useNormalizedBeam, nhits=nhits, neg=neg1,
