@@ -118,7 +118,7 @@ def plotter(sampler):
 
 
 def setup_sampler(data, xyrange, useNormalizedBeam=False, nhits=None, neg=False, 
-					rangeScale=None, sigminmax=(3,8)):
+                    rangeScale=None, sigminmax=(3,8)):
     """
     setup the sampler using data over the range xyrange
     """
@@ -150,7 +150,7 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False, nhits=None, neg=False,
         npar = 5
 
     mod.setxyRange(xyrange, scale=rangeScale)    ## class variables: sets the prior for all instances
-	mod.sigMin, mod.sigMax=sigminmax
+    mod.sigMin, mod.sigMax=sigminmax
     print 'setting sigMin, sigMax=', mod.sigMin, mod.sigMax
 
     dx = (mod.centerMin[0],mod.centerMax[0])
