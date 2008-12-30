@@ -14,7 +14,7 @@ from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
                     arange, asarray, sqrt, minimum, maximum, logical_and)
 from numpy import concatenate as cat
 
-import numpy.core.ma as ma
+import numpy.ma as ma
 
 import MCMC
 import Likelihood
@@ -124,13 +124,6 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False, nhits=None, neg=False,
     """
 
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
-
-#    sigcut = 0.2 
-#    ctscut = 12  
-    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
-    ctscut = 4     ## only keep pixels with this many hits
-                   ## nb these also apply to TOI data in which case
-                   ## cts is the number of hits in the 'parent' pixel
 
 
 ### nothing from here down is specific to ##MAXI

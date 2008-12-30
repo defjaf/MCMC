@@ -116,7 +116,8 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 
 
 ##MAXI   split from original setup_sampler
-def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=(2,3)):
+def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=(2,3), 
+                   sigcut=sigcut, ctscut=ctscut):
     """
     read the data needed for the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -180,6 +181,14 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     run the sampler nruns times for the detectors with both Day and Night data
     """
     
+    #    sigcut = 0.2 
+    #    ctscut = 12  
+    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
+    ctscut = 4     ## only keep pixels with this many hits
+                   ## nb these also apply to TOI data in which case
+                   ## cts is the number of hits in the 'parent' pixel
+    
+    
     plotOne = False   ### can't get this to work yet!
     if plotOne:
         pylab.axes()
@@ -218,7 +227,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 ax.cla()
 
             ## need to explicitly read the data here, now -- how to make generic?
-            data, xyrange = read_data_MAXI(num=det, DayNight=DayNight)
+            data, xyrange = read_data_MAXI(num=det, DayNight=DayNight, sigcut=sigcut, ctscut=ctscut)
             like, prop_sigmas, start_params = setup_sampler(data, xyrange,
                                                             useNormalizedBeam=useNormalizedBeam)
             
@@ -312,7 +321,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 if startCols is not None:
                     if neg is None: neg1 = (dfac[tuple(startCols)][det]<0)
 
-                    data, xyrange = read_data_MAXI(files=[fil],cols=startCols)
+                    data, xyrange = read_data_MAXI(files=[fil],cols=startCols, sigcut=sigcut, ctscut=ctscut)
                     like, prop_sigmas, start_params = setup_sampler(
                         data, xyrange,
                         useNormalizedBeam=useNormalizedBeam,
@@ -336,7 +345,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 ##   therefore may need to adjust prior ranges
 
                 if neg is None: neg1 = (dfac[tuple(cols)][det]<0)
-                data, xyrange = read_data_MAXI(files=[fil],cols=cols)
+                data, xyrange = read_data_MAXI(files=[fil],cols=cols, sigcut=sigcut, ctscut=ctscut)
                 like, prop_sigmas, start_params = setup_sampler(
                     data, xyrange,
                     useNormalizedBeam=useNormalizedBeam, nhits=nhits, neg=neg1,
