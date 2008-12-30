@@ -117,7 +117,7 @@ def plotter(sampler):
 
 
 
-def setup_sampler(data, xyrange, useNormalizedBeam=False, nhits=None, neg=False, 
+def setup_sampler(data, xyrange, useNormalizedBeam=False ,
                     rangeScale=None, sigminmax=(3,8)):
     """
     setup the sampler using data over the range xyrange
@@ -279,6 +279,29 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
         
         pylab.gca().cla()
         for d in data: plotMod(d, vals, mod)
+
+
+def plotMod(data, params=None, model=None, hold=False):
+    """ plot the data in MAXIPOLBeamdData.data with params 
+    actually, doesn't use the model parameter"""
+    x, y, d = regrid(data.x, data.y, data.d)
+    ### make full 2d x, y arrays (there's probably a more clever way to do this!)
+    ij = 0
+    xx = array(shape=len(x)*len(y), type=float64)
+    yy = array(shape=len(x)*len(y), type=float64)
+    for j in range(len(y)):
+        for i in range(len(x)):
+            xx[ij] = x[i]
+            yy[ij] = y[j]
+            ij += 1
+    pylab.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
+                     interpolation='nearest', origin='lower', aspect='free', hold=hold)
+    ## aspect = 'preserve' for square pixels; can't do that with contour however
+    #pylab.contour(x, y, ma.log(d))
+    if params is not None:
+        vals = model(*params).atxy(xx, yy)
+        vals.shape = d.shape
+        pylab.contour(x, y, vals)
 
 
 

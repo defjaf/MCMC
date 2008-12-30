@@ -24,6 +24,13 @@ from ProcessBeamData import setup_sampler, sample1beam, plotter
 
 import getdist
 
+#    sigcut = 0.2 
+#    ctscut = 12  
+sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
+ctscut = 4     ## only keep pixels with this many hits
+               ## nb these also apply to TOI data in which case
+               ## cts is the number of hits in the 'parent' pixel
+
 
 def readMAXIPOLdataLuis(filename):
     """ read the data and make an instance of class BeamData """
@@ -117,7 +124,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 
 ##MAXI   split from original setup_sampler
 def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=(2,3), 
-                   sigcut=sigcut, ctscut=ctscut):
+                   sigcut=0.0, ctscut=0, nhits=None, neg=False):
     """
     read the data needed for the sampler for a single beam with data in directory 'dir',
     given by the files in the sequence 'files', or with detector
@@ -176,17 +183,11 @@ def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=
 
 ## this is probably specific to ##MAXI -- just the very inner loop is generic
 def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
-              noCorrelations=True, fac=None, doBlock=True):
+              noCorrelations=True, fac=None, doBlock=True, nhits=None):
     """
     run the sampler nruns times for the detectors with both Day and Night data
     """
     
-    #    sigcut = 0.2 
-    #    ctscut = 12  
-    sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
-    ctscut = 4     ## only keep pixels with this many hits
-                   ## nb these also apply to TOI data in which case
-                   ## cts is the number of hits in the 'parent' pixel
     
     
     plotOne = False   ### can't get this to work yet!
