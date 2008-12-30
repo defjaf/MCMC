@@ -322,11 +322,11 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 if startCols is not None:
                     if neg is None: neg1 = (dfac[tuple(startCols)][det]<0)
 
-                    data, xyrange = read_data_MAXI(files=[fil],cols=startCols, sigcut=sigcut, ctscut=ctscut)
+                    data, xyrange = read_data_MAXI(files=[fil],cols=startCols, sigcut=sigcut, ctscut=ctscut,
+                                                   nhits=nhits, neg=neg1)
                     like, prop_sigmas, start_params = setup_sampler(
                         data, xyrange,
                         useNormalizedBeam=useNormalizedBeam,
-                        nhits=nhits, neg=neg1,
                         rangeScale=rangeScale)
 
                     startres, ana = sample1beam(like, nMC=nMC, fac=fac, 
@@ -346,10 +346,11 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                 ##   therefore may need to adjust prior ranges
 
                 if neg is None: neg1 = (dfac[tuple(cols)][det]<0)
-                data, xyrange = read_data_MAXI(files=[fil],cols=cols, sigcut=sigcut, ctscut=ctscut)
+                data, xyrange = read_data_MAXI(files=[fil],cols=cols, sigcut=sigcut, ctscut=ctscut,
+                                               nhits=nhits, neg=neg1)
                 like, prop_sigmas, start_params = setup_sampler(
                     data, xyrange,
-                    useNormalizedBeam=useNormalizedBeam, nhits=nhits, neg=neg1,
+                    useNormalizedBeam=useNormalizedBeam,
                     rangeScale=rangeScale)
                 
                 if startCols is not None:

@@ -11,7 +11,7 @@ import pylab
 
 import numpy
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
-                    arange, asarray, sqrt, minimum, maximum, logical_and)
+                    arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
 import numpy.ma as ma
@@ -287,15 +287,15 @@ def plotMod(data, params=None, model=None, hold=False):
     x, y, d = regrid(data.x, data.y, data.d)
     ### make full 2d x, y arrays (there's probably a more clever way to do this!)
     ij = 0
-    xx = array(shape=len(x)*len(y), type=float64)
-    yy = array(shape=len(x)*len(y), type=float64)
+    xx = empty(len(x)*len(y), dtype=float64)
+    yy = empty(len(x)*len(y), dtype=float64)
     for j in range(len(y)):
         for i in range(len(x)):
             xx[ij] = x[i]
             yy[ij] = y[j]
             ij += 1
     pylab.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
-                     interpolation='nearest', origin='lower', aspect='free', hold=hold)
+                     interpolation='nearest', origin='lower', aspect='auto', hold=hold)
     ## aspect = 'preserve' for square pixels; can't do that with contour however
     #pylab.contour(x, y, ma.log(d))
     if params is not None:
