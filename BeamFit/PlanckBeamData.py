@@ -64,7 +64,7 @@ def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
 
 
 ##MAXI   split from original setup_sampler
-def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, **kwargs, noise=None):
+def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, noise=None, **kwargs):
     """
     
     read piolib img2d data. For each detector, read a pair (data, nhit).
