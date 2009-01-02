@@ -1,6 +1,6 @@
-""" deal with 2d beam data (from MAXIPOL) """
+""" deal with 2d beam data (originally from MAXIPOL) """
 
-## should refactor into ProcessBeamData and MAXIPOLBeamData???
+## refactored from MAXIPOLBeamData???
 ## see ##MAXI below for candidates for latter
 
 from __future__ import division
@@ -125,8 +125,6 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
 
     numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
 
-
-### nothing from here down is specific to ##MAXI
 #### set likelihood, model
 
     if useNormalizedBeam:
@@ -282,7 +280,7 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
 
 
 def plotMod(data, params=None, model=None, hold=False):
-    """ plot the data in MAXIPOLBeamdData.data with params 
+    """ plot the data with params 
     actually, doesn't use the model parameter"""
     x, y, d = regrid(data.x, data.y, data.d)
     ### make full 2d x, y arrays (there's probably a more clever way to do this!)
@@ -295,7 +293,7 @@ def plotMod(data, params=None, model=None, hold=False):
             yy[ij] = y[j]
             ij += 1
     pylab.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
-                     interpolation='nearest', origin='lower', aspect='auto', hold=hold)
+                 interpolation='nearest', origin='lower', aspect='auto', hold=hold)
     ## aspect = 'preserve' for square pixels; can't do that with contour however
     #pylab.contour(x, y, ma.log(d))
     if params is not None:

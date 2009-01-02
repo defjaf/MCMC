@@ -14,8 +14,8 @@ import gzip
 from itertools import izip, repeat
 
 import numpy
-from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
-                    arange, asarray, sqrt, minimum, maximum, logical_and)
+from numpy import (array, float64, zeros, ones, int32, log, where, exp,
+                   arange, asarray, sqrt, minimum, maximum, logical_and)
 from numpy import concatenate as cat
 
 from BeamData import BeamData
@@ -251,7 +251,6 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     return reslist
 
 
-# probably needs to be split ##MAXI
 def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
             mapOnly=False, nhits=None, neg=None, rangeScale=None, 
