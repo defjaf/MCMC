@@ -42,7 +42,7 @@ from ProcessBeamData import setup_sampler, sample1beam, plotter
 import getdist
 
 try:
-    import piolib
+    import piolib as pio
 except:
     print "Will probably fail, piolib not available"
 
