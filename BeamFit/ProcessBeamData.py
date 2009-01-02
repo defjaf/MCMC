@@ -14,8 +14,11 @@ from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
                     arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
-import numpy.ma as ma
-
+try:
+    import numpy.ma as ma
+except ImportError:
+    import numpy.core.ma as ma
+    
 import MCMC
 import Likelihood
 from BeamFit import (BeamModel, NormalizedBeamModel, 
