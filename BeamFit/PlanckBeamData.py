@@ -1,3 +1,5 @@
+from __future__ import division
+
 """ 
     read and process 2d beam data from Planck (based on original from MAXIPOL) 
     
@@ -20,7 +22,6 @@
 whitenoise = {143:0.000492295, 217:0.000404022, 353:0.000303889, 545:0.000184390 }
 
 
-from __future__ import division
 import sys
 import math
 import os.path
