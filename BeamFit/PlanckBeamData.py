@@ -170,8 +170,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     return reslist
 
 
-# not corrected for Planck ##MAXI
-def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
+#  corrected for Planck ##MAXI
+def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
             nhits=None, neg=None, rangeScale=None, 
             closeFigs=False, figName=None, startCols=None, startParams=None):
