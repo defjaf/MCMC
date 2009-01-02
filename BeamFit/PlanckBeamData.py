@@ -190,7 +190,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
     MCs = range(20)
 
 
-    ntot = dets.size() * objs.size() * iters.size() * MCs.size()
+    ntot = len(dets) * len(objs) * len(iters) * len(MCs)
     nrow = ncol = int(math.sqrt(ntot))
     if nrow*ncol < len(dets): ncol += 1
     if nrow*ncol < len(dets): nrow += 1
