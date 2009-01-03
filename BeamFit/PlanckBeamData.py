@@ -107,11 +107,11 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         
         y = y.T
         
-        x = asarray(x, float64)
-        y = asarray(y, float64)
-        img = asarray(img, float64)
-        sig = asarray(sig, float64)
-        hit = asarray(hit, float64)
+        x = asarray(x, float64).flat
+        y = asarray(y, float64).flat
+        img = asarray(img, float64).flat
+        sig = asarray(sig, float64).flat
+        hit = asarray(hit, float64).flat
         
         data.append(BeamData(x, y, img, sig, cts = hit))
         
