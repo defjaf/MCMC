@@ -77,8 +77,8 @@ def testnoise():
 
     npix1 = int(sqrt(imgs[0].size))
     if (npix1**2) == imgs[0].size:
-        imgs.shape=(npix1,npix1)
-        hits.shape=(npix1,npix1)
+        imgs.shape=(-1,npix1,npix1)
+        hits.shape=(-1,npix1,npix1)
     
     # dels = imgs.copy()
     #
