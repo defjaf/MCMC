@@ -173,9 +173,9 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 
 #  corrected for Planck ##MAXI
 def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
-            noCorrelations=True, fac=None, doBlock=True, cols=None, dets=None,
-            nhits=None, neg=None, rangeScale=None, 
-            closeFigs=False, figName=None, startCols=None, startParams=None):
+            noCorrelations=True, fac=None, doBlock=True, dets=None,
+            nhits=None, rangeScale=None, 
+            closeFigs=False, figName=None, startParams=None):
     """
     run the sampler  for the detectors with TOI data
     """
@@ -185,7 +185,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
     ntotrun = nfig
 
     
-    dets = ["217-1"]
+    if dets is None: dets = ["217-1"]
     objs = ["HII", "Radio"]
     iters = range(1,3)
     MCs = range(20)
@@ -193,8 +193,8 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
 
     ntot = len(dets) * len(objs) * len(iters) * len(MCs)
     nrow = ncol = int(math.sqrt(ntot))
-    if nrow*ncol < len(dets): ncol += 1
-    if nrow*ncol < len(dets): nrow += 1
+    if nrow*ncol < ntot: ncol += 1
+    if nrow*ncol < ntot: nrow += 1
 
 
     res={}
