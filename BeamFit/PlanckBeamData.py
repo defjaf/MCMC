@@ -82,7 +82,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         sigma_white = noise
     else:
         try:
-            sigma_white = whitenoise[det]
+            sigma_white = whitenoise[int(det[:3])]  ## this is a cheat to convert the det to an integer
         except:   ## should catch appropriate exception
             print "Can't get white noise; using 1"
             sigma_white = 1.0
