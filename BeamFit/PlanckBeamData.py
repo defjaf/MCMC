@@ -154,7 +154,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                         data, xyrange = read_data_Planck(det=det, MC=MC, iter=it, obj=obj, 
                                                          sigcut=sigcut, ctscut=ctscut)
                         like, prop_sigmas, start_params = setup_sampler(data, xyrange,
-                                                                        useNormalizedBeam=useNormalizedBeam)
+                                                                        useNormalizedBeam=useNormalizedBeam,
+                                                                        sigminmax=(2,20))
             
                         res[det] = sample1beam(like, nMC=nMC,  fac=fac,
                                                prop_sigmas=prop_sigmas, start_params=start_params,
@@ -219,7 +220,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
                                                          sigcut=sigcut, ctscut=ctscut)
                         like, prop_sigmas, start_params = setup_sampler(
                             data, xyrange,
-                            useNormalizedBeam=useNormalizedBeam,
+                            useNormalizedBeam=useNormalizedBeam,sigminmax=(2,20),
                             rangeScale=rangeScale)
                             
                         if startParams is not None:
