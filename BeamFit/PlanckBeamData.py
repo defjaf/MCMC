@@ -187,7 +187,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     """
     
     dets = ["217-1"]
-    objs = ["HII", "Radio"]
+    objs = ["HII", "radio"]
     iters = range(1,3)
     MCs = range(20)
     
