@@ -75,6 +75,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
     otherwise, call getobjname(**kwargs) to get the files -- do this, or just explicitly call???
     """
     
+    
     if files is None:
         files = getobjname(**kwargs)
 
@@ -82,6 +83,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         sigma_white = noise
     else:
         try:
+            det = kwargs['det']
             sigma_white = whitenoise[int(det[:3])]  ## this is a cheat to convert the det to an integer
         except KeyError:   ## should catch appropriate exception
             print "Can't get white noise; using 1"
