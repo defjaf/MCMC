@@ -65,7 +65,7 @@ def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
 
 
 ##MAXI   split from original setup_sampler
-def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, noise=None, **kwargs):
+def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, noise=None, det=None, **kwargs):
     """
     
     read piolib img2d data. For each detector, read a pair (data, nhit).
@@ -83,7 +83,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
     else:
         try:
             sigma_white = whitenoise[int(det[:3])]  ## this is a cheat to convert the det to an integer
-        except:   ## should catch appropriate exception
+        except KeyError:   ## should catch appropriate exception
             print "Can't get white noise; using 1"
             sigma_white = 1.0
 
