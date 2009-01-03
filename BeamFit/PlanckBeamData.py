@@ -20,7 +20,7 @@ from __future__ import division
 """
 
 whitenoise = {143:0.000492295, 217:0.000404022, 353:0.000303889, 545:0.000184390 }
-
+sigminmax = (1, 10) ## arcmin
 
 import sys
 import math
@@ -31,7 +31,7 @@ import gzip
 from itertools import izip, repeat
 
 import numpy
-from numpy import (array, float64, zeros, ones, int32, log, where, exp,
+from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace,
                    arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
@@ -111,7 +111,7 @@ def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
 
 
 ##MAXI   split from original setup_sampler
-def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, noise=None, **kwargs):
+def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, noise=None, mapsize=0.01, **kwargs):
     """
     
     read piolib img2d data. For each detector, read a pair (data, nhit).
@@ -119,6 +119,8 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
     if files is present, it is a (2,N) sequence where each entry is (data, nhit)
     
     otherwise, call getobjname(**kwargs) to get the files -- do this, or just explicitly call???
+    
+    mapsize gives the size of the map in radians; will convert to arcmin
     """
     
     
@@ -150,8 +152,15 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         x = empty((npix, npix),dtype=float64)
         y = empty((npix, npix),dtype=float64)
          
-        x[:] = arange(npix)
-        y[:] = arange(npix)
+        
+        if mapsize is None:
+            mapsize = npix
+        else:
+            mapsize *= 60*180/np.pi ## convert to minutes
+         
+         ## are the values at pixel centers or edges?
+        x[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=false)
+        y[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=false)
         
         y = y.T
         
@@ -203,7 +212,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                                                          sigcut=sigcut, ctscut=ctscut)
                         like, prop_sigmas, start_params = setup_sampler(data, xyrange,
                                                                         useNormalizedBeam=useNormalizedBeam,
-                                                                        sigminmax=(2,20))
+                                                                        sigminmax=sigminmax)
             
                         res[det] = sample1beam(like, nMC=nMC,  fac=fac,
                                                prop_sigmas=prop_sigmas, start_params=start_params,
@@ -268,7 +277,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
                                                          sigcut=sigcut, ctscut=ctscut)
                         like, prop_sigmas, start_params = setup_sampler(
                             data, xyrange,
-                            useNormalizedBeam=useNormalizedBeam,sigminmax=(2,20),
+                            useNormalizedBeam=useNormalizedBeam,sigminmax=sigminmax,
                             rangeScale=rangeScale)
                             
                         if startParams is not None:
