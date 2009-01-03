@@ -80,7 +80,7 @@ def testnoise():
         d -= imgs[0]
         
     means = d.mean(axis=0)
-    stdvs = d.std(axis=0)*sqrt(hits[0])
+    stdvs = d.std(axis=0)  ##*sqrt(hits[0])
         
     return (imgs, hits, means, stdvs)
     
