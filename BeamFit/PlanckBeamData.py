@@ -71,16 +71,26 @@ def testnoise():
         imgs.append(img)
         hits.append(hit)
         
+    
     imgs = asarray(imgs)
     hits = asarray(hits)
+
+    npix1 = int(np.sqrt(imgs[0].size))
+    if (npix1**2) == imgs[0].size:
+        imgs.shape=(npix1,npix1)
+        hits.shape=(npix1,npix1)
     
-    dels = imgs.copy()
+    # dels = imgs.copy()
+    #
+    # for d in dels:
+    #      d -= imgs[0]
+    #      
+    #  means = d.mean(axis=0)
+    #  stdvs = d.std(axis=0)  ##*sqrt(hits[0])
+
     
-    for d in dels:
-        d -= imgs[0]
-        
-    means = d.mean(axis=0)
-    stdvs = d.std(axis=0)  ##*sqrt(hits[0])
+    means = imgs.mean(axis=0)
+    stdvs = imgs.std(axis=0)
         
     return (imgs, hits, means, stdvs)
     
