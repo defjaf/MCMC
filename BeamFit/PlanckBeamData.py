@@ -161,8 +161,8 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
             mapsize *= 60*180/np.pi ## convert to minutes
          
          ## are the values at pixel centers or edges?
-        x[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=false)
-        y[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=false)
+        x[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=False)
+        y[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=False)
         
         y = y.T
         
