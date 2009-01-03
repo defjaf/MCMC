@@ -71,8 +71,8 @@ def testnoise():
         imgs.append(img)
         hits.append(hit)
         
-    imgs = np.array(imgs)
-    hits = np.array(hits)
+    imgs = asarray(imgs)
+    hits = asarray(hits)
     
     dels = imgs.copy()
     
