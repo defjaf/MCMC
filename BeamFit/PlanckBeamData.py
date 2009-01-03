@@ -75,7 +75,7 @@ def testnoise():
     imgs = asarray(imgs)
     hits = asarray(hits)
 
-    npix1 = int(np.sqrt(imgs[0].size))
+    npix1 = int(sqrt(imgs[0].size))
     if (npix1**2) == imgs[0].size:
         imgs.shape=(npix1,npix1)
         hits.shape=(npix1,npix1)
