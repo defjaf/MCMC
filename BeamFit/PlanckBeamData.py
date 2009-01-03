@@ -232,7 +232,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 
 #  corrected for Planck ##MAXI
 def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
-            noCorrelations=True, fac=None, doBlock=True, dets=None,
+            noCorrelations=True, fac=None, doBlock=True, 
+            dets=None, objs=None, iters=None, MCs=None,
             nhits=None, rangeScale=None, 
             closeFigs=False, figName=None, startParams=None):
     """
@@ -245,9 +246,9 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
 
     
     if dets is None: dets = ["217-1"]
-    objs = ["HII", "Radio"]
-    iters = [1] ##range(1,3)
-    MCs = range(20)
+    if objs is None: objs = ["HII", "Radio"]
+    if iters is None: iters = [1] ##range(1,3)
+    if MCs is None: MCs = range(20)
 
 
     ntot = len(dets) * len(objs) * len(iters) * len(MCs)
