@@ -90,7 +90,11 @@ def testnoise():
 
     
     means = imgs.mean(axis=0)
-    stdvs = imgs.std(axis=0)
+    stdvs = imgs.std(axis=0)*sqrt(hits[0])
+    
+    stdev = imgs[imgs>0].std()
+    
+    print "global stdev = %f" % (stdev,)
         
     return (imgs, hits, means, stdvs)
     
