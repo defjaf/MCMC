@@ -263,7 +263,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
             for it in iters:
                 for MC in MCs:
                     print 'Detector: %s, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
-                    figf = figname + '_' + det +'_' + str(MC).strip() + '_' + str(it).strip()+'_' 
+                    figf = figName + '_' + det +'_' + str(MC).strip() + '_' + str(it).strip()+'_' 
                     
                     res[ib] = []
                     startres = []
