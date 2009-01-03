@@ -52,7 +52,29 @@ sigcut = 0.02  ## minimum sigma for data -- eliminates weird low-error points
 ctscut = 4     ## only keep pixels with this many hits
                ## nb these also apply to TOI data in which case
                ## cts is the number of hits in the 'parent' pixel
-
+               
+def testnoise():
+    """look at a series of MCs to check if the noise levels make sense"""
+    
+    nmc = 20
+    det = "217-1"
+    obj = "HII"
+    
+    imgs = []
+    hits = []
+    
+    for imc in range(nmc):
+        files = getobjname(det=det, MC=imc, iter=1, obj=obj)
+        img = pio.ReadIMG2DObject(files[0], "PIODOUBLE", "")
+        hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
+        
+        imgs.append(img)
+        hits.append(hits)
+        
+    return (imgs, hits)
+    
+    
+    
 def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
     if db is None: 
         db = "/space/dmc/m2db/DATA"
