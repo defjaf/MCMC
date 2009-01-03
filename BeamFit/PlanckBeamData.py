@@ -113,7 +113,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         sig = asarray(sig, float64)
         hit = asarray(hit, float64)
         
-        data.append(BeamFit.BeamData(x, y, img, sig, cts = hit))
+        data.append(BeamData(x, y, img, sig, cts = hit))
         
     xyrange = data[0]   ### set from the zeroth dataset
 
