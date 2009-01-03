@@ -69,7 +69,7 @@ def testnoise():
         hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
         
         imgs.append(img)
-        hits.append(hits)
+        hits.append(hit)
         
     return (imgs, hits)
     
