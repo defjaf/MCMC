@@ -246,7 +246,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
     
     if dets is None: dets = ["217-1"]
     objs = ["HII", "Radio"]
-    iters = range(1,3)
+    iters = [1] ##range(1,3)
     MCs = range(20)
 
 
@@ -263,6 +263,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
             for it in iters:
                 for MC in MCs:
                     print 'Detector: %s, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
+                    figf = figname + '_' + det +'_' + str(MC).strip() + '_' + str(it).strip()+'_' 
                     
                     res[ib] = []
                     startres = []
