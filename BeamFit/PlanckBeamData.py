@@ -202,7 +202,8 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
         for obj in objs:
             for it in iters:
                 for MC in MCs:
-                    ib += 1
+                    print 'Detector: %d, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
+                    
                     res[ib] = []
                     startres = []
 
@@ -235,21 +236,24 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
                         sys.stdout.flush()
                         fig=pylab.figure(1)
                         ax=fig.add_subplot(nrow, ncol, ib+1)
-                        samples = cat([ s.samples for s in res[det][-1][0] ])
+                        samples = cat([ s.samples for s in res[ib][-1][0] ])
 
                         for var in samples.transpose(): ax.plot(var)
                         if figName:
                             fig.savefig(figf+str(fig.number).strip()+'.png')
 
                         fig=pylab.figure(2)
-                        getdist.histgrid(res[det][-1][0][-1])
+                        getdist.histgrid(res[ib][-1][0][-1])
 
                         if figName:
                             fig.savefig(figf+str(fig.number).strip()+'.png')
 
                     except None:
                         print "Unexpected error:", sys.exc_info()[0]
-                        print "... when running ", fil, fb
+                        print "... when running Detector: %d, obj: %s, iter: %d, MC: %d" % (det, obj, it, MC)
+                        
+                    ib += 1
+                    
 
         if closeFigs: pylab.close('all')
 
