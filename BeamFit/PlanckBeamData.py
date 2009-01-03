@@ -93,7 +93,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
         sig = sigma_white/sqrt(hit)
         ## assume square, although really should read keywords for size
-        npix = np.sqrt(img.size)
+        npix = sqrt(img.size)
         if npix*npix != img.size:
             print "Image size problem: size=%d, npix=%f" % (img.size, npix)
         
