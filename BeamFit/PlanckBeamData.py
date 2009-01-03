@@ -35,6 +35,8 @@ from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace
                    arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
+import numpy as np
+
 from BeamData import BeamData
 
 from ProcessBeamData import setup_sampler, sample1beam, plotter
