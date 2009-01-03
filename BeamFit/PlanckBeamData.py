@@ -61,7 +61,7 @@ def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
         
     base = db + '/' + grp + '/' + 'map_' 
     suff = '_' + str(MC).strip() + '_' + str(iter).strip()+'_' 
-    return [base + kind + suff + obj for kind in ['data', 'hit']]
+    return [base + kind + det + suff + obj for kind in ['data_', 'hit_']]
 
 
 ##MAXI   split from original setup_sampler
