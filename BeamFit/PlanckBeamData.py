@@ -71,7 +71,18 @@ def testnoise():
         imgs.append(img)
         hits.append(hit)
         
-    return (imgs, hits)
+    imgs = np.array(imgs)
+    hits = np.array(hits)
+    
+    dels = imgs.copy()
+    
+    for d in dels:
+        d -= imgs[0]
+        
+    means = d.mean(axis=0)
+    stdvs = d.std(axis=0)*sqrt(hits[0])
+        
+    return (imgs, hits, means, stdvs)
     
     
     
