@@ -246,7 +246,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
 
     
     if dets is None: dets = ["217-1"]
-    if objs is None: objs = ["HII", "Radio"]
+    if objs is None: objs = ["HII", "radio"]
     if iters is None: iters = [1] ##range(1,3)
     if MCs is None: MCs = range(20)
 
