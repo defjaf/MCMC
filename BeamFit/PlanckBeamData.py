@@ -32,7 +32,7 @@ from itertools import izip, repeat
 
 import numpy
 from numpy import (array, float64, zeros, ones, int32, log, where, exp,
-                   arange, asarray, sqrt, minimum, maximum, logical_and)
+                   arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
 from BeamData import BeamData
