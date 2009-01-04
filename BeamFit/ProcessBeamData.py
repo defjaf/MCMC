@@ -138,10 +138,12 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
         mod = OffsetNormalizedBeamModel.OffsetNormalizedBeamModel
         like = NormalizedBeamLikelihood.NormalizedBeamLikelihood(data=data, model=mod)
         npar = 9
+        use_xy = OffsetNormalizedBeamModel.use_xy
     else:    
         mod = BeamModel.GaussianBeamModel2D
         like = Likelihood.Likelihood(data=data, model=mod)
         npar = 5
+        use_xy = False
 
     mod.setxyRange(xyrange, scale=rangeScale)    ## class variables: sets the prior for all instances
     mod.sigMin, mod.sigMax=sigminmax
@@ -167,6 +169,8 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
     if need_prop_sig:
         # prop_sigmas = ( (delx/3, dely/3 ), (delx/5, dely/5 ), 0.6)
         prop_sigmas = ( (delx/10, dely/10), (delx/10, dely/10), 0.6)
+        if use_xy:
+            prop_sigmas[-1] = 0.2
 
 
  #   start_params = ( (uniform(*dx), uniform(*dy)), 

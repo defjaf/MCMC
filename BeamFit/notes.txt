@@ -1,6 +1,7 @@
 Lots of FP errors with use_xy = True
 
 possibly a problem with rho ~ +/-1?
+store determinant factor separately for this case?
 
 Warning: overflow encountered in exp  (gauss2d)
 Warning: overflow encountered in multiply (chi2)
@@ -8,4 +9,9 @@ Warning: overflow encountered in true_divide
 
 and get this every time 
 Warning: invalid value encountered in true_divide
+ I think due to some zeros in the statistics (/ana[0]) when some parameters are fixed??
+
+need to be able to specify use_xy in processbeamdata
+
+but otherwise the _xy version is much more sensible, as there's no angle ambiguity.
 
