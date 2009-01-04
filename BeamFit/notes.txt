@@ -2,6 +2,7 @@ Lots of FP errors with use_xy = True
 
 possibly a problem with rho ~ +/-1?
 store determinant factor separately for this case?
+further evidence: don't get the error when you start with sigma_rho=0.2 vs 0.6
 
 Warning: overflow encountered in exp  (gauss2d)
 Warning: overflow encountered in multiply (chi2)
