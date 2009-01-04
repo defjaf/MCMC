@@ -355,7 +355,7 @@ def saveres(reslist, file=None):
     return newres
 
 
-def makereport(reslist, file=sys.stdout, hasTOI=False, hasRuns=False):
+def makereport(reslist, file=sys.stdout, hasRuns=False):
     """
     print out a 'report' of the MCMC run
     """
@@ -367,13 +367,8 @@ def makereport(reslist, file=sys.stdout, hasTOI=False, hasRuns=False):
         for det, res in resrun.iteritems():
             file.write("%d" % det)
 
-            try:
-                if not hasTOI: 
-                    val = res[1][0]
-                    sig = res[1][1]
-                else:
-                    val = res[-1][1][0]
-                    sig = res[-1][1][1]
+                val = res[0][1][0]
+                sig = res[0][1][1]
                 
                 for (v, s) in zip(val, sig):
                     file.write("   %f +- %f" % (v, s))
