@@ -127,7 +127,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
     
     
     if files is None:
-        files = getobjname(**kwargs)
+        files = [getobjname(**kwargs)]
 
     if noise is not None:
         sigma_white = noise
@@ -140,7 +140,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
             sigma_white = 1.0
 
     data = []
-    for iset in files:
+    for fset in files:
         img = pio.ReadIMG2DObject(fset[0], "PIODOUBLE", "")
         hit = pio.ReadIMG2DObject(fset[1], "PIODOUBLE", "") ### double or int???
         
