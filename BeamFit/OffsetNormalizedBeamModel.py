@@ -18,9 +18,17 @@ from numpy import array, exp, asarray, cos, sin, sqrt, float64, fabs
 import math
 
 import Proposal
-from BeamModel import GaussianBeamModel2D
 
-class OffsetNormalizedBeamModel(GaussianBeamModel2D):
+use_xy = True
+
+if use_xy:
+    from BeamModel import GaussianBeamModel2D_xy as G2D
+    print "Using sigma_x, sigma_y, rho params"
+else:
+    from BeamModel import GaussianBeamModel2D as G2D
+    print "Using, sigma_1, sigma_2, angle params"
+
+class OffsetNormalizedBeamModel(G2D):
     """
     model of a *normalized* 2d Gaussian beam model (i.e., it
     integrates to the actual power in data units in the beam)
@@ -31,15 +39,14 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
        theta=arccos(mu), phi = sph'l polar coords of normal to the plane
     """
     
-    fmtstring = GaussianBeamModel2D.fmtstring + " %.3f (%.3f %.3f %.3f)"
+    fmtstring = G2D.fmtstring + " %.3f (%.3f %.3f %.3f)"
     
     #locBlk = [0, 1, 2, 2]
     locBlk = [0, 1, 2, 3]
-    paramBlocks = (GaussianBeamModel2D.paramBlocks 
-                   + [GaussianBeamModel2D.nBlock+l for l in locBlk])
+    paramBlocks = (G2D.paramBlocks + [G2D.nBlock+l for l in locBlk])
     nBlock = max(paramBlocks)+1
     
-    texNames = GaussianBeamModel2D.texNames + [r"$O$", r"$\mu$", r"$\phi$"]
+    texNames = G2D.texNames + [r"$O$", r"$\mu$", r"$\phi$"]
     
     nparam = 9
 
@@ -47,9 +54,18 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
         """
         set the parameters from
             (x, y), (sigma_major, sigma_minor), angle, amplitude,
+            
+        [OR         (sig_x, sig_y),             rho]
             (offset, mu, phi)
         """
-        self.setParameters_MajMinAng(center, sigmas, angle)
+        
+        ### could call super().__init__ instead 
+        if use_xy:
+            self.setParameters_MajMinAng(center, sigmas, angle)
+        else:
+            self.setParameters_xyRho(center, sigmas, angle)  ## but really angle=rho
+        super(OffsetNormalizedBeamModel, cls).__init__(center, sigmas, angle)
+            
         self.amplitude = amplitude
         #sqrtdet = sigmas[0]*sigmas[1]    
         #self.norm = amplitude/sqrtdet/2/math.pi   ### CHECK THIS
@@ -60,16 +76,16 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
         self.offset_phi = plane[2]
 
     def at(self, data):
-        return self.norm*(GaussianBeamModel2D.at(self, data) +
+        return self.norm*(G2D.at(self, data) +
                           self.offset +
                           planexy(self.offset_mu, self.offset_phi, 
                                   data.x-self.center[0], data.y-self.center[1]))
 
     def atxy(self, x, y):
-        return self.norm*(GaussianBeamModel2D.atxy(self, x, y) +
-                          self.offset +
-                          planexy(self.offset_mu, self.offset_phi, 
-                                  x-self.center[0], y-self.center[1]))
+        return self.norm*(G2D.atxy(self, x, y) +
+                        self.offset +
+                        planexy(self.offset_mu, self.offset_phi, 
+                                x-self.center[0], y-self.center[1]))
 
     __call__ = at
 
@@ -90,6 +106,8 @@ class OffsetNormalizedBeamModel(GaussianBeamModel2D):
         
     ##could probably just append to the
     ## superclass methods' output, but not worth the effort
+    ## don't have to convert for the use_xy version, 
+    ##      since ang % math.pi = angle for angle = rho in (-1,1)
         
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """

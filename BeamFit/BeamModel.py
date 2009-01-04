@@ -18,6 +18,7 @@ from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
 import Proposal
 
+
 class GaussianBeamModel2D(object):
     """
     model of an unnormalized 2d gaussian beam; parameters
@@ -208,8 +209,69 @@ class GaussianBeamModel2D(object):
                          uniform(0,math.pi/2) )
         else:
             pass
+            
+            
+
+class GaussianBeamModel2D_xy(GaussianBeamModel2D):
+    """like GaussianBeamModel2D, but explicitly use sig_x, sig_y as parameters"""
+
+    texNames = [r"x", r"y", r"$\sigma_x$", r"$\sigma_y$", r"$\rho$", r"$A$"]
+    
+    __init__ = super(GaussianBeamModel2D_xy, self).setParameters_XYRho
+
+    @classmethod
+    def prior(cls, center, sigmas, rho):
+        """get the unnormalized prior for the parameters
+        """
+        
+        if not super(GaussianBeamModel2D_xy, cls).prior(center, sigmas, 0):
+            return 0
+            
+        if rho<-1 or rho>1:
+            return 0
+            
+        return 1
+        
+    ## note that we do (angle % pi) in these [probably really only needed in 'package'?]
+    def unpackage_xy(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        xy, sigxy, rho = param_seqs
+        return array( [ xy[0], xy[1], sigxy[0], sigxy[1], rho], dtype=float64)
+
+    def package_xy(params_flat):
+        """ convert from flat array to structured sequence of parameters """
+        return (tuple(params_flat[0:2]), tuple(params_flat[2:4]), params_flat[4])
+
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package_xy,
+                                                unpackage=unpackage_xy)
+
+## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
+
+    def startfrom(self, data, random=None):
+        """
+        generate a set of starting parameters for the model:
+        non-random version
+        center = <x>, <y>
+        sigmas = <x^2>-<x>^2, <y^2>-<y>^2
+        rho=0
+        """
+        if random is not None:
+            dx = (self.centerMin[0], self.centerMax[0])
+            dy = (self.centerMin[1], self.centerMax[1])
+
+            start_params = ( (uniform(*dx), uniform(*dy)),
+                         (uniform(0,(dx[1]-dx[0])/5), uniform(0,(dy[1]-dy[0])/5)),
+                         uniform(-1,1) )
+        else:
+            pass
+
 
 def gauss2d(x, y, x0, y0, Cinv_xx, Cinv_xy, Cinv_yy):
     dx = x-x0; dy = y-y0
     return exp(-0.5 * (dx*dx*Cinv_xx + dy*dy*Cinv_yy + 2*dx*dy*Cinv_xy))
 
+        
