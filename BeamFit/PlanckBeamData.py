@@ -290,10 +290,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
 
                         data, xyrange = read_data_Planck(det=det, MC=MC, iter=it, obj=obj, 
                                                          sigcut=sigcut, ctscut=ctscut)
-                                                         
-                        print "got data"
-                        return data, xyrange
-                                                         
+                                                                                                                  
                         like, prop_sigmas, start_params = setup_sampler(
                             data, xyrange,
                             useNormalizedBeam=useNormalizedBeam,sigminmax=sigminmax,
