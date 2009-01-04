@@ -110,6 +110,7 @@ class GaussianBeamModel2D(object):
     def setParameters_XYRho(self, center, sigma_xy, rho):
         """set the parameters from x, y, sig_x, sig_y, rho=corr.coeff."""
         
+        self.center = center
         self.sig2_xy=array(sigma_xy, float64)**2
         self.rho = rho
         self.set_Cinv()
