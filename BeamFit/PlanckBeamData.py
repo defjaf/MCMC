@@ -148,16 +148,20 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         npix = sqrt(img.size)
         if npix*npix != img.size:
             print "Image size problem: size=%d, npix=%f" % (img.size, npix)
+        
+        sh = (npix, npix)
+        hit.shape = sh
+        img.shape = sh
 
         good = hit>0
         
-        sig = zeros((npix, npix), dtype=float64)
+        sig = zeros(sh, dtype=float64)
         sig[good] = sigma_white/sqrt(hit[good])
         
         ### need to generate (x,y) position arrays. Just use integers?
         
-        x = empty((npix, npix),dtype=float64)
-        y = empty((npix, npix),dtype=float64)
+        x = empty(sh, dtype=float64)
+        y = empty(sh, dtype=float64)
          
         
         if mapsize is None:
