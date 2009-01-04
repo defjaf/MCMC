@@ -367,15 +367,12 @@ def makereport(reslist, file=sys.stdout, hasRuns=False):
         for det, res in resrun.iteritems():
             file.write("%d" % det)
 
-                val = res[0][1][0]
-                sig = res[0][1][1]
-                
-                for (v, s) in zip(val, sig):
-                    file.write("   %f +- %f" % (v, s))
-            except:
-                print "\n... when running ", irun, det,
-                print "Unexpected error:", sys.exc_info()[0]
-                    
+            val = res[0][1][0]
+            sig = res[0][1][1]
+            
+            for (v, s) in zip(val, sig):
+                file.write("   %f +- %f" % (v, s))
+
             file.write("\n")
 
     
