@@ -170,7 +170,7 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
         # prop_sigmas = ( (delx/3, dely/3 ), (delx/5, dely/5 ), 0.6)
         prop_sigmas = ( (delx/10, dely/10), (delx/10, dely/10), 0.6)
         if use_xy:
-            prop_sigmas[-1] = 0.2
+            prop_sigmas = ( (delx/10, dely/10), (delx/10, dely/10), 0.2)
 
 
  #   start_params = ( (uniform(*dx), uniform(*dy)), 
