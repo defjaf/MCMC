@@ -64,16 +64,27 @@ class NormalizedBeamModel(G2D):
 
     ## note that we do (angle % pi) in these [probably really only needed in 'package'?]
     ## could probably just append to the superclass methods' output, but not worth the effort
-    def unpackage(param_seqs):
-        """ convert from structured sequence of parameters to flat array """
-        xy, sig12, ang, amp = param_seqs
-        return array( [ xy[0], xy[1], sig12[0], sig12[1], ang % math.pi, amp] )
+    if use_xy:
+        def unpackage(param_seqs):
+            """ convert from structured sequence of parameters to flat array """
+            xy, sig12, ang, amp = param_seqs
+            return array( [ xy[0], xy[1], sig12[0], sig12[1], ang % math.pi, amp] )
     
-    def package(params_flat):
-        """ convert from flat array to structured sequence of parameters """
-        return (tuple(params_flat[0:2]), tuple(params_flat[2:4]),
-                params_flat[4] % math.pi, params_flat[5])
-
+        def package(params_flat):
+            """ convert from flat array to structured sequence of parameters """
+            return (tuple(params_flat[0:2]), tuple(params_flat[2:4]),
+                    params_flat[4] % math.pi, params_flat[5])
+    else:
+        def unpackage(param_seqs):
+            """ convert from structured sequence of parameters to flat array """
+            xy, sig12, ang, rho = param_seqs
+            return array( [ xy[0], xy[1], sig12[0], sig12[1], rho, amp] )
+    
+        def package(params_flat):
+            """ convert from flat array to structured sequence of parameters """
+            return (tuple(params_flat[0:2]), tuple(params_flat[2:4]),
+                    params_flat[4], params_flat[5])
+        
     ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
                                                 unpackage=unpackage)
