@@ -143,11 +143,16 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
     for iset in files:
         img = pio.ReadIMG2DObject(files[0], "PIODOUBLE", "")
         hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
-        sig = sigma_white/sqrt(hit)
+        
         ## assume square, although really should read keywords for size
         npix = sqrt(img.size)
         if npix*npix != img.size:
             print "Image size problem: size=%d, npix=%f" % (img.size, npix)
+
+        good = hit>0
+        
+        sig = zeros((npix, npix), dtype=float64)
+        sig[good] = sigma_white/sqrt(hit[good])
         
         ### need to generate (x,y) position arrays. Just use integers?
         
@@ -166,11 +171,13 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         
         y = y.T
         
-        x = asarray(x, float64).flatten()
-        y = asarray(y, float64).flatten()
-        img = asarray(img, float64).flatten()
-        sig = asarray(sig, float64).flatten()
-        hit = asarray(hit, float64).flatten()
+        ## ok, now remove all of the points with no hits
+        
+        x = asarray(x[good], float64).flatten()
+        y = asarray(y[good], float64).flatten()
+        img = asarray(img[good], float64).flatten()
+        sig = asarray(sig[good], float64).flatten()
+        hit = asarray(hit[good], float64).flatten()  ## use integer?
         
         data.append(BeamData(x, y, img, sig, cts = hit))
         
