@@ -248,8 +248,8 @@ class GaussianBeamModel2D_xy(GaussianBeamModel2D):
                                                 unpackage=unpackage_xy)
 
 ## need to do this conversion after we send the methods to the Proposal class
-    unpackage=staticmethod(unpackage)
-    package=staticmethod(package)
+    unpackage=staticmethod(unpackage_xy)
+    package=staticmethod(package_xy)
 
 
     def startfrom(self, data, random=None):
