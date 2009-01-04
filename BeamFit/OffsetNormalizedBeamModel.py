@@ -19,7 +19,7 @@ import math
 
 import Proposal
 
-use_xy = False ## True doesn't work yet???
+use_xy = True ## True doesn't work yet???
 
 if use_xy:
     from BeamModel import GaussianBeamModel2D_xy as G2D
