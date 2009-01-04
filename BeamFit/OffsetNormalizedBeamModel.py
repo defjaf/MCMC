@@ -64,7 +64,7 @@ class OffsetNormalizedBeamModel(G2D):
         #     self.setParameters_MajMinAng(center, sigmas, angle)
         # else:
         #     self.setParameters_xyRho(center, sigmas, angle)  ## but really angle=rho
-        super(OffsetNormalizedBeamModel, cls).__init__(center, sigmas, angle)
+        super(OffsetNormalizedBeamModel, self).__init__(center, sigmas, angle)
             
         self.amplitude = amplitude
         #sqrtdet = sigmas[0]*sigmas[1]    
