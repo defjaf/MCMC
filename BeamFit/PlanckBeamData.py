@@ -177,7 +177,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         y = asarray(y[good], float64).flatten()
         img = asarray(img[good], float64).flatten()
         sig = asarray(sig[good], float64).flatten()
-        hit = asarray(hit[good], float64).flatten()  ## use integer?
+        hit = asarray(hit[good], float64).flatten() ## use integer
         
         data.append(BeamData(x, y, img, sig, cts = hit))
         
