@@ -141,8 +141,8 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
 
     data = []
     for iset in files:
-        img = pio.ReadIMG2DObject(files[0], "PIODOUBLE", "")
-        hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
+        img = pio.ReadIMG2DObject(fset[0], "PIODOUBLE", "")
+        hit = pio.ReadIMG2DObject(fset[1], "PIODOUBLE", "") ### double or int???
         
         ## assume square, although really should read keywords for size
         npix = int(sqrt(img.size))
