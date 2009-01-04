@@ -1,0 +1,11 @@
+Lots of FP errors with use_xy = True
+
+possibly a problem with rho ~ +/-1?
+
+Warning: overflow encountered in exp  (gauss2d)
+Warning: overflow encountered in multiply (chi2)
+Warning: overflow encountered in true_divide
+
+and get this every time 
+Warning: invalid value encountered in true_divide
+

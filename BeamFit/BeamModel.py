@@ -1,4 +1,6 @@
 ## maybe should store C^-1 determinant separately??
+### get lots of fp errors especially in first iteration of the MCMC
+
 
 # normalize to 1 at peak
 #     could just use inheritance for a version with unit area...
