@@ -1,3 +1,5 @@
+## maybe should store C^-1 determinant separately??
+
 # normalize to 1 at peak
 #     could just use inheritance for a version with unit area...
 

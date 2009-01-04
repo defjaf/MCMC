@@ -12,15 +12,23 @@ from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
 
 import Proposal
-from BeamModel import GaussianBeamModel2D
 
-class NormalizedBeamModel(GaussianBeamModel2D):
+use_xy = False ## True doesn't work yet???
+
+if use_xy:
+    from BeamModel import GaussianBeamModel2D_xy as G2D
+    print "Using sigma_x, sigma_y, rho params"
+else:
+    from BeamModel import GaussianBeamModel2D as G2D
+    print "Using, sigma_1, sigma_2, angle params"
+
+class NormalizedBeamModel(G2D):
     """
     model of a *normalized* 2d Gaussian beam model (i.e., it
     integrates to the actual power in data units in the beam)
     """
     
-    fmtstring = GaussianBeamModel2D.fmtstring + " %.3f"
+    fmtstring = G2D.fmtstring + " %.3f"
     
     nparam = 6
 
@@ -31,17 +39,17 @@ class NormalizedBeamModel(GaussianBeamModel2D):
         set the parameters from
             (x, y), (sigma_major, sigma_minor), angle, amplitude
         """
-        self.setParameters_MajMinAng(center, sigmas, angle)
+        super(OffsetNormalizedBeamModel, self).__init__(center, sigmas, angle)
         self.amplitude = amplitude
         sqrtdet = sigmas[0]*sigmas[1]    
         #self.norm = amplitude/sqrtdet/2/math.pi   ### CHECK THIS
         self.norm = amplitude   ### CHECK THIS
 
     def at(self, data):
-        return self.norm*GaussianBeamModel2D.at(self, data)
+        return self.norm*G2D.at(self, data)
 
     def atxy(self, x, y):
-        return self.norm*GaussianBeamModel2D.atxy(self, x, y)
+        return self.norm*G2D.atxy(self, x, y)
 
     __call__ = at
 
