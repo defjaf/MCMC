@@ -145,7 +145,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         hit = pio.ReadIMG2DObject(files[1], "PIODOUBLE", "") ### double or int???
         
         ## assume square, although really should read keywords for size
-        npix = sqrt(img.size)
+        npix = int(sqrt(img.size))
         if npix*npix != img.size:
             print "Image size problem: size=%d, npix=%f" % (img.size, npix)
         
@@ -155,8 +155,8 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
 
         good = hit>0
         
-        sig = zeros(sh, dtype=float64)
-        sig[good] = sigma_white/sqrt(hit[good])
+        sig = zeros(sh, dtype=float64) + sigma_white
+        sig[good] /= sqrt(hit[good])
         
         ### need to generate (x,y) position arrays. Just use integers?
         
@@ -290,6 +290,10 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
 
                         data, xyrange = read_data_Planck(det=det, MC=MC, iter=it, obj=obj, 
                                                          sigcut=sigcut, ctscut=ctscut)
+                                                         
+                        print "got data"
+                        return data, xyrange
+                                                         
                         like, prop_sigmas, start_params = setup_sampler(
                             data, xyrange,
                             useNormalizedBeam=useNormalizedBeam,sigminmax=sigminmax,
