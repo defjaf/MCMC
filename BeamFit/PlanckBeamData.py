@@ -108,7 +108,7 @@ def getobjname(db=None, grp=None, det=None, MC=None, iter=None, obj=None):
         grp = "FPRec_IMG2D_simu4"
         
     base = '/'.join([db, grp, 'map_']) 
-    suff = '_'.join([str(MC).strip(), str(iter).strip(), ''])
+    suff = '_'.join(['', str(MC).strip(), str(iter).strip(), ''])
     return [base + kind + det + suff + obj for kind in ['data_', 'hit_']]
 
 
@@ -264,7 +264,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
             for it in iters:
                 for MC in MCs:
                     print 'Detector: %s, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
-                    figf = '_'.join([figName, det, str(MC).strip(), str(it).strip(), obj, ''])
+                    figf = '_'.join(['',figName, det, str(MC).strip(), str(it).strip(), obj, ''])
                     
                     res[ib] = []
                     startres = []
