@@ -217,7 +217,8 @@ class GaussianBeamModel2D_xy(GaussianBeamModel2D):
 
     texNames = [r"x", r"y", r"$\sigma_x$", r"$\sigma_y$", r"$\rho$", r"$A$"]
     
-    __init__ = super(GaussianBeamModel2D_xy, self).setParameters_XYRho
+    def __init__(self, center, sigmas, rho):
+        super(GaussianBeamModel2D_xy, self).setParameters_XYRho(center, sigmas, rho)
 
     @classmethod
     def prior(cls, center, sigmas, rho):

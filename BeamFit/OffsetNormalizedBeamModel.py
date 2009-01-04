@@ -60,10 +60,10 @@ class OffsetNormalizedBeamModel(G2D):
         """
         
         ### could call super().__init__ instead 
-        if use_xy:
-            self.setParameters_MajMinAng(center, sigmas, angle)
-        else:
-            self.setParameters_xyRho(center, sigmas, angle)  ## but really angle=rho
+        # if use_xy:
+        #     self.setParameters_MajMinAng(center, sigmas, angle)
+        # else:
+        #     self.setParameters_xyRho(center, sigmas, angle)  ## but really angle=rho
         super(OffsetNormalizedBeamModel, cls).__init__(center, sigmas, angle)
             
         self.amplitude = amplitude
