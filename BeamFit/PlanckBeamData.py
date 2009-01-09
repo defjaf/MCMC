@@ -159,21 +159,14 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         sig[good] /= sqrt(hit[good])
         
         ### need to generate (x,y) position arrays. Just use integers?
-        
-        x = empty(sh, dtype=float64)
-        y = empty(sh, dtype=float64)
-         
-        
         if mapsize is None:
             mapsize = npix
         else:
             mapsize *= 60*180/np.pi ## convert to minutes
          
          ## are the values at pixel centers or edges?
-        x[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=False)
-        y[:] = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=False)
-        
-        y = y.T
+        oned = linspace(-mapsize/2, mapsize/2, num = npix, endpoint=False)
+        x,y = np.meshgrid(oned, oned)
         
         ## ok, now remove all of the points with no hits
         
