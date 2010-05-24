@@ -2,7 +2,7 @@
 
 from __future__ import division
 
-from numpy import asarray, float64, log
+from numpy import asarray, float64, log, dot
 
 class GaussianData(object):
     """
@@ -31,7 +31,7 @@ class GaussianData(object):
     def quadform(self, A=None, B=None):
         """
             calculate A^T N^-1 B or A^T N^-1 A or data^T N^-1 data
-            works for vector A,B  [not yet for matrix -- untested]
+            works for vector A,B  [and probably matrix -- untested]
             NB. for this concrete class, N^-1 = diag(1/sig^2)
             
             Special case for if A==B==None, use A=B=self.data.
@@ -40,14 +40,17 @@ class GaussianData(object):
         """
         if A is None and B is None:
             if self.data_chi2 is None:
-                self.data_chi2 = (self.d*self.d/self.sig2).sum()
+                # self.data_chi2 = (self.d*self.d/self.sig2).sum()
+                self.data_chi2 = np.dot(self.d,self.d/self.sig2)
             return self.data_chi2
         elif B is None:
-            return (A*A/self.sig2).sum()
+            return dot(A.transpose(),A/self.sig2)
+            #return (A*A/self.sig2).sum()
         elif A is None:
             raise NotImplementedError ### Pick a better exception here!
         else:
-            return (A*B/self.sig2).sum()
+            return np.dot(A.transpose(),B/self.sig2)
+            # return (A*B/self.sig2).sum()
 
     def chi2(self, vec=None):
         """ 
