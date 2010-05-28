@@ -8,6 +8,10 @@ class SEDLikelihood1(Likelihood.Likelihood):
     """
     submm SED flux likelihood, marginalized over individual amplitudes.
     (This is essentially the same as the beamFit Likelihood.Likelihood, but boosted to matrices.)
+    
+    Current version assumes the same parameters for each object 
+    (so to do a single object just use a data-list of length 1)
+    
     """
     ## this doesn't need to be a class method, although can just use self.model_vals!
     def lnLike1(self, model_vals=None, data=None):
