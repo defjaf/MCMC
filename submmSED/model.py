@@ -66,23 +66,14 @@ class submmModel2(object):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data):
-        """plot the data and the model"""
-        f = np.linspace(data.freq[0], data.freq[-1], 100)
-        model_flux = self.at(f)
-        data.plot()
-        plt.plot(f, model_flux)
-
-
-
-        def startfrom(self, data, random=None):
-            """
-            generate a set of starting parameters for the model:
-            """
-            if random is not None:
-                start_params = (2., 10., 2., 5., 1.0)  ## careful of units
-            else:
-                pass
+    def startfrom(self, data=None, random=None):
+        """
+        generate a set of starting parameters for the model:
+        """
+        if random is not None:
+            start_params = (2., 10., 2., 5.)  ## careful of units
+        else:
+            pass
 
 
 
