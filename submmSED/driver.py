@@ -7,8 +7,12 @@ Created by Andrew H. Jaffe on 2010-05-22.
 Copyright (c) 2010 Imperial College London. All rights reserved.
 """
 
+from __future__ import division
+
 import sys
 import os
+
+import numpy as np
 
 import MCMC
 
@@ -22,10 +26,10 @@ import getdist
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 
-def main(filename="", i=0, rotateParams=False):
+def main(filename="./submmSED.txt", i=0, rotateParams=False):
     
     
-    nMC = 10000
+    nMC = 10000,10000
     
     
     ## read the data
@@ -35,8 +39,8 @@ def main(filename="", i=0, rotateParams=False):
     ## initialize the model (with a class, not an object)
     mod = model.submmModel2
 
-    start_params = mod.startfrom()
-    prop_sigmas = mod.startfrom()/4.0
+    start_params = np.asarray(mod.startfrom(random=False))
+    prop_sigmas = start_params/4.0
 
     like = likelihood.SEDLikelihood1(data=dat, model=mod)
     

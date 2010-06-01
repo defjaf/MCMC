@@ -24,7 +24,11 @@ def blackbody(T, nu):
 class submmModel2(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
        marginalize analytically over both amplitudes, A1, A2
-       (so the at() and __call__() methods aren't really useful)
+
+       needs a __call__ method to return the *matrix* flux(i, nu) for i=1,2!!!!
+       and this needs to be correctly handled by the likelihood
+       so: __call__ must return in a form usable by likelihood.set_model_vals and model.quadform
+
     """
 
     nparam = 4
@@ -51,7 +55,7 @@ class submmModel2(object):
         return 1.0
 
 
-    def unpackage(param_seqs*):
+    def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
         return asarray( param_seqs, dtype=float64)
 
@@ -66,16 +70,17 @@ class submmModel2(object):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def startfrom(self, data=None, random=None):
+    @classmethod
+    def startfrom(cls, data=None, random=None):
         """
         generate a set of starting parameters for the model:
         """
         if random is not None:
-            start_params = (2., 10., 2., 5.)  ## careful of units
+            cls.start_params = (2., 10., 2., 5.)  ## careful of units
         else:
             pass
 
-
+        return cls.start_params
 
     
 
@@ -124,7 +129,7 @@ class submmModel1(object):
         
         
 
-    def unpackage(param_seqs*):
+    def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
         return array( param_seqs, dtype=float64)
 
@@ -146,8 +151,8 @@ class submmModel1(object):
         plt.plot(f, model_flux)
         
         
-    
-    def startfrom(self, data, random=None):
+    @classmethod
+    def startfrom(cls, data, random=None):
         """
         generate a set of starting parameters for the model:
         """
@@ -157,7 +162,7 @@ class submmModel1(object):
             pass
             
             
-class submmModel_normalized(submmModel):
+class submmModel_normalized(submmModel1):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
 
     """
