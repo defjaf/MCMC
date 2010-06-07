@@ -16,6 +16,9 @@ class SEDLikelihood2(Likelihood.Likelihood):
     
     """
     ## this doesn't need to be a class method, although can just use self.model_vals!
+    
+    ## FIXME appear to be problems here -- returning negative likelihood for reasonable values.
+    
     def lnLike1(self, model_vals=None, data=None):
         """
         return ln p(data|params) up to a param-independent term,
@@ -41,6 +44,8 @@ class SEDLikelihood2(Likelihood.Likelihood):
         
         ## solve for (FNiF) z = (FNid) for z
         z = linalg.solve(FNiF, FNid)
+        
+        print "lnlike1:", z, detFNiF
         
         return 0.5 * (dot(FNid.transpose(), z) - log(detFNiF))
 

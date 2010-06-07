@@ -23,7 +23,7 @@ def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
     x = h_over_k*nu/T
     prefac = 1.0 #### FIX
-    return prefac*nu**2/(exp(x)-1)
+    return prefac*nu**3/(exp(x)-1)
     
     
 class submmModel2(object):
@@ -92,7 +92,7 @@ class submmModel2(object):
         generate a set of starting parameters for the model:
         """
         if random is not None:
-            cls.start_params = (2., 10., 2., 5.)  ## careful of units
+            cls.start_params = (2., 30., 2., 20.)  ## careful of units
         else:
             pass
 
