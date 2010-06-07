@@ -4,7 +4,7 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, asarray
+from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log
 
 
 import Proposal
@@ -14,11 +14,16 @@ import Proposal
 ##   should be explicit about r12 for each object 
 ##    -- make it an array and make this the model for all objects together
 
+### TODO: __call__ for model.quadform (and possibly set_model_vals?)
+####   returns matrix of amplitudes for each component at each frequency
+
+h_over_k = 4.799237e-11 ### s K
+
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
     x = h_over_k*nu/T
     prefac = 1.0 #### FIX
-    return prefac*nu^2/(exp(x)-1)
+    return prefac*nu**2/(exp(x)-1)
     
     
 class submmModel2(object):
@@ -27,7 +32,8 @@ class submmModel2(object):
 
        needs a __call__ method to return the *matrix* flux(i, nu) for i=1,2!!!!
        and this needs to be correctly handled by the likelihood
-       so: __call__ must return in a form usable by likelihood.set_model_vals and model.quadform
+       so: __call__ must return in a form usable by likelihood.set_model_vals and ****model.quadform****
+         nb. model.quadform takes matrices, A & B, of amplitudes as input and returns A^T N^{-1} B
 
     """
 
@@ -54,6 +60,16 @@ class submmModel2(object):
 
         return 1.0
 
+    def at_nu(self, nu):
+        return asarray([nu**self.b1 * blackbody(self.T1, nu),
+                        nu**self.b2 * blackbody(self.T2, nu)])
+
+    def at(self, data):
+        return asarray([data.freq**self.b1 * blackbody(self.T1, data.freq), 
+                        data.freq**self.b2 * blackbody(self.T2, data.freq) ]).transpose()
+        ### shape=(2,n_freq); is this right? or transpose this?
+        
+    __call__ = at
 
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
@@ -131,7 +147,7 @@ class submmModel1(object):
 
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
-        return array( param_seqs, dtype=float64)
+        return asarray( param_seqs, dtype=float64)
 
     package = tuple
 

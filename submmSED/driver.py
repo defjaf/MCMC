@@ -42,7 +42,7 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False):
     start_params = np.asarray(mod.startfrom(random=False))
     prop_sigmas = start_params/4.0
 
-    like = likelihood.SEDLikelihood1(data=dat, model=mod)
+    like = likelihood.SEDLikelihood2(data=dat, model=mod)
     
     mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
                         fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)

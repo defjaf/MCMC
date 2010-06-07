@@ -41,15 +41,15 @@ class GaussianData(object):
         if A is None and B is None:
             if self.data_chi2 is None:
                 # self.data_chi2 = (self.d*self.d/self.sig2).sum()
-                self.data_chi2 = np.dot(self.d,self.d/self.sig2)
+                self.data_chi2 = dot(self.d,self.d/self.sig2)
             return self.data_chi2
         elif B is None:
-            return dot(A.transpose(),A/self.sig2)
+            return dot(A.transpose()/self.sig2,A)
             #return (A*A/self.sig2).sum()
         elif A is None:
             raise NotImplementedError ### Pick a better exception here!
         else:
-            return np.dot(A.transpose(),B/self.sig2)
+            return dot(A.transpose()/self.sig2,B)
             # return (A*B/self.sig2).sum()
 
     def chi2(self, vec=None):

@@ -1,10 +1,12 @@
 from __future__ import division
 import Likelihood
 
-from numpy import linalg, dot
+from numpy import linalg, dot, log
+
+from Likelihood import ZeroPosterior
 
 
-class SEDLikelihood1(Likelihood.Likelihood):
+class SEDLikelihood2(Likelihood.Likelihood):
     """
     submm SED flux likelihood, marginalized over individual amplitudes.
     (This is essentially the same as the beamFit Likelihood.Likelihood, but boosted to matrices.)
@@ -51,7 +53,8 @@ class SEDLikelihood1(Likelihood.Likelihood):
         assumes no correlations between datasets (which means between objects)
         """
         self.setModel(params)
-        return sum( [ self.lnLike1(self.model_vals, d) for d in self.data ] )
+        return sum( [ self.lnLike1(v, d) for v, d in zip(self.model_vals, self.data) ] )
+                
 
 
 
