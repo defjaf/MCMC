@@ -52,18 +52,9 @@ class SEDLikelihood2(Likelihood.Likelihood):
         return 0.5 * (dot(FNid.transpose(), z) - log(detFNiF))
 
 
-
-
-
 class SEDLikelihood1(Likelihood.Likelihood):
-    """submm SED flux likelihood, marginalized over overall amplitude.
-       nb. need to be able to 
-           a) have parameter r12 (ratio of component amplitudes) be object-specific
-           b) fix those per-object parameters to 0 for single-component model
-           
-           but nb. the beamfit Likelihood.Likelihood.lnLike1 is exactly the correct form, except for 
-           the object-specific part. So really the only change is in the full lnLike which needs to 
-           set individual r12
+    """
+       single-component grey-body submm SED flux likelihood, marginalized over overall amplitude.
     """
 
     pass   ## should use as-is, but with new name

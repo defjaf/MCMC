@@ -14,6 +14,8 @@ import os
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 import MCMC
 
 import likelihood
@@ -26,22 +28,20 @@ import getdist
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 
-def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None):
-    
-    
-    nMC = 10000,10000
-    
-    
+def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None, nMC=(10000,10000)):
+        
     ## read the data
     alldata = data.readfluxes(filename)
     dat = alldata[i]
+    
+    print "Object: ", dat.name
     
     ## initialize the model (with a class, not an object)    
     if onecomponent:
         mod = model.submmModel1
         like = likelihood.SEDLikelihood1(data=dat, model=mod)
     else:
-        mod = model.submmModel2
+        mod = model.submmModel2            
         like = likelihood.SEDLikelihood2(data=dat, model=mod)
         
     if start is None: 
@@ -58,7 +58,7 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
                         fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
 
     getdist.histgrid(mcmc[-1])
-    
+    plt.suptitle(str(int(dat.name)))
     return mcmc, ana
 
 

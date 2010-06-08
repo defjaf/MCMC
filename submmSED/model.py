@@ -20,7 +20,7 @@ import Proposal
 #### TODO: need to be able to estimate the amplitudes (max Likelihood?) for plotting and checking
 ##         make it more easy to switch these models in and out? (e.g., make index and temperature into arrays)
 
-h_over_k = 4.799237e-11 ### s K
+h_over_k = 0.04799237 ###  K/Ghz
 
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
@@ -48,6 +48,7 @@ class submmModel2(object):
     fmtstring = "%.3f "*4
     paramBlocks =  range(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
+    texNames = [r"$\beta_1$", r"$T_1$", r"$\beta_2$", r"$T_2$"]
 
     def __init__(self, b1, T1, b2, T2):
 
@@ -64,6 +65,12 @@ class submmModel2(object):
 
         if T1<0 or T2<0:
             return 0
+            
+        if b1<0 or b2<0 or b1>6 or b2>6:
+            return 0
+            
+        ### want to separate the two cases: force T1<T2
+        if T1>T2: return 0
 
         return 1.0
 
@@ -114,6 +121,7 @@ class submmModel1(object):
     fmtstring = "%.3f "*2
     paramBlocks =  range(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
+    texNames = [r"$\beta$", "$T$"]
 
     def __init__(self, b, T):
 
@@ -137,7 +145,10 @@ class submmModel1(object):
         if T<0:
             return 0
 
-        return 1./T
+        if b<-1 or b>6:
+            return 0
+
+        return 1.
 
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
@@ -204,7 +215,7 @@ class submmModel_ratio(object):
 
         if T1<0 or T2<0:
             return 0
-
+            
         return log(r12)
         
         

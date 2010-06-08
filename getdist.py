@@ -143,7 +143,7 @@ def scatter2d(MCMC, params, **kwargs):
     else:
         axis = pylab.gca()
 
-    return axis.scatter(s1,s2, s=.01, faceted=False, **kwargs)
+    return axis.scatter(s1,s2, s=.01, edgecolors='none', **kwargs)
 
 def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False):
     """
