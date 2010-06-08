@@ -2,7 +2,7 @@
 
 from __future__ import division
 
-from numpy import asarray, float64, log, dot
+from numpy import asarray, float64, log, dot, transpose
 
 class GaussianData(object):
     """

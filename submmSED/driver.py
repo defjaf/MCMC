@@ -26,7 +26,7 @@ import getdist
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 
-def main(filename="./submmSED.txt", i=0, rotateParams=False):
+def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None):
     
     
     nMC = 10000,10000
@@ -36,18 +36,28 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False):
     alldata = data.readfluxes(filename)
     dat = alldata[i]
     
-    ## initialize the model (with a class, not an object)
-    mod = model.submmModel2
-
-    start_params = np.asarray(mod.startfrom(random=False))
-    prop_sigmas = start_params/4.0
-
-    like = likelihood.SEDLikelihood2(data=dat, model=mod)
+    ## initialize the model (with a class, not an object)    
+    if onecomponent:
+        mod = model.submmModel1
+        like = likelihood.SEDLikelihood1(data=dat, model=mod)
+    else:
+        mod = model.submmModel2
+        like = likelihood.SEDLikelihood2(data=dat, model=mod)
+        
+    if start is None: 
+        start_params = np.asarray(mod.startfrom(random=False))
+    else:
+        start_params = np.asarray(start)
+    if sigmas is None:
+        prop_sigmas = start_params/4.0
+    else:
+        prop_sigmas = sigmas
+    
     
     mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
                         fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
 
-    getdist.histgrid(mcmc)
+    getdist.histgrid(mcmc[-1])
     
     return mcmc, ana
 
@@ -57,6 +67,10 @@ def plotter(sampler):
     make a plot from the results of the sampler
     (could probably make this more generic if plotMod is a member fn of the model)
     for now, only plot the *first* dataset (since for this case that's the 'good' data)
+    
+    TODO: calculate stats for the amplitude here?
+    
+    NOT USED IN ABOVE YET
     """
 
     mod = sampler.like.model

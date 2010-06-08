@@ -14,10 +14,14 @@ class SEDLikelihood2(Likelihood.Likelihood):
     Current version assumes the same parameters for each object 
     (so to do a single object just use a data-list of length 1)
     
+    
     """
     ## this doesn't need to be a class method, although can just use self.model_vals!
     
-    ## FIXME appear to be problems here -- returning negative likelihood for reasonable values.
+    ## DONE appear to be problems here -- returning negative likelihood for reasonable values.
+    ##      needed better normalization in blackbody function -- FIXME: make physical
+    ##      is there any way to deal with a purposely-zero eigenvalue in the determinant
+    ##        (e.g., when one amplitude is fixed to zero?)
     
     def lnLike1(self, model_vals=None, data=None):
         """
@@ -44,22 +48,10 @@ class SEDLikelihood2(Likelihood.Likelihood):
         
         ## solve for (FNiF) z = (FNid) for z
         z = linalg.solve(FNiF, FNid)
-        
-        print "lnlike1:", z, detFNiF
-        
+                        
         return 0.5 * (dot(FNid.transpose(), z) - log(detFNiF))
 
 
-    def lnLike(self, params): 
-        """
-        calculate the sum of the lnLike for each of the datasets
-        i.e., \sum_i ln p(data_i |params) up to a param-independent term
-        
-        assumes no correlations between datasets (which means between objects)
-        """
-        self.setModel(params)
-        return sum( [ self.lnLike1(v, d) for v, d in zip(self.model_vals, self.data) ] )
-                
 
 
 
@@ -74,11 +66,4 @@ class SEDLikelihood1(Likelihood.Likelihood):
            set individual r12
     """
 
-
-    def lnLike(self, params): ### NOT DONE
-        """
-        calculate the sum of the lnLike for each of the datasets
-        i.e., \sum_i ln p(data_i |params) up to a param-independent term,
-        """
-        self.setModel(params)
-        return sum( [ self.lnLike1(self.model_vals, d) for d in self.data ] )
+    pass   ## should use as-is, but with new name

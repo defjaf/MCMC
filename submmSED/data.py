@@ -37,7 +37,7 @@ def readfluxes(filename):
     """read fluxes from a DLC file: each line is [name f1 e1 f2 e2 f3 e3 f3 e4 z]"""
     lines = loadtxt(filename, skiprows=2)
     
-    nu = [60, 100, 450, 850]
+    nu = asarray([60.0, 100, 450, 850]) ## GHz
     data = []
     for obj in lines:
         name, f1, e1, f2, e2, f3, e3, f3, e4, z = obj

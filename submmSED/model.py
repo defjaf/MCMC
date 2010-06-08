@@ -17,12 +17,19 @@ import Proposal
 ### TODO: __call__ for model.quadform (and possibly set_model_vals?)
 ####   returns matrix of amplitudes for each component at each frequency
 
+#### TODO: need to be able to estimate the amplitudes (max Likelihood?) for plotting and checking
+##         make it more easy to switch these models in and out? (e.g., make index and temperature into arrays)
+
 h_over_k = 4.799237e-11 ### s K
 
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
+    
+    if T==0:
+        return 0
+        
     x = h_over_k*nu/T
-    prefac = 1.0 #### FIX
+    prefac = 1.0e-20 #### FIXME: find a physical definition to go here
     return prefac*nu**3/(exp(x)-1)
     
     
@@ -98,9 +105,66 @@ class submmModel2(object):
 
         return cls.start_params
 
-    
-
 class submmModel1(object):
+    """model a submm SED as a one-component grey body: flux = A nu^b B_nu(T)
+       marginalize analytically over the overall amplitude
+    """
+
+    nparam = 2
+    fmtstring = "%.3f "*2
+    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    nBlock = max(paramBlocks)+1
+
+    def __init__(self, b, T):
+
+        self.b = b
+        self.T = T
+
+
+    def at_nu(self, nu):
+        return nu**self.b * blackbody(self.T, nu) 
+
+    def at(self, data):
+        return data.freq**self.b * blackbody(self.T, data.freq) 
+        
+    __call__ = at    
+
+    @classmethod
+    def prior(cls, b, T):
+        """get the unnormalized prior for the parameters
+        """
+
+        if T<0:
+            return 0
+
+        return 1./T
+
+    def unpackage(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        return asarray( param_seqs, dtype=float64)
+
+    package = asarray
+
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package,
+                                                unpackage=unpackage)
+    ## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
+    @classmethod
+    def startfrom(cls, data=None, random=None):
+        """
+        generate a set of starting parameters for the model:
+        """
+        if random is not None:
+            cls.start_params = (0., 0.1)  ## careful of units
+        else:
+            pass
+        return cls.start_params
+
+
+class submmModel_ratio(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
        marginalize analytically over the overall amplitude, so write as
        unnorm_flux = A (nu^b1 B_nu(T1) + r12 nu^b2 B_nu(T2) )
@@ -149,7 +213,7 @@ class submmModel1(object):
         """ convert from structured sequence of parameters to flat array """
         return asarray( param_seqs, dtype=float64)
 
-    package = tuple
+    package = asarray
 
     ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
@@ -168,14 +232,15 @@ class submmModel1(object):
         
         
     @classmethod
-    def startfrom(cls, data, random=None):
+    def startfrom(cls, data=None, random=None):
         """
         generate a set of starting parameters for the model:
         """
         if random is not None:
-            start_params = (2., 10., 2., 5., 1.0)  ## careful of units
+            cls.start_params = (2., 10., 2., 5., 1.0)  ## careful of units
         else:
             pass
+        return cls.start_params
             
             
 class submmModel_normalized(submmModel1):
