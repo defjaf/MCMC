@@ -32,9 +32,15 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
         
     ## read the data
     alldata = data.readfluxes(filename)
-    dat = alldata[i]
-    
-    print "Object: ", dat.name
+    try:
+        dat = alldata[i]
+        name = str(int(dat.name))
+        
+    except TypeError:
+        dat = [alldata[ii] for ii in i]
+        name = " + ".join(str(int(d.name)) for d in dat)
+        
+    print "Object[s] %s", name
     
     ## initialize the model (with a class, not an object)    
     if onecomponent:
@@ -58,7 +64,7 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
                         fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
 
     getdist.histgrid(mcmc[-1])
-    plt.suptitle(str(int(dat.name)))
+    plt.suptitle(name)
     return mcmc, ana
 
 

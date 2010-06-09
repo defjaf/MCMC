@@ -1,3 +1,5 @@
+** Allow "ancillary" derived parameters/calculations in addition to the MCMC model params (e.g., the ML amplitudes in a marginalized gaussian model -- could store alongside or even as part of MCMC.samples)
+
 ** problem when a window is always 0 (or ~0) in a bin for a single experiment? seems to want very large bandpowers? [[iS THIS THE low-ell PROBLEM???]]
 
 ** translate/wrap wmap3 likelihood

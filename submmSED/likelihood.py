@@ -46,7 +46,8 @@ class SEDLikelihood2(Likelihood.Likelihood):
             
         #### want (FNid)^T (FNiF)^-1 (FNid)
         
-        ## solve for (FNiF) z = (FNid) for z
+        ## solve for (FNiF) z = (FNid) for z = (FNiF)^{-1} (FNid)
+        ## NB. z is the ML value of the marginalized amplitudes!!!
         z = linalg.solve(FNiF, FNid)
                         
         return 0.5 * (dot(FNid.transpose(), z) - log(detFNiF))
