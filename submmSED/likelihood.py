@@ -1,7 +1,7 @@
 from __future__ import division
 import Likelihood
 
-from numpy import linalg, dot, log, empty
+from numpy import linalg, dot, log, empty, log10
 
 from Likelihood import ZeroPosterior
 
@@ -58,9 +58,9 @@ class SEDLikelihood2(Likelihood.Likelihood):
         
     nDerived = 2  ## actually it depends on the dimension of, e.g., model_vals
     derivedTexNames = [r"$\ln A_1$", r"$\ln A_2$"]
-    def getDerived(self, model_vals=None, data=None):
+    def getDerived(self, *params):
         """ calculate a list of any derived parameters """  
-        return log(self.MLamplitude)
+        return log10(self.MLamplitude)
         
         
 
@@ -71,9 +71,9 @@ class SEDLikelihood1(Likelihood.Likelihood):
 
     nDerived = 1    
     derivedTexNames = [r"$\ln A$"]
-    def getDerived(self, model_vals=None, data=None):
+    def getDerived(self, *params):
         """ calculate a list of any derived parameters """  
-        return [log(self.MLamplitude)]
+        return [log10(self.MLamplitude)]
         
 
 
