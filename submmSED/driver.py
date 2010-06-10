@@ -40,7 +40,7 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
         dat = [alldata[ii] for ii in i]
         name = " + ".join(str(int(d.name)) for d in dat)
         
-    print "Object[s] %s", name
+    print "Object[s] %s" % name
     
     ## initialize the model (with a class, not an object)    
     if onecomponent:

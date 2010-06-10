@@ -1,7 +1,7 @@
 from __future__ import division
 import Likelihood
 
-from numpy import linalg, dot, log
+from numpy import linalg, dot, log, empty
 
 from Likelihood import ZeroPosterior
 
@@ -48,14 +48,37 @@ class SEDLikelihood2(Likelihood.Likelihood):
         
         ## solve for (FNiF) z = (FNid) for z = (FNiF)^{-1} (FNid)
         ## NB. z is the ML value of the marginalized amplitudes!!!
-        z = linalg.solve(FNiF, FNid)
-                        
-        return 0.5 * (dot(FNid.transpose(), z) - log(detFNiF))
+        self.MLamplitude = linalg.solve(FNiF, FNid)
 
+        # ## require positive amplitudes
+        # if self.MLamplitude<0:
+        #     raise ZeroPosterior(self.MLamplitude)
+                        
+        return 0.5 * (dot(FNid.transpose(), self.MLamplitude) - log(detFNiF))
+        
+    nDerived = 2  ## actually it depends on the dimension of, e.g., model_vals
+    derivedTexNames = [r"$\ln A_1$", r"$\ln A_2$"]
+    def getDerived(self, model_vals=None, data=None):
+        """ calculate a list of any derived parameters """  
+        return log(self.MLamplitude)
+        
+        
 
 class SEDLikelihood1(Likelihood.Likelihood):
     """
        single-component grey-body submm SED flux likelihood, marginalized over overall amplitude.
     """
 
-    pass   ## should use as-is, but with new name
+    nDerived = 1    
+    derivedTexNames = [r"$\ln A$"]
+    def getDerived(self, model_vals=None, data=None):
+        """ calculate a list of any derived parameters """  
+        return [log(self.MLamplitude)]
+        
+
+
+        
+        
+    
+    
+    

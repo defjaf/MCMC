@@ -10,22 +10,28 @@ import sys
 import os
 import os.path
 import copy
-import numpy
-import pylab
+import numpy as np
+import matplotlib.pyplot as plt
 
 from itertools import islice, groupby
 
 
 def GaussPDF(x, mean=0, stdev=1):
-    return numpy.exp(-0.5*(x-mean)**2/stdev**2)/numpy.sqrt(2*numpy.pi)/stdev
+    return np.exp(-0.5*(x-mean)**2/stdev**2)/np.sqrt(2*np.pi)/stdev
 
-def printvals(MCMC, params=None, lnLike=None):
-    """ like loop over hist(), but don't plot """
-    
+def getallsamples(MCMC, derived=True):
     try:
         s = MCMC.samples
+        if derived and MCMC.nDerived:
+            s = np.hstack([s,MCMC.derived])
     except AttributeError:
         s = MCMC
+    return s
+
+def printvals(MCMC, params=None, lnLike=None, derived=True):
+    """ like loop over hist(), but don't plot """
+    
+    s = getallsamples(MCMC, derived=derived)
         
     try:
         if lnLike is None: lnLike = MCMC.lnPr
@@ -49,7 +55,7 @@ def printvals(MCMC, params=None, lnLike=None):
     return
     
 
-def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
+def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, derived=True):
     """
     for the MCMC output (or just the list of samples),
     use pylab to make a histograms of parameter number=param
@@ -57,15 +63,12 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
          (only use the 
     """
     
-    try:
-        s = MCMC.samples
-    except AttributeError:
-        s = MCMC
+    s = getallsamples(MCMC, derived=derived)        
         
     s1 = s.transpose()[param]
         
     if axis is None: 
-        axis=pylab.gca()
+        axis=plt.gca()
 
     hist = axis.hist(s1,  bins=nbins, orientation=orientation)
 
@@ -75,7 +78,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
         print 'mean = %f +- %f' % (mean, stdv)
         smin, smax = min(hist[1]), max(hist[1])
         norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
-        ss = numpy.arange(smin, smax, (smax-smin)/5/nbins)
+        ss = np.arange(smin, smax, (smax-smin)/5/nbins)
 
         axis.hold(True)
         axis.plot(ss, norm*GaussPDF(ss, mean, stdv), 'k')
@@ -85,13 +88,10 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None):
     
     
 def hists(MCMC, nbins=30, params=None, orientation='vertical',
-          nrow=None, ncol=None):
+          nrow=None, ncol=None, derived=True):
     """ plot histograms of samples """
     
-    try:
-        s = MCMC.samples
-    except AttributeError:
-        s = MCMC
+    s = getallsamples(MCMC, derived=derived)        
 
     if params is None:
         npar = s.shape[1]
@@ -108,7 +108,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
             ncol = int(npar/nrow+1)
         
     for ip in xrange(npar):
-        pylab.subplot(nrow, ncol, ip+1)   ### 1...n instead of 0...n-1!
+        plt.subplot(nrow, ncol, ip+1)   ### 1...n instead of 0...n-1!
         hist(s, ip, nbins=nbins, orientation=orientation)
     
 
@@ -122,10 +122,11 @@ def scatter2d(MCMC, params, **kwargs):
           color code
           
     """
-    try:
-        s = MCMC.samples
-    except AttributeError:
-        s = MCMC
+
+    derived = kwargs.setdefault('derived', False)
+    s = getallsamples(MCMC, derived=derived)
+    del kwargs['derived']
+
 
     s1 = s.transpose()[params[0]]
     s2 = s.transpose()[params[1]]
@@ -141,20 +142,17 @@ def scatter2d(MCMC, params, **kwargs):
         axis = kwargs['axis']
         del kwargs['axis']
     else:
-        axis = pylab.gca()
+        axis = plt.gca()
 
     return axis.scatter(s1,s2, s=.01, edgecolors='none', **kwargs)
 
-def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False):
+def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True):
     """
     make a 2d grid of histograms and scatterplots of the selected parameters
     """
 
-    try:
-        s = MCMC.samples
-    except AttributeError:
-        s = MCMC
-
+    s = getallsamples(MCMC, derived=derived)
+        
     try:
         if lnLike is None: lnLike = MCMC.lnPr
     except AttributeError:
@@ -165,10 +163,10 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
         print s[lnLike.argmax()]
 
     if params is None:
-        try:
-            params = MCMC.paramBlocks
-            npar = len(params)
-        except AttributeError:            
+        # try:   ### removed June 2010 to deal with derived parmaters. Don't need this case?
+        #     params = MCMC.paramBlocks
+        #     npar = len(params)
+        # except AttributeError:            
             npar = s.shape[1]
             params=xrange(npar)
     else:
@@ -176,16 +174,18 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
 
     if labels is None:
         try:
-            labels= MCMC.texNames
+            labels=MCMC.texNames
+            if derived: 
+                labels += MCMC.like.derivedTexNames
         except AttributeError:
             pass
 
     nrow = ncol = npar
 
-    #norm = pylab.normalize(vmin=-10, vmax=0)
-    norm = pylab.normalize()
+    #norm = plt.normalize(vmin=-10, vmax=0)
+    norm = plt.normalize()
 
-    fig = pylab.gcf()
+    fig = plt.gcf()
 
     for ipar1, par1 in enumerate(islice(params, 1, npar)):        ### rows 
         for ipar2, par2 in enumerate(islice(params, ipar1+1)):          ### columns
@@ -193,7 +193,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
             ax=fig.add_subplot(nrow, ncol, npar*ipar1+ipar2+1)
             ax.hold(False)
             #splot = \ 
-            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax)
+            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, derived=derived)
                     ### par2, par1 since x-axis along columns
             ax.set_xticklabels([])
             if ipar2 != 0:
@@ -210,12 +210,12 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False)
         if labels is not None:
             ax.set_xlabel(labels[par])
             
-    if not quiet: pylab.draw()
+    if not quiet: plt.draw()
 
 
 ### no longer needed -- array.std() now uses 1/N
 def stddev(arr):
-    return arr.std()*numpy.sqrt((arr.size-1)/arr.size)
+    return arr.std()*np.sqrt((arr.size-1)/arr.size)
 
 
 def convertSampleFile(filename):
@@ -238,11 +238,11 @@ def convertSampleFile(filename):
         samples.extend([float(c) for c in cols[2:]]*nsamp)
 
     fil.close()
-    samples = numpy.array(samples)
+    samples = np.array(samples)
     nrow = len(samples)/npar
     samples.shape=(nrow, npar)
 
-    return numpy.array(lnLike), samples
+    return np.array(lnLike), samples
 
 def main(filename, burn=None, labels=None):
 
@@ -254,7 +254,7 @@ def main(filename, burn=None, labels=None):
     #print 'lnLike: ', lnLike.shape, lnLike.dtype
     #print 'samples: ', samples.shape, samples.dtype
     histgrid(samples[burn:], labels = labels)
-    pylab.show()
+    plt.show()
    
    
 def key(filename):
@@ -300,14 +300,14 @@ def doall(dir=None, burn=None, labels=None, thin=None, quiet=False, keyfn=None):
                     if i==0:
                         lnLike=lnLike1[burn::thin]; samples=samples1[burn::thin]
                     else:
-                        lnLike=numpy.concatenate((lnLike, lnLike1[burn::thin]))
-                        samples=numpy.concatenate((samples, samples1[burn::thin]))
+                        lnLike=np.concatenate((lnLike, lnLike1[burn::thin]))
+                        samples=np.concatenate((samples, samples1[burn::thin]))
                     i+=1
                     
             if i>0:
-                pylab.clf()
+                plt.clf()
                 histgrid(samples, labels=labels, lnLike=-lnLike, quiet=quiet)
-                pylab.savefig(dir+key+'.png')
+                plt.savefig(dir+key+'.png')
                 
                
 if __name__=="__main__":

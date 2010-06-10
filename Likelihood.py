@@ -32,7 +32,13 @@ class Likelihood(object):
     now works for a sequence of datasets
      - store only sequence even if only one dataset
      - relies on a single not being a sequence
+     
+     snow also calculates the ML value of the amplitude parameter, 
+     NOT DONE, BUT SEE CODE **and requires ML amplitude>0**
+     
     """
+    
+    nDerived = 0
     
     def __init__(self, data=None, model=None):
         self.setdata(data)
@@ -62,6 +68,7 @@ class Likelihood(object):
         """set the model for the given paramaters"""
         self.this_model = self.model(*params)
         self.model_vals = [self.this_model(d) for d in self.data]
+        self.MLamplitude = None
         #self.model_vals = map(self.this_model,self.data)
 
     ## this doesn't need to be a class method, although can just use self.model_vals!
@@ -78,8 +85,14 @@ class Likelihood(object):
         FNid = data.quadform(model_vals, data.d)
         if FNiF<=0:
             raise ZeroPosterior(FNiF)
-        return 0.5 * (FNid*FNid/FNiF - log(FNiF))
-
+        self.MLamplitude = FNid/FNiF
+        
+        # ## require positive amplitudes
+        # if self.MLamplitude<0:
+        #     raise ZeroPosterior(self.MLamplitude)
+        
+        return 0.5 * (FNid*self.MLamplitude - log(FNiF))
+        
     def lnLike(self, params): 
         """
         calculate the sum of the lnLike for each of the datasets

@@ -10,6 +10,9 @@ from __future__ import division
 
 ###### currently, self.mod.proposal is indeed a class, but the package and unpackage methods are set by a factory function.
 
+### 10 June 2010: added derived parameters -- likelihood needs getDerived(*params), nDerived, derivedTexNames
+###   should just keep them in the parameter samples array or treat separately????
+
 import math
 
 from progressbar import ProgressBar
@@ -27,6 +30,15 @@ from Likelihood import ZeroPosterior
 ### directly from model)
 
 #debugf = file("debug.out", "w")
+
+from contextlib import contextmanager
+
+@contextmanager
+def finishing(obj):
+    try:
+        yield obj
+    finally:
+        obj.finish()
 
 class MCMC(object):
     """    Metropolis sampler    """
@@ -117,6 +129,12 @@ class MCMC(object):
         self.samples[0] = paramarr
         self.prev = params
         prior = self.like.model.prior(*params)
+        
+        try:
+            self.nDerived = self.like.nDerived
+        except AttributeError:
+            self.nDerived = self.like.nDerived = 0    
+        
         if prior<=0:
             raise ZeroPriorError(params)
         
@@ -127,6 +145,10 @@ class MCMC(object):
             self.accept = ones(dtype=int32, shape=self.like.model.nBlock)
         
         self.accepted[0] = True
+        
+        if self.nDerived:
+            self.derived = empty(dtype=float64, shape=(1, self.nDerived))
+            self.derived[0] = self.like.getDerived(*params)
     
     
     def getStart(self):
@@ -143,18 +165,23 @@ class MCMC(object):
         
         newsamples = empty(shape=(nMC, self.nparams), dtype=float64)
         newlnPr = empty(shape=nMC, dtype=float64)
+        if self.nDerived:
+            newDerived = empty(shape=(nMC, self.nDerived), dtype=float64)
         newaccepted = empty(shape=nMC, dtype=bool8)
-        pbar = ProgressBar().start()
-        
-        for i in xrange(nMC):  ## do with comprehension?
-            samples, newlnPr[i], newaccepted[i] = self.sample()
-            newsamples[i] = self.like.model.unpackage(samples)
-            pbar.update(100.0*(i+1)/nMC)
-        pbar.finish()
+
+        with finishing(ProgressBar().start()) as pbar:
+            for i in xrange(nMC):  ## do with comprehension?
+                samples, newlnPr[i], newaccepted[i], derived = self.sample()
+                if self.nDerived:
+                    newDerived[i] = derived
+                newsamples[i] = self.like.model.unpackage(samples)
+                pbar.update(100.0*(i+1)/nMC)
         
         self.samples = concatenate((self.samples, newsamples))
         self.lnPr = concatenate((self.lnPr, newlnPr))
         self.accepted = concatenate((self.accepted, newaccepted))
+        if self.nDerived:
+            self.derived = concatenate((self.derived, newDerived))
     
     
     def sample(self):
@@ -212,8 +239,13 @@ class MCMC(object):
         
         if self.doBlock:
             self.iBlock = (self.iBlock+1) % self.like.model.nBlock
+            
+        if self.nDerived:
+            derived = self.like.getDerived(*next)
+        else:
+            derived = None
         
-        return next, next_lnPr, accepted
+        return next, next_lnPr, accepted, derived
     
     
     ######## duplicates effort; shouldn't recalculate if burn, stride don't change

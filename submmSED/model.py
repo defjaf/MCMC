@@ -17,8 +17,9 @@ import Proposal
 ### TODO: __call__ for model.quadform (and possibly set_model_vals?)
 ####   returns matrix of amplitudes for each component at each frequency
 
-#### TODO: need to be able to estimate the amplitudes (max Likelihood?) for plotting and checking
-##         make it more easy to switch these models in and out? (e.g., make index and temperature into arrays)
+#### amplitudes are calculated in the associated likelihood class
+####  (not checked for more than one amplitude)
+####  TODO: use amplitude>0 prior???
 
 h_over_k = 0.04799237 ###  K/Ghz
 
@@ -29,7 +30,7 @@ def blackbody(T, nu):
         return 0
         
     x = h_over_k*nu/T
-    prefac = 1.0e-20 #### FIXME: find a physical definition to go here
+    prefac = 1.0e-10 #### FIXME: find a physical definition to go here
     return prefac*nu**3/(exp(x)-1)
     
     
