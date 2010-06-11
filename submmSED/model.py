@@ -23,6 +23,9 @@ import Proposal
 
 h_over_k = 0.04799237 ###  K/Ghz
 
+minTemp = 3.0
+print "min Temp = %f K" % minTemp
+
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
     
@@ -64,7 +67,7 @@ class submmModel2(object):
         """get the unnormalized prior for the parameters
         """
 
-        if T1<0 or T2<0:
+        if T1<minTemp or T2<minTemp:
             return 0
             
         if b1<0 or b2<0 or b1>6 or b2>6:

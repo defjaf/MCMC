@@ -5,6 +5,7 @@ from numpy import linalg, dot, log, empty, log10
 
 from Likelihood import ZeroPosterior
 
+dolog10 = False  # "compile-time" flag for the derived parameter
 
 class SEDLikelihood2(Likelihood.Likelihood):
     """
@@ -57,10 +58,18 @@ class SEDLikelihood2(Likelihood.Likelihood):
         return 0.5 * (dot(FNid.transpose(), self.MLamplitude) - log(detFNiF))
         
     nDerived = 2  ## actually it depends on the dimension of, e.g., model_vals
-    derivedTexNames = [r"$\ln A_1$", r"$\ln A_2$"]
-    def getDerived(self, *params):
-        """ calculate a list of any derived parameters """  
-        return log10(self.MLamplitude)
+
+    if dolog10:
+        derivedTexNames = [r"$\ln A_1$", r"$\ln A_2$"]
+        def getDerived(self, *params):
+            """ calculate a list of any derived parameters """  
+            return log10(self.MLamplitude)
+    else:
+        derivedTexNames = [r"$A_1$", r"$A_2$"]
+        def getDerived(self, *params):
+            """ calculate a list of any derived parameters """  
+            return self.MLamplitude
+        
         
         
 
@@ -70,11 +79,16 @@ class SEDLikelihood1(Likelihood.Likelihood):
     """
 
     nDerived = 1    
-    derivedTexNames = [r"$\ln A$"]
-    def getDerived(self, *params):
-        """ calculate a list of any derived parameters """  
-        return [log10(self.MLamplitude)]
-        
+    if dolog10:
+        derivedTexNames = [r"$\ln A$"]
+        def getDerived(self, *params):
+            """ calculate a list of any derived parameters """  
+            return [log10(self.MLamplitude)]
+    else:
+        derivedTexNames = [r"$A$"]
+        def getDerived(self, *params):
+            """ calculate a list of any derived parameters """  
+            return [self.MLamplitude]
 
 
         

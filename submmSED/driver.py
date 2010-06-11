@@ -28,7 +28,8 @@ import getdist
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 
-def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None, nMC=(10000,10000)):
+def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None, 
+         nMC=(10000,10000), nDerived=None):
         
     ## read the data
     alldata = data.readfluxes(filename)
@@ -58,6 +59,9 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
         prop_sigmas = start_params/4.0
     else:
         prop_sigmas = sigmas
+        
+    if nDerived is not None:
+        like.nDerived = nDerived
     
     
     mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
