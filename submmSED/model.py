@@ -85,7 +85,6 @@ class submmModel2(object):
     def at(self, data):
         return asarray([data.freq**self.b1 * blackbody(self.T1, data.freq), 
                         data.freq**self.b2 * blackbody(self.T2, data.freq) ]).transpose()
-        ### shape=(2,n_freq); is this right? or transpose this?
         
     __call__ = at
 
