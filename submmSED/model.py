@@ -6,25 +6,24 @@ import math
 import matplotlib.pyplot as plt
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log
 
+speed_of_light = 299792.458 ### micron GHz
 
 import Proposal
 
-## careful -- this is the model for a *single* SED, but [probably]
-##            need to marginalize over the ratio r12 for *each object* 
+## careful -- this is the model for a *single* SED, but
+##            would need to marginalize over the ratio r12 for *each object* 
 ##   should be explicit about r12 for each object 
 ##    -- make it an array and make this the model for all objects together
 
-### TODO: __call__ for model.quadform (and possibly set_model_vals?)
-####   returns matrix of amplitudes for each component at each frequency
 
-#### amplitudes are calculated in the associated likelihood class
+#### for unnormed cases, amplitudes are calculated in the associated likelihood class
 ####  (not checked for more than one amplitude)
 ####  TODO: use amplitude>0 prior???
 
 h_over_k = 0.04799237 ###  K/Ghz
 
-minTemp = 3.0
-print "min Temp = %f K" % minTemp
+minTemp = 3.0; maxTemp=100.0
+print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
 
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
@@ -145,7 +144,7 @@ class submmModel1(object):
         """get the unnormalized prior for the parameters
         """
 
-        if T<0:
+        if T<minTemp:
             return 0
 
         if b<-1 or b>6:
@@ -216,11 +215,10 @@ class submmModel_ratio(object):
         """get the unnormalized prior for the parameters
         """
 
-        if T1<0 or T2<0:
+        if T1<minTemp or T2<minTemp:
             return 0
             
         return log(r12)
-        
         
 
     def unpackage(param_seqs):
@@ -239,8 +237,8 @@ class submmModel_ratio(object):
 
     def plot(self, data):
         """plot the data and the model"""
-        f = np.linspace(data.freq[0], data.freq[-1], 100)
-        model_flux = self.at(f)
+        f = linspace(data.freq[0], data.freq[-1], 100)
+        model_flux = self.at_nu(f)
         data.plot()
         plt.plot(f, model_flux)
         
@@ -257,7 +255,7 @@ class submmModel_ratio(object):
         return cls.start_params
             
             
-class submmModel_normalized(submmModel1):
+class submmModel2_normalized(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
 
     """
@@ -266,6 +264,7 @@ class submmModel_normalized(submmModel1):
     fmtstring = "%.3f "*6
     paramBlocks =  range(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
+    texNames = [r"$A_1$", r"$\beta_1$", r"$T_1$", r"$A_2$", r"$\beta_2$", r"$T_2$"]
 
     def __init__(self, A1, b1, T1, A2, b2, T2):
 
@@ -292,26 +291,118 @@ class submmModel_normalized(submmModel1):
         """get the unnormalized prior for the parameters
         """
 
-        if T1<0 or T2<0:
+        if T1<minTemp or T2<minTemp or A1<0 or A2<0:
             return 0
+            
+        if T1>maxTemp or T2>maxTemp:
+            return 0
+            
+        if b1<-1 or b1>6 or b2<-1 or b2>6 :
+            return 0
+
+        
 
         return 1
 
-    def plot(self, data):
+    def plot(self, data, wavelength=True):
         """plot the data and the model"""
-        f = np.linspace(data.freq[0], data.freq[-1], 100)
-        model_flux = self.at(f)
-        data.plot()
+        f = linspace(data.freq[0], data.freq[-1], 100)
+        model_flux = self.at_nu(f)
+        data.plot(fmt='o', wavelength=wavelength)
+        if wavelength:
+            f = speed_of_light/f
         plt.plot(f, model_flux)
 
+    package = asarray
 
+    def unpackage(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        return asarray( param_seqs, dtype=float64)
 
-    def startfrom(self, data, random=None):
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package,
+                                                unpackage=unpackage)
+
+## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
+    @classmethod
+    def startfrom(cls, data=None, random=None):
         """
         generate a set of starting parameters for the model:
         """
         if random is not None:
-            start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
+            cls.start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
         else:
             pass
+
+class submmModel1_normalized(submmModel2_normalized):
+    """model a submm SED as a one-component grey body: flux = A nu^b B_nu(T)
+
+    """
+
+    nparam = 3
+    fmtstring = "%.3f "*3
+    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    nBlock = max(paramBlocks)+1
+    texNames = [r"$A$", r"$\beta$", r"$T$"]
+    
+    def __init__(self, A, b, T):
+
+        self.A = A
+        self.b = b
+        self.T = T
+
+
+    def at_nu(self, nu):
+        return self.A * nu**self.b * blackbody(self.T, nu)
+
+    def at(self, data):
+        return self.A * data.freq**self.b * blackbody(self.T, data.freq)
+
+    __call__ = at    
+
+    @classmethod
+    def prior(cls, A, b, T):
+        """get the unnormalized prior for the parameters
+        """
+
+        if T<minTemp or A<0 or T>maxTemp:
+            return 0
+
+        return 1
+        # 
+        # 
+        #     def plot(self, data):
+        #         """plot the data and the model"""
+        #         f = linspace(data.freq[0], data.freq[-1], 100)
+        #         model_flux = self.at(f)
+        #         data.plot()
+        #         plt.plot(f, model_flux)
+        # 
+        #     package = asarray
+        # 
+        #     def unpackage(param_seqs):
+        #         """ convert from structured sequence of parameters to flat array """
+        #         return asarray( param_seqs, dtype=float64)
+        # 
+        #     ## nb. an *instance* of proposal; should pass the class [name] to this?
+        #     proposal = Proposal.GenericGaussianProposal(package=package,
+        #                                                 unpackage=unpackage)
+        # 
+        # ## need to do this conversion after we send the methods to the Proposal class
+        #     unpackage=staticmethod(unpackage)
+        #     package=staticmethod(package)
+        
+    @classmethod
+    def startfrom(cls, data=None, random=None):
+        """
+        generate a set of starting parameters for the model:
+        """
+        if random is None:
+            cls.start_params = (1., 2., 10.)  ## careful of units
+        else:
+            pass
+
 

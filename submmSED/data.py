@@ -30,7 +30,7 @@ class submmData(GaussianData):
         else:
             self.freq_obs = None
 
-    def plot(self, lab=True, wavelength=False):
+    def plot(self, lab=True, wavelength=False, fmt=None):
         """ plot the data """
         if wavelength:
             x = speed_of_light/self.freq
@@ -38,9 +38,9 @@ class submmData(GaussianData):
         else:
             x = self.freq
             xlab = "frequency [GHz]"
-            
-        plt.semilogy(x, self.d)
-        plt.errorbar(x, self.d, self.sig)
+                        
+        plt.semilogy(x, self.d, fmt)
+        plt.errorbar(x, self.d, self.sig, fmt=fmt)
         if lab:
             plt.xlabel(xlab)
             plt.ylabel("flux")

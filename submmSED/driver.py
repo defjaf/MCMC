@@ -28,7 +28,7 @@ import getdist
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 
-def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, start=None, sigmas=None, 
+def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None):
         
     ## read the data
@@ -43,13 +43,20 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
         
     print "Object[s] %s" % name
     
-    ## initialize the model (with a class, not an object)    
-    if onecomponent:
-        mod = model.submmModel1
-        like = likelihood.SEDLikelihood1(data=dat, model=mod)
+    ## initialize the model (with a class, not an object)
+    if getNorm:
+        if onecomponent:
+            mod = model.submmModel1_normalized
+        else:
+            mod = model.submmModel2_normalized     
+        like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)        
     else:
-        mod = model.submmModel2            
-        like = likelihood.SEDLikelihood2(data=dat, model=mod)
+        if onecomponent:
+            mod = model.submmModel1
+            like = likelihood.SEDLikelihood1(data=dat, model=mod)
+        else:
+            mod = model.submmModel2            
+            like = likelihood.SEDLikelihood2(data=dat, model=mod)
         
     if start is None: 
         start_params = np.asarray(mod.startfrom(random=False))
@@ -69,6 +76,16 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
 
     getdist.histgrid(mcmc[-1])
     plt.suptitle(name)
+    
+    plt.figure(2)
+    params = ana[0]
+    meanmod = mod(*params)
+    try:
+        meanmod.plot(dat, wavelength=False)
+        plt.suptitle(name)        
+    except AttributeError:
+        pass
+    
     return mcmc, ana
 
 

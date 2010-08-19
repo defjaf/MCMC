@@ -93,6 +93,43 @@ class SEDLikelihood1(Likelihood.Likelihood):
 
         
         
+class SEDLikelihood_normalized(Likelihood.Likelihood):
+    """
+    submm SED flux likelihood, including individual amplitudes.
+    (This is essentially a Gaussian likelihood)
+
+    Current version assumes the same parameters for each object 
+    (so to do a single object just use a data-list of length 1)
     
+    Should work for both 1- and 2-parameter models
+
+    """
+    nDerived = 0
     
-    
+    def lnLike1(self, model_vals=None, data=None):
+        """
+        return ln p(data|params) up to a param-independent term,
+        - for a single dataset
+        - assuming params have already been set by self.setModel
+
+        Gaussian likelihood
+            if d_i = A B(p_i) + e_i    <ee>=N
+            
+        -2 ln P = (d - AB)^T N^{-1} (d - AB) + ln det N
+                = chi^2 + ln det N
+        """
+        ## nb. dNiB = d^T N^-1 B, etc.
+
+        return -0.5 * data.chi2(model_vals)
+
+
+    def lnNorm1(self, data=None):
+        """
+        return the parameter-independent part of the ln-likelihood
+        - for a single dataset
+        """
+
+        return -0.5 * ( data.n * log(2*pi) + data.lnDetN)
+        
+
+
