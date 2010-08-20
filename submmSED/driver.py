@@ -29,7 +29,7 @@ import getdist
 
 
 def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None):
+         nMC=(10000,10000), nDerived=None, noPlots=False):
         
     ## read the data
     alldata = data.readfluxes(filename)
@@ -70,21 +70,22 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
     if nDerived is not None:
         like.nDerived = nDerived
     
-    
     mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
                         fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
 
-    getdist.histgrid(mcmc[-1])
-    plt.suptitle(name)
+    if not noPlots:
+
+        getdist.histgrid(mcmc[-1])
+        plt.suptitle(name)
     
-    plt.figure(2)
-    params = ana[0]
-    meanmod = mod(*params)
-    try:
-        meanmod.plot(dat, wavelength=False)
-        plt.suptitle(name)        
-    except AttributeError:
-        pass
+        plt.figure(2)
+        params = ana[0]
+        meanmod = mod(*params)
+        try:
+            meanmod.plot(dat, wavelength=False)
+            plt.suptitle(name)        
+        except AttributeError:
+            pass
     
     return mcmc, ana
 

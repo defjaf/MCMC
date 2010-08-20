@@ -4,7 +4,7 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log
+from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate
 
 speed_of_light = 299792.458 ### micron GHz
 
