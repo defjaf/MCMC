@@ -27,15 +27,20 @@ import getdist
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
+fname_DLC = "./submmSED.txt"
+fname_ERCSC = "./ercsc_iifscz.txt"
 
-def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False):
+def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False):
         
     ## read the data
-    alldata = data.readfluxes(filename)
+    if DLC:
+        alldata = data.readfluxes_DLC(filename)
+    else:
+        alldata = data.readfluxes_ERCSC_TopCat(filename)
     try:
         dat = alldata[i]
-        name = str(int(dat.name))
+        name = dat.name
         
     except TypeError:
         dat = [alldata[ii] for ii in i]
@@ -82,7 +87,7 @@ def main(filename="./submmSED.txt", i=0, rotateParams=False, onecomponent=True, 
         params = ana[0]
         meanmod = mod(*params)
         try:
-            meanmod.plot(dat, wavelength=False)
+            meanmod.plot(dat, wavelength=True, logplot=True)
             plt.suptitle(name)        
         except AttributeError:
             pass

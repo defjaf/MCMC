@@ -4,7 +4,7 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate
+from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max
 
 speed_of_light = 299792.458 ### micron GHz
 
@@ -33,7 +33,8 @@ def blackbody(T, nu):
         
     x = h_over_k*nu/T
     prefac = 1.0e-10 #### FIXME: find a physical definition to go here
-    return prefac*nu**3/(exp(x)-1)
+    with errstate(over='ignore'):
+        return prefac*nu**3/(exp(x)-1)
     
     
 class submmModel2(object):
@@ -235,11 +236,11 @@ class submmModel_ratio(object):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data):
+    def plot(self, data, logplot=True):
         """plot the data and the model"""
         f = linspace(data.freq[0], data.freq[-1], 100)
         model_flux = self.at_nu(f)
-        data.plot()
+        data.plot(logplot=logplot)
         plt.plot(f, model_flux)
         
         
@@ -304,11 +305,11 @@ class submmModel2_normalized(object):
 
         return 1
 
-    def plot(self, data, wavelength=True):
+    def plot(self, data, wavelength=True, logplot=True):
         """plot the data and the model"""
-        f = linspace(data.freq[0], data.freq[-1], 100)
+        f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
-        data.plot(fmt='o', wavelength=wavelength)
+        data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
         if wavelength:
             f = speed_of_light/f
         plt.plot(f, model_flux)
@@ -365,15 +366,16 @@ class submmModel1_normalized(submmModel2_normalized):
 
     @classmethod
     def prior(cls, A, b, T):
-        """get the unnormalized prior for the parameters
-        """
+        """get the unnormalized prior for the parameters"""
 
         if T<minTemp or A<0 or T>maxTemp:
             return 0
+            
+        if b<-1 or b>6:
+            return 0
 
         return 1
-        # 
-        # 
+        
         #     def plot(self, data):
         #         """plot the data and the model"""
         #         f = linspace(data.freq[0], data.freq[-1], 100)
