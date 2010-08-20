@@ -171,7 +171,7 @@ class submmModel1(object):
         generate a set of starting parameters for the model:
         """
         if random is not None:
-            cls.start_params = (0., 0.1)  ## careful of units
+            cls.start_params = (2.0, 10.0)  ## careful of units
         else:
             pass
         return cls.start_params
