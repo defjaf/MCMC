@@ -6,6 +6,8 @@ from numpy import linalg, dot, log, empty, log10
 from Likelihood import ZeroPosterior
 
 dolog10 = False  # "compile-time" flag for the derived parameter
+dodet = False
+
 
 class SEDLikelihood2(Likelihood.Likelihood):
     """
@@ -41,26 +43,35 @@ class SEDLikelihood2(Likelihood.Likelihood):
         FNiF = data.quadform(model_vals)     
         FNid = data.quadform(model_vals, data.d)
         
-        detFNiF = linalg.det(FNiF)
-        if detFNiF<=0:
-            raise ZeroPosterior(FNiF)
+        if dodet:
+        
+            detFNiF = linalg.det(FNiF)
+            if detFNiF<=0:
+                raise ZeroPosterior(FNiF)
             
         #### want (FNid)^T (FNiF)^-1 (FNid)
         
         ## solve for (FNiF) z = (FNid) for z = (FNiF)^{-1} (FNid)
         ## NB. z is the ML value of the marginalized amplitudes!!!
-        self.MLamplitude = linalg.solve(FNiF, FNid)
+        try:
+            self.MLamplitude = linalg.solve(FNiF, FNid)
+        except linalg.LinAlgError:
+            raise ZeroPosterior
 
         # ## require positive amplitudes
         # if self.MLamplitude<0:
         #     raise ZeroPosterior(self.MLamplitude)
                         
-        return 0.5 * (dot(FNid.transpose(), self.MLamplitude) - log(detFNiF))
+        if dodet:
+            return 0.5 * (dot(FNid.transpose(), self.MLamplitude) - log(detFNiF))
+        else:
+            return 0.5 * (dot(FNid.transpose(), self.MLamplitude))
+            
         
     nDerived = 2  ## actually it depends on the dimension of, e.g., model_vals
 
     if dolog10:
-        derivedTexNames = [r"$\ln A_1$", r"$\ln A_2$"]
+        derivedTexNames = [r"$\log A_1$", r"$\log A_2$"]
         def getDerived(self, *params):
             """ calculate a list of any derived parameters """  
             return log10(self.MLamplitude)
@@ -78,9 +89,24 @@ class SEDLikelihood1(Likelihood.Likelihood):
        single-component grey-body submm SED flux likelihood, marginalized over overall amplitude.
     """
 
+    if not dodet:
+        def lnLike1(self, model_vals=None, data=None):
+
+            FNiF = data.quadform(model_vals)     
+            FNid = data.quadform(model_vals, data.d)
+        
+            self.MLamplitude = FNid/FNiF
+    
+            # ## require positive amplitudes
+            # if self.MLamplitude<0:
+            #     raise ZeroPosterior(self.MLamplitude)
+    
+            return 0.5 * FNid*self.MLamplitude
+
+
     nDerived = 1    
     if dolog10:
-        derivedTexNames = [r"$\ln A$"]
+        derivedTexNames = [r"$\log A$"]
         def getDerived(self, *params):
             """ calculate a list of any derived parameters """  
             return [log10(self.MLamplitude)]
