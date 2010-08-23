@@ -46,7 +46,8 @@ class submmData(GaussianData):
             plt.loglog(x, self.d, fmt)
         else:
             plt.plot(x, self.d, fmt)
-        sigs = [np.min([0.99999*self.d, self.sig],axis=0), self.sig]
+        one_e = 1.0 - 1e-10
+        sigs = [np.min([one_e*self.d, self.sig],axis=0), self.sig]
         plt.errorbar(x, self.d, sigs, fmt=None)
         if lab:
             plt.xlabel(xlab)
