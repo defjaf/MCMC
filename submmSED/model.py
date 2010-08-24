@@ -22,8 +22,9 @@ import Proposal
 
 h_over_k = 0.04799237 ###  K/Ghz
 
-minTemp = 3.0; maxTemp=100.0
+minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
+minb, maxb = 0., 3.
 
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
@@ -70,7 +71,7 @@ class submmModel2(object):
         if T1<minTemp or T2<minTemp:
             return 0
             
-        if b1<0 or b2<0 or b1>6 or b2>6:
+        if b1<minb or b2<minb or b1>maxb or b2>maxb:
             return 0
             
         ### want to separate the two cases: force T1<T2
@@ -148,7 +149,7 @@ class submmModel1(object):
         if T<minTemp:
             return 0
 
-        if b<-1 or b>6:
+        if b<minb or b>maxb:
             return 0
 
         return 1.
@@ -215,6 +216,9 @@ class submmModel_ratio(object):
     def prior(cls, b1, T1, b2, T2, r12):
         """get the unnormalized prior for the parameters
         """
+
+        if b1<minb or b2<minb or b1>maxb or b2>maxb:
+            return 0
 
         if T1<minTemp or T2<minTemp:
             return 0
@@ -298,9 +302,11 @@ class submmModel2_normalized(object):
         if T1>maxTemp or T2>maxTemp:
             return 0
             
-        if b1<-1 or b1>6 or b2<-1 or b2>6 :
+        if b1<minb or b2<minb or b1>maxb or b2>maxb:
             return 0
 
+        ### want to separate the two cases: force T1<T2
+        if T1>T2: return 0
         
 
         return 1
@@ -371,7 +377,7 @@ class submmModel1_normalized(submmModel2_normalized):
         if T<minTemp or A<0 or T>maxTemp:
             return 0
             
-        if b<-1 or b>6:
+        if b<minb or b>maxb:
             return 0
 
         return 1

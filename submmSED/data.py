@@ -92,12 +92,20 @@ def readfluxes_ERCSC_TopCat(filename):
     
     errfrac = 0.1   ### fractional error for IRAS
     lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
-    nu_IRAS = speed_of_light/lambda_IRAS  ## GHz
+    err_IRAS = asarray([0, 1.0, 0.1, 0.1])
     nu_Planck = asarray([217., 353., 545., 857.])  ## GHz
-    nu_obs = concatenate((nu_Planck, nu_IRAS))
     
     Planck_idx = (0,2,4,6)
     IRAS_idx = (11,12,13,14)
+    
+    IRAS_idx = IRAS_idx[1:]   ### ignore 11=12 micron!
+    err_IRAS = err_IRAS[1:]
+    lambda_IRAS = lambda_IRAS[1:]
+    
+    nu_IRAS = speed_of_light/lambda_IRAS  ## GHz
+    nu_obs = concatenate((nu_Planck, nu_IRAS))
+
+
     with open(filename) as f:
         while True:
             l = f.readline()   ### this construction is necessary to avoid 
@@ -115,7 +123,7 @@ def readfluxes_ERCSC_TopCat(filename):
         
         ## convert Planck fluxes to mJy from Jy
         flux = asarray([1e-3*obj[i] for i in Planck_idx] + [obj[i] for i in IRAS_idx])
-        sig  = asarray([1e-3*obj[i+1] for i in Planck_idx] + [errfrac*obj[i] for i in IRAS_idx])
+        sig  = asarray([1e-3*obj[i+1] for i in Planck_idx] + [ef*obj[i] for i, ef in zip(IRAS_idx, err_IRAS)])
 
         name = obj[8].strip()
         name_alt = obj[17].strip()

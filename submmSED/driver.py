@@ -31,7 +31,7 @@ fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 
 def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False):
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0):
         
     ## read the data
     if DLC:
@@ -80,10 +80,12 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
 
     if not noPlots:
 
-        getdist.histgrid(mcmc[-1])
+        plt.figure(fig0)
+        lnLike = []
+        maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1])
         plt.suptitle(name)
     
-        plt.figure(2)
+        plt.figure(fig0+2)
         params = ana[0]
         meanmod = mod(*params)
         try:
@@ -92,7 +94,7 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
         except AttributeError:
             pass
     
-    return mcmc, ana
+    return mcmc, ana, (maxlnLike, maxLikeParams)
 
 
 def plotter(sampler):
