@@ -343,6 +343,41 @@ class submmModel2_normalized(object):
             cls.start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
         else:
             pass
+            
+
+class submmModel2_normalized_logA(submmModel2_normalized):
+    """model a submm SED as a two-component grey body: flux = 10**logA1 nu^b1 B_nu(T1) + 10**A2 nu^b2 B_nu(T2)
+    """
+    texNames = [r"$\log A_1$", r"$\beta_1$", r"$T_1$", r"$\log A_2$", r"$\beta_2$", r"$T_2$"]
+
+    def __init__(self, logA1, b1, T1, logA2, b2, T2):
+
+        self.A1 = 10.0**logA1
+        self.b1 = b1
+        self.T1 = T1
+        self.b2 = b2
+        self.T2 = T2
+        self.A2 = 10.0**logA2
+
+    @classmethod
+    def prior(cls, logA1, b1, T1, logA2, b2, T2):
+        """get the unnormalized prior for the parameters
+        """
+
+        if T1<minTemp or T2<minTemp:
+            return 0
+            
+        if T1>maxTemp or T2>maxTemp:
+            return 0
+            
+        if b1<minb or b2<minb or b1>maxb or b2>maxb:
+            return 0
+
+        ### want to separate the two cases: force T1<T2
+        if T1>T2: return 0
+        
+        return 1
+
 
 class submmModel1_normalized(submmModel2_normalized):
     """model a submm SED as a one-component grey body: flux = A nu^b B_nu(T)
@@ -413,4 +448,26 @@ class submmModel1_normalized(submmModel2_normalized):
         else:
             pass
 
+class submmModel1_normalized_logA(submmModel1_normalized):
+    """model a submm SED as a one-component grey body: flux = 10**(logA) nu^b B_nu(T)
+    """
+    texNames = [r"$\log A$", r"$\beta$", r"$T$"]
+
+    def __init__(self, logA, b, T):
+
+        self.A = 10.0**logA
+        self.b = b
+        self.T = T
+
+    @classmethod
+    def prior(cls, logA, b, T):
+        """get the unnormalized prior for the parameters"""
+
+        if T<minTemp or T>maxTemp:
+            return 0
+
+        if b<minb or b>maxb:
+            return 0
+
+        return 1
 

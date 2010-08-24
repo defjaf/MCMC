@@ -51,9 +51,9 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
     ## initialize the model (with a class, not an object)
     if getNorm:
         if onecomponent:
-            mod = model.submmModel1_normalized
+            mod = model.submmModel1_normalized_logA
         else:
-            mod = model.submmModel2_normalized     
+            mod = model.submmModel2_normalized_logA
         like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)        
     else:
         if onecomponent:
@@ -88,8 +88,10 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
         plt.figure(fig0+2)
         params = ana[0]
         meanmod = mod(*params)
+        MLmod = mod(*maxLikeParams)
         try:
             meanmod.plot(dat, wavelength=True, logplot=True)
+            MLmod.plot(dat, wavelength=True, logplot=True)
             plt.suptitle(name)    
         except AttributeError:
             pass

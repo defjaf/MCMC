@@ -75,15 +75,16 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
     hist = axis.hist(s1,  bins=nbins, orientation=orientation)
 
     if gauss:
-        mean = s1.mean()
         stdv = s1.std()  ## stddev(s1)
+        mean = s1.mean()
         print 'mean = %f +- %f' % (mean, stdv)
-        smin, smax = min(hist[1]), max(hist[1])
-        norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
-        ss = np.arange(smin, smax, (smax-smin)/5/nbins)
+        if stdv > 0:
+            smin, smax = min(hist[1]), max(hist[1])
+            norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
+            ss = np.arange(smin, smax, (smax-smin)/5/nbins)
 
-        axis.hold(True)
-        axis.plot(ss, norm*GaussPDF(ss, mean, stdv), 'k')
+            axis.hold(True)
+            axis.plot(ss, norm*GaussPDF(ss, mean, stdv), 'k')
         
     return hist
     
