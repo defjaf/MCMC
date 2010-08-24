@@ -39,20 +39,22 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
         lnLike = None
 
     if lnLike is not None: 
-        print 'Max ln likelihood %f at parameters:' % max(lnLike)
-        print s[lnLike.argmax()]
+        maxlnLike = max(lnLike)
+        maxLikeParams = s[lnLike.argmax()]
+        print 'Max ln likelihood %f at parameters:' % maxlnLike
+        print maxLikeParams
 
     if params is None:
         params=xrange(s.shape[1])
     
-    for param in params:
+    for param,ML in zip(params, maxLikeParams):
         s1 = s.T[param]
         
         mean = s1.mean()
         stdv = s1.std()  ## stddev(s1)
-        print 'mean = %f +- %f' % (mean, stdv)        
+        print 'mean = %f +- %f | ML = %f' % (mean, stdv, ML)        
         
-    return
+    return (maxlnLike, maxLikeParams)
     
 
 def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, derived=True):
@@ -146,7 +148,7 @@ def scatter2d(MCMC, params, **kwargs):
 
     return axis.scatter(s1,s2, s=.01, edgecolors='none', **kwargs)
 
-def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True):
+def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True, maxlnLike=[]):
     """
     make a 2d grid of histograms and scatterplots of the selected parameters
     """
@@ -159,9 +161,11 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         lnLike = None
         
     if lnLike is not None: 
-        print 'Max ln likelihood %f at parameters:' % max(lnLike)
-        print s[lnLike.argmax()]
-
+        maxlnLike = max(lnLike)
+        maxLikeParams = s[lnLike.argmax()]
+        print 'Max ln likelihood %f at parameters:' % maxlnLike
+        print maxLikeParams
+        
     if params is None:
         # try:   ### removed June 2010 to deal with derived parmaters. Don't need this case?
         #     params = MCMC.paramBlocks
@@ -211,7 +215,10 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
             ax.set_xlabel(labels[par])
             
     if not quiet: plt.draw()
-
+    
+    if lnLike is not None:
+        return (maxlnLike, maxLikeParams)
+    
 
 ### no longer needed -- array.std() now uses 1/N
 def stddev(arr):
