@@ -12,16 +12,15 @@ from __future__ import division
 import sys
 import os
 
-import numpy as np
+import operator
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 import MCMC
-
 import likelihood
 import data
 import model
-
 import getdist
 
 
@@ -31,7 +30,15 @@ fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 
 def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0):
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0, savefig=False):
+        
+        
+    ret = []
+        
+    if not operator.isSequenceType(i):
+        idata = [i]
+    else:
+        idata = i
         
     ## read the data
     if DLC:
@@ -39,64 +46,107 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
-    try:
-        dat = alldata[i]
-        name = dat.name + "(z=%4.2f)" % (dat.z)
-    except TypeError:
-        dat = [alldata[ii] for ii in i]
-        name = " + ".join(str(int(d.name)) for d in dat)
+    for i in idata:
         
-    print "Object[s] %s" % name
-    
-    ## initialize the model (with a class, not an object)
-    if getNorm:
-        if onecomponent:
-            mod = model.submmModel1_normalized_logA
-        else:
-            mod = model.submmModel2_normalized_logA
-        like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)        
-    else:
-        if onecomponent:
-            mod = model.submmModel1
-            like = likelihood.SEDLikelihood1(data=dat, model=mod)
-        else:
-            mod = model.submmModel2            
-            like = likelihood.SEDLikelihood2(data=dat, model=mod)
-        
-    if start is None: 
-        start_params = np.asarray(mod.startfrom(random=False))
-    else:
-        start_params = np.asarray(start)
-    if sigmas is None:
-        prop_sigmas = start_params/4.0
-    else:
-        prop_sigmas = sigmas
-        
-    if nDerived is not None:
-        like.nDerived = nDerived
-    
-    mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
-                        fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
-
-    if not noPlots:
-
-        plt.figure(fig0)
-        lnLike = []
-        maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1])
-        plt.suptitle(name)
-    
-        plt.figure(fig0+2)
-        params = ana[0]
-        meanmod = mod(*params)
-        MLmod = mod(*maxLikeParams)
         try:
-            meanmod.plot(dat, wavelength=True, logplot=True)
-            MLmod.plot(dat, wavelength=True, logplot=True)
-            plt.suptitle(name)    
-        except AttributeError:
-            pass
+            dat = alldata[i]
+            name = dat.name + "(z=%4.2f)" % (dat.z)
+        except TypeError:
+            dat = [alldata[j] for j in i]
+            name = " + ".join(str(int(d.name)) for d in dat)
+        
+        print "Object[s] %s" % name
     
-    return mcmc, ana, (maxlnLike, maxLikeParams)
+        ## initialize the model (with a class, not an object)
+        if getNorm:
+            if onecomponent:
+                mod = model.submmModel1_normalized_logA
+            else:
+                mod = model.submmModel2_normalized_logA
+            like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)        
+        else:
+            if onecomponent:
+                mod = model.submmModel1
+                like = likelihood.SEDLikelihood1(data=dat, model=mod)
+            else:
+                mod = model.submmModel2            
+                like = likelihood.SEDLikelihood2(data=dat, model=mod)
+        
+        if start is None: 
+            start_params = np.asarray(mod.startfrom(random=False))
+        else:
+            start_params = np.asarray(start)
+        if sigmas is None:
+            prop_sigmas = start_params/4.0
+        else:
+            prop_sigmas = sigmas
+        
+        if nDerived is not None:
+            like.nDerived = nDerived
+    
+        mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
+                            fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
+
+        if not noPlots:
+
+            fig = plt.figure(fig0)
+            lnLike = []
+            maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1])
+            plt.suptitle(name)
+    
+            if savefig:
+                try:
+                    fname = name + savefig
+                except TypeError:
+                    fname = name
+                    
+                fig.savefig(fname+"_0.png")
+                plt.close(fig)
+    
+            fig=plt.figure(fig0+1)
+            params = ana[0]
+            meanmod = mod(*params)
+            MLmod = mod(*maxLikeParams)
+            try:
+                meanmod.plot(dat, wavelength=True, logplot=True)
+                MLmod.plot(dat, wavelength=True, logplot=True)
+                plt.suptitle(name)    
+            except AttributeError:
+                pass
+            if savefig:
+                fig.savefig(fname+"_1.png")
+                plt.close(fig)
+                
+            fig0 += 2
+    
+        ret.append((mcmc, ana, (maxlnLike, maxLikeParams))) 
+    
+    if len(ret) == 1:
+        ret = ret[0]
+        
+    return ret
+
+def many():
+    
+    idata =[i*50 for i in range(6,29)]
+    
+    nMC = (15000,100000)
+
+    print "Two-Component beta = 2"
+    ret1 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
+                start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), 
+                nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
+
+    print "One-Component"
+    ret2 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
+                start=(1,2.,10), sigmas=(1,2,2),
+                nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
+                
+    print "One-Component beta = 2"
+    ret3 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
+                start=(1,2.,10), sigmas=(1,0,2),
+                nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
+                
 
 
 def plotter(sampler):
