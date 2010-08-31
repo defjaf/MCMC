@@ -30,7 +30,7 @@ fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 
 def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0, savefig=False):
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0, savefig=False, retMCMC=True):
         
         
     ret = []
@@ -119,7 +119,10 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
                 
             fig0 += 2
     
-        ret.append((mcmc, ana, (maxlnLike, maxLikeParams))) 
+        if retMCMC:
+            ret.append((mcmc, ana, (maxlnLike, maxLikeParams))) 
+        else:
+            ret.append((ana, (maxlnLike, maxLikeParams))) 
     
     if len(ret) == 1:
         ret = ret[0]
@@ -134,20 +137,21 @@ def many():
 
     print "Two-Component beta = 2"
     ret1 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), 
+                start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
                 nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
 
     print "One-Component"
     ret2 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10), sigmas=(1,2,2),
+                start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
                 nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
                 
     print "One-Component beta = 2"
     ret3 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10), sigmas=(1,0,2),
+                start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
                 nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
                 
-
+    return ret1, ret2, ret3
+    
 
 def plotter(sampler):
     """
