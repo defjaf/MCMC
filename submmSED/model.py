@@ -6,7 +6,7 @@ import math
 import matplotlib.pyplot as plt
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max
 
-import numexpr as ne
+#import numexpr as ne
 
 speed_of_light = 299792.458 ### micron GHz
 

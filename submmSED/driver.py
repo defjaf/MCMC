@@ -15,6 +15,11 @@ import os
 import operator
 
 import numpy as np
+
+if __name__ == "__main__":
+    import matplotlib
+    matplotlib.use("AGG")
+    
 import matplotlib.pyplot as plt
 
 import MCMC
@@ -22,6 +27,8 @@ import likelihood
 import data
 import model
 import getdist
+
+import cPickle as pickle
 
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
@@ -122,6 +129,7 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
         if retMCMC:
             ret.append((mcmc, ana, (maxlnLike, maxLikeParams))) 
         else:
+            del mcmc
             ret.append((ana, (maxlnLike, maxLikeParams))) 
     
     if len(ret) == 1:
@@ -129,29 +137,107 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
         
     return ret
 
-def many():
-    
-    idata =[i*50 for i in range(6,29)]
-    
-    nMC = (15000,100000)
+idata =[i*50 for i in range(6,29)]
+nMC = (15000,100000)
 
-    print "Two-Component beta = 2"
-    ret1 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
-                nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
+def many(which = range(3), idata=idata, nMC = nMC):
+    
+    ret1 = ret2 = ret3 = []
 
-    print "One-Component"
-    ret2 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
-                nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
+    if 0 in which:
+        print "Two-Component beta = 2"
+        ret1 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+                    start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
+
+    if 1 in which:
+        print "One-Component"
+        ret2 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+                    start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
+                    nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
                 
-    print "One-Component beta = 2"
-    ret3 = main("submmSED/ercsc_iifscz.txt", getNorm=True, i = idata, 
-                start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
-                nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
+    if 2 in which:
+        print "One-Component beta = 2"
+        ret3 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+                    start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
+                    nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
                 
     return ret1, ret2, ret3
     
+
+def postprocess():
+    
+    ret = []
+    idxs = [[0,2,3,5], [0,1,2], [0,2]]
+    for i in range(3):
+        fname = "out_[%d].pickle" % i
+        with open(fname) as f:
+            ret0 = pickle.load(f)
+            
+        ix = idxs[i]
+        ret0 = ret0[i]
+        nobj = len(ret0)
+        npar = len(ix)
+        
+        dt = np.dtype([
+            ('mean', np.float, (npar,)), 
+            ('sig', np.float, (npar,)), 
+            ('covar', np.float, (npar,npar)), 
+            ('ML', np.float),
+            ('ev', np.float),
+            ('MLpar', np.float, (npar,))
+        ])
+        ret_i = np.empty(nobj, dtype = dt)
+        
+        ### each of ret[i] has format
+        ## [ <for each object>... 
+        ##   (
+        ##     ([parameter means], [parameter sigmas], [normalized covar]),
+        ##     (ML, [ML params])
+        #    )
+        ## ...]
+ 
+        for iobj, obj in enumerate(ret0):
+            ret_i[iobj]['mean'][:] = np.array(obj[0][0])[ix]
+            ret_i[iobj]['sig'][:] = np.array(obj[0][1])[ix]
+            covar = np.array(obj[0][2])[:,ix][ix]
+            ML = obj[1][0]
+            ret_i[iobj]['covar'][:,:] = covar
+            ret_i[iobj]['ML'] = ML
+            ret_i[iobj]['ev'] = ML + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
+            ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
+        
+        ret.append(ret_i)
+    
+    return ret
+
+names = [
+"F23301-4313(z=0.09)",
+"F13408-2026(z=0.05)",
+"F23398-6613(z=0.04)",
+"F23446-6402(z=0.03)",
+"F14187+7149(z=0.03)",
+"F14383+6213(z=0.02)",
+"F11510+4344(z=0.02)",
+"F14165+2510(z=0.02)",
+"F15052+1946(z=0.02)",
+"F14262+3237(z=0.01)",
+"F01370-4912(z=0.01)",
+"F20397-5332(z=0.01)",
+"F10126+7338(z=0.01)",
+"F12227+0512(z=0.01)",
+"F08554+5357(z=0.01)",
+"F11497-2637(z=0.01)",
+"F12319+0227(z=0.01)",
+"F11593-1836(z=0.01)",
+"F14366+0534(z=0.01)",
+"F03161-2747(z=0.00)",
+"F12498-0055(z=0.00)",
+"F10518+1736(z=0.00)",
+"F04046-2118(z=0.00)"
+]
+names.reverse()
+
 
 def plotter(sampler):
     """
@@ -196,5 +282,16 @@ def plotter(sampler):
 
 
 if __name__ == '__main__':
-    main()
+    which = []
+    for s in reversed(sys.argv):
+        try:
+            which.append(int(s))
+        except ValueError:
+            break
+    print "which=", which
+    ret = many(which)
+    with open("out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
+        pickle.dump(ret, f)
+    
+    
 
