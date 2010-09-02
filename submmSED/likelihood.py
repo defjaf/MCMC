@@ -1,7 +1,13 @@
 from __future__ import division
 import Likelihood
 
-from numpy import linalg, dot, log, empty, log10
+from numpy import dot, log, empty, log10
+
+
+try:
+    from scipy import linalg
+except ImportError:
+    from numpy import linalg    
 
 from Likelihood import ZeroPosterior
 
@@ -54,7 +60,7 @@ class SEDLikelihood2(Likelihood.Likelihood):
         ## solve for (FNiF) z = (FNid) for z = (FNiF)^{-1} (FNid)
         ## NB. z is the ML value of the marginalized amplitudes!!!
         try:
-            self.MLamplitude = linalg.solve(FNiF, FNid)
+            self.MLamplitude = linalg.solve(FNiF, FNid, overwrite_a=True, overwrite_b=True, sym_pos=True)
         except linalg.LinAlgError:
             raise ZeroPosterior
 
@@ -65,7 +71,7 @@ class SEDLikelihood2(Likelihood.Likelihood):
         if dodet:
             return 0.5 * (dot(FNid.transpose(), self.MLamplitude) - log(detFNiF))
         else:
-            return 0.5 * (dot(FNid.transpose(), self.MLamplitude))
+            return 0.5 * dot(FNid.transpose(), self.MLamplitude)
             
         
     nDerived = 2  ## actually it depends on the dimension of, e.g., model_vals

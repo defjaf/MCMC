@@ -23,6 +23,7 @@ import Proposal
 ####  TODO: use amplitude>0 prior???
 
 h_over_k = 0.04799237 ###  K/Ghz
+prefac = 1.0e-10 #### FIXME: find a physical definition to go here
 
 minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
@@ -31,11 +32,10 @@ minb, maxb = 0., 3.
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
     
-    if T==0:
-        return 0
+    # if T==0:
+    #     return 0
         
     x = h_over_k*nu/T
-    prefac = 1.0e-10 #### FIXME: find a physical definition to go here
     with errstate(over='ignore'):
       #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
         return prefac*nu**3/(exp(x)-1)

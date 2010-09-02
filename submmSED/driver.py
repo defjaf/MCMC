@@ -127,17 +127,22 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
             fig0 += 2
     
         if retMCMC:
-            ret.append((mcmc, ana, (maxlnLike, maxLikeParams))) 
+            ret.append((mcmc, ana, (maxlnLike, maxLikeParams), name)) 
         else:
             del mcmc
-            ret.append((ana, (maxlnLike, maxLikeParams))) 
+            ret.append((ana, (maxlnLike, maxLikeParams), name)) 
     
     if len(ret) == 1:
         ret = ret[0]
         
     return ret
+    
+    
 
-idata =[i*50 for i in range(6,29)]
+# idata =[i*50 for i in range(6,29)]
+# nMC = (15000,100000)
+
+idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 
 def many(which = range(3), idata=idata, nMC = nMC):
@@ -170,9 +175,13 @@ def postprocess():
     ret = []
     idxs = [[0,2,3,5], [0,1,2], [0,2]]
     for i in range(3):
-        fname = "out_[%d].pickle" % i
-        with open(fname) as f:
-            ret0 = pickle.load(f)
+        
+        fname = "out_[%d].pickle" % i        
+        try:
+            with open(fname) as f:
+                ret0 = pickle.load(f)
+        except IOError:
+            continue
             
         ix = idxs[i]
         ret0 = ret0[i]
@@ -180,6 +189,7 @@ def postprocess():
         npar = len(ix)
         
         dt = np.dtype([
+            ('name', 'S19'),
             ('mean', np.float, (npar,)), 
             ('sig', np.float, (npar,)), 
             ('covar', np.float, (npar,npar)), 
@@ -193,11 +203,13 @@ def postprocess():
         ## [ <for each object>... 
         ##   (
         ##     ([parameter means], [parameter sigmas], [normalized covar]),
-        ##     (ML, [ML params])
+        ##     (ML, [ML params]),
+        ##     name    !!! added in recent versions
         #    )
         ## ...]
  
         for iobj, obj in enumerate(ret0):
+            ret_i[iobj]['name'] = obj[2]
             ret_i[iobj]['mean'][:] = np.array(obj[0][0])[ix]
             ret_i[iobj]['sig'][:] = np.array(obj[0][1])[ix]
             covar = np.array(obj[0][2])[:,ix][ix]
@@ -238,6 +250,38 @@ names = [
 ]
 names.reverse()
 
+def writeTabAll(ret123, fbase, ext='.npy'):
+    for i, r in enumerate(ret123):
+        fname = fbase + str(i) + ext
+        writeTab(r, fname)
+        
+
+def writeTab(ret, fname, names=names):
+    """ write the output of the postprocess function to a text file 
+        run separately on each of the elements of postprocess()
+     """
+     
+    try:
+        anames = ret['name']
+    except ValueError:
+        anames = np.array(names)
+
+    anames.shape = (len(anames),1)
+    alls = np.hstack([anames, ret['MLpar'], ret['sig']])
+        
+    npar = len(ret['MLpar'][0])
+    hdr = ['Name']
+    for i in range(npar):
+        hdr.append("ML param %d" % i)
+    for i in range(npar):
+        hdr.append("sigma param %d" % i)
+    hdr = ("%19s "*(2*npar+1)) % tuple(hdr)
+    with open(fname, 'w') as f:
+        f.write(hdr + '\n')
+        np.savetxt(f, alls, fmt="%19s", delimiter=' ')
+        
+        
+        
 
 def plotter(sampler):
     """
