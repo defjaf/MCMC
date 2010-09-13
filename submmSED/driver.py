@@ -170,13 +170,13 @@ def many(which = range(3), idata=idata, nMC = nMC):
     return ret1, ret2, ret3
     
 
-def postprocess():
+def postprocess(dirname="./"):
     
     ret = []
     idxs = [[0,2,3,5], [0,1,2], [0,2]]
     for i in range(3):
         
-        fname = "out_[%d].pickle" % i        
+        fname = dirname+"out_[%d].pickle" % i        
         try:
             with open(fname) as f:
                 ret0 = pickle.load(f)
@@ -223,40 +223,19 @@ def postprocess():
     
     return ret
 
-names = [
-"F23301-4313(z=0.09)",
-"F13408-2026(z=0.05)",
-"F23398-6613(z=0.04)",
-"F23446-6402(z=0.03)",
-"F14187+7149(z=0.03)",
-"F14383+6213(z=0.02)",
-"F11510+4344(z=0.02)",
-"F14165+2510(z=0.02)",
-"F15052+1946(z=0.02)",
-"F14262+3237(z=0.01)",
-"F01370-4912(z=0.01)",
-"F20397-5332(z=0.01)",
-"F10126+7338(z=0.01)",
-"F12227+0512(z=0.01)",
-"F08554+5357(z=0.01)",
-"F11497-2637(z=0.01)",
-"F12319+0227(z=0.01)",
-"F11593-1836(z=0.01)",
-"F14366+0534(z=0.01)",
-"F03161-2747(z=0.00)",
-"F12498-0055(z=0.00)",
-"F10518+1736(z=0.00)",
-"F04046-2118(z=0.00)"
-]
-names.reverse()
 
-def writeTabAll(ret123, fbase, ext='.npy'):
+def writeTabAll(ret123, fbase, ext='.npy', dirname=None):
+    if dir is not None:
+        ret123 = postprocess(dirname)
+        
     for i, r in enumerate(ret123):
         fname = fbase + str(i) + ext
         writeTab(r, fname)
         
+    return ret123
+        
 
-def writeTab(ret, fname, names=names):
+def writeTab(ret, fname, names=None):
     """ write the output of the postprocess function to a text file 
         run separately on each of the elements of postprocess()
      """
@@ -281,8 +260,6 @@ def writeTab(ret, fname, names=names):
         np.savetxt(f, alls, fmt="%19s", delimiter=' ')
         
         
-        
-
 def plotter(sampler):
     """
     make a plot from the results of the sampler

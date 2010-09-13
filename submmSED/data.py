@@ -72,8 +72,14 @@ def readfluxes_DLC(filename):
     return data
         
         
-def readfluxes_ERCSC_TopCat(filename):
-    """read fluxes from a TopCat file (complicated format)"""
+def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
+    """read fluxes from a TopCat file (complicated format)
+    if upperlim, then convert detections at less than (upperlim*sigma) 
+    into upper limits
+       (specifically, set <f>=0,
+            flux<0 gets sig<=2*sig, and flux>0 get sig<=2*flux
+    if delete_upperlim, then delete detections at less than (upperlim*sigma) 
+    """
     
     # dtype = [('Flux217', np.float64), ('Err217', np.float64), 
     #           ('Flux353', np.float64), ('Err353', np.float64), 
@@ -121,14 +127,33 @@ def readfluxes_ERCSC_TopCat(filename):
     data = []
     for obj in lines:
         
-        ## convert Planck fluxes to mJy from Jy
-        flux = asarray([1e-3*obj[i] for i in Planck_idx] + [obj[i] for i in IRAS_idx])
-        sig  = asarray([1e-3*obj[i+1] for i in Planck_idx] + [ef*obj[i] for i, ef in zip(IRAS_idx, err_IRAS)])
-
         name = obj[8].strip()
         name_alt = obj[17].strip()
         zspec = obj[15]
         z = obj[16]
+
+        ## convert Planck fluxes to mJy from Jy
+        flux = asarray([1e-3*obj[i] for i in Planck_idx] + [obj[i] for i in IRAS_idx])
+        sig  = asarray([1e-3*obj[i+1] for i in Planck_idx] + [ef*obj[i] for i, ef in zip(IRAS_idx, err_IRAS)])
+
+        if delete_upperlim:
+            idx_good = np.logical_and(flux>0, flux/sig>upperlim)
+            flux = flux[idx_good]
+            sig = sig[idx_good]
+            nu_obs = nu_obs[idx_good]
+            if not np.all(idx_good):
+                name += "D"
+        elif upperlim:
+            idx_lt0 = flux<0
+            idx_gt0 = np.logical_and(flux > 0, flux/sig<upperlim)
+            idx = np.logical_or(idx_lt0, idx_gt0)
+            if np.any(idx):
+                flux_gt0 = flux[idx_gt0]
+                sig[idx_lt0] = 2*sig[idx_lt0]
+                flux[idx] = 0.01*sig[idx]
+                sig[idx_gt0] = 2*flux_gt0
+                name += "U"
+
         nu_rest = nu_obs*(1.+zspec)
 
         data.append(submmData(nu_rest, flux, sig, name, zspec, 
