@@ -35,9 +35,10 @@ import cPickle as pickle
 
 fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
+fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 
-def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, fig0=0, savefig=False, retMCMC=True):
+def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True):
         
         
     ret = []
@@ -50,6 +51,8 @@ def main(filename=fname_ERCSC, i=0, rotateParams=False, onecomponent=True, getNo
     ## read the data
     if DLC:
         alldata = data.readfluxes_DLC(filename)
+    elif MRR:
+        alldata = data.readfluxes_MRR(filename)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -149,21 +152,23 @@ def many(which = range(3), idata=idata, nMC = nMC):
     
     ret1 = ret2 = ret3 = []
 
+    fil = "./ercsc_iifscz.txt"
+
     if 0 in which:
         print "Two-Component beta = 2"
-        ret1 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+        ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
 
     if 1 in which:
         print "One-Component"
-        ret2 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+        ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
                 
     if 2 in which:
         print "One-Component beta = 2"
-        ret3 = main("./ercsc_iifscz.txt", getNorm=True, i = idata, 
+        ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
                 

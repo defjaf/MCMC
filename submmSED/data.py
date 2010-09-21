@@ -47,11 +47,14 @@ class submmData(GaussianData):
         else:
             plt.plot(x, self.d, fmt)
         one_e = 1.0 - 1e-10
-        sigs = [np.min([one_e*self.d, self.sig],axis=0), self.sig]
-        plt.errorbar(x, self.d, sigs, fmt=None)
+        #sigs = [np.min([one_e*self.d, self.sig],axis=0), self.sig]
+        sigs = self.sig
+        plt.errorbar(x, self.d, sigs, fmt=fmt)
         if lab:
             plt.xlabel(xlab)
             plt.ylabel("flux")
+            
+        plt.ylim(ymin=self.d[self.d>0].min()/10.)
 
 
 def readfluxes_DLC(filename):
@@ -147,36 +150,39 @@ def readfluxes_MRR(filename):
     lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
     nu_Planck = asarray([857., 545., 353., 217.])  ## GHz
         
-    
-    nu_IRAS = speed_of_light/lambda_IRAS  ## GHz
-    nu_obs = concatenate((nu_Planck, nu_IRAS))
-    
-    lines = np.genfromtxt(filename, dtype=dtype, delimiters=delims)
+    lines = np.genfromtxt(filename, dtype=dtype, delimiter=delims)
     
     data = []
     for obj in lines:
         z = obj['z']
-        nu_rest = (1+z)*nu_obs
         name = obj['nameIRAS']
+        nu_obs = list(nu_Planck)
         flux =  [1e-3*obj[i] for i in ['s%d' % int(f) for f in nu_Planck]] 
         sig  =  [1e-3*obj[i] for i in ['e%d' % int(f) for f in nu_Planck]] 
         for i,lam in enumerate(lambda_IRAS):
             if i in IRAS_ignore: 
                 continue
+                
+            nu_obs += [speed_of_light/lam]
             nq = obj['nq%d' % (i+1)]
             flx = obj['s%d' % int(lam)]
             if nq == 1: # upperlimit 
-                flux += [0.01*flx]
+                flux += [0.0] ##[0.01*flx]
                 sig += [flx]
-            elif nq == 2:# low qual -- sig = flux
+            elif nq == 2:# low qual -- sig = 0.5*flux 
                 flux += [flx]
-                sig += [flx]
+                sig += [0.5*flx]
             elif nq == 3: # high qual -- sig = 0.1 * flux
                 flux += [flx]
-                sig += [errfrac*flx]
+                sig += [0.1*flx]
+            elif nq == 5:  ##nb. don't know what '5' means!
+                flux += [flx]
+                sig += [flx]
+            else:
+                print 'got nq=%d at %s' % (nq, name)
                 
-        
-                
+        nu_obs = asarray(nu_obs)
+        nu_rest = (1+z)*nu_obs
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
 
     return data
@@ -260,7 +266,7 @@ def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
             if np.any(idx):
                 flux_gt0 = flux[idx_gt0]
                 sig[idx_lt0] = 2*sig[idx_lt0]
-                flux[idx] = 0.01*sig[idx]
+                flux[idx] = 0 ##0.01*sig[idx]
                 sig[idx_gt0] = 2*flux_gt0
                 name += "U"
 
