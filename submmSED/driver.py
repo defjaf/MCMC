@@ -147,12 +147,15 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
 
 idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
+#    fil = "./ercsc_iifscz.txt"
+fil = "./ERCSCalliifscz4550850.dat"
 
-def many(which = range(3), idata=idata, nMC = nMC):
+
+def many(which = range(3), idata=idata, nMC = nMC, fil=fil):
+
+    print "Using file %s" % fil
     
     ret1 = ret2 = ret3 = []
-
-    fil = "./ercsc_iifscz.txt"
 
     if 0 in which:
         print "Two-Component beta = 2"
