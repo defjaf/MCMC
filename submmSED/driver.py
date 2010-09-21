@@ -42,7 +42,8 @@ fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 
 def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True):
+         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
+         fdir = "./"):
         
         
     ret = []
@@ -110,9 +111,9 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
     
             if savefig:
                 try:
-                    fname = name + savefig
+                    fname = fdir+name + savefig
                 except TypeError:
-                    fname = name
+                    fname = fdir+name
                     
                 fig.savefig(fname+"_0.png")
                 plt.close(fig)
@@ -120,7 +121,8 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             fig=plt.figure(fig0+1)
             params = ana[0]
             meanmod = mod(*params)
-            meanlnProb = like.lnPr(meanmod) + mod.prior(*params) #### AHJ: NOT TESTED
+            meanlnProb = like.lnPost(params)
+            print "ln Pr of mean = %f" % meanlnProb
             MLmod = mod(*maxLikeParams)
             try:
                 meanmod.plot(dat, wavelength=True, logplot=True)
@@ -157,7 +159,7 @@ idata = range(726)
 fil = "./ERCSCalliifscz4550850.dat"
 
 
-def many(which = range(3), idata=idata, nMC = nMC, fil=fil):
+def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./"):
 
     print "Using file %s" % fil
     
@@ -167,19 +169,19 @@ def many(which = range(3), idata=idata, nMC = nMC, fil=fil):
         print "Two-Component beta = 2"
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
-                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2")
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=100, savefig="1comp")
+                    nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=200, savefig="1comp_b2")
+                    nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir)
                 
     return ret1, ret2, ret3
     
@@ -327,6 +329,7 @@ def simul():
 
 
 if __name__ == '__main__':
+    fdir = "./figs0921a/"
     which = []
     for s in reversed(sys.argv):
         try:
@@ -334,7 +337,7 @@ if __name__ == '__main__':
         except ValueError:
             break
     print "which=", which
-    ret = many(which)
+    ret = many(which, fdir=fdir)
     with open("out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
         pickle.dump(ret, f)
     

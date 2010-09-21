@@ -127,7 +127,7 @@ class Likelihood(object):
         """
         return self.lnLike(params) + self.lnNorm()
 
-    def lnPost(self):
+    def lnPost(self, params):
         """
         return the parameter-independent part of the ln-posterior
         """
