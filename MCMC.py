@@ -184,6 +184,7 @@ class MCMC(object):
             self.derived = concatenate((self.derived, newDerived))
     
     
+    ## would it be faster (possibly cython-able) to lift this up into MC_append and refactor the whole range(nMC) loop?
     def sample(self):
         """ get a single next sample from the chain; nb in 'native' format """
         
