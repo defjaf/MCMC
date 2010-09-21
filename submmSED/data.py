@@ -22,12 +22,12 @@ class submmData(GaussianData):
     """
 
     def __init__(self, freq, flux, sigma, name, z, nu_obs=None, z_alt=None, name_alt=None):
-        GaussianData.__init__(self, flux, sigma)        
+        GaussianData.__init__(self, asarray(flux), asarray(sigma))        
         self.freq=asarray(freq)
         #self.name = asarray(name)
         self.name = str(name)
         self.z = asarray(z)
-        self.freq_obs = nu_obs
+        self.freq_obs = asarray(nu_obs)
         self.z_alt = z_alt
         self.name_alt = name_alt
 
@@ -141,12 +141,12 @@ def readfluxes_MRR(filename):
             ['a6']*2  + ['a23','a22','a22']
     }
     
-    errfrac = 0.1   ### fractional error for IRAS
+    errfrac = 0.1   ### fractional error for IRAS high-quality
+    IRAS_ignore=set()  ### indices 0...3 of IRAS wavelengths to ignore
+
     lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
-    err_IRAS = asarray([0, 1.0, 0.1, 0.1])
     nu_Planck = asarray([857., 545., 353., 217.])  ## GHz
         
-    IRAS_ignore=set()  ### indices 0...3 of IRAS wavelengths to ignore
     
     nu_IRAS = speed_of_light/lambda_IRAS  ## GHz
     nu_obs = concatenate((nu_Planck, nu_IRAS))
@@ -165,15 +165,17 @@ def readfluxes_MRR(filename):
                 continue
             nq = obj['nq%d' % (i+1)]
             flx = obj['s%d' % int(lam)]
-            if nq == 1: # upperlimit
+            if nq == 1: # upperlimit 
                 flux += [0.01*flx]
                 sig += [flx]
-            elif nq == 2:# low qual
+            elif nq == 2:# low qual -- sig = flux
                 flux += [flx]
                 sig += [flx]
-            elif nq == 3: # high qual
+            elif nq == 3: # high qual -- sig = 0.1 * flux
                 flux += [flx]
-                sig += [ef*flx]
+                sig += [errfrac*flx]
+                
+        
                 
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
 
