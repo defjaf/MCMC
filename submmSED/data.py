@@ -57,7 +57,7 @@ class submmData(GaussianData):
 def readfluxes_DLC(filename):
     """read fluxes from a DLC file: each line is [name f1 e1 f2 e2 f3 e3 f3 e4 z]"""
     lines = loadtxt(filename, skiprows=2)
-    
+
     lambda_obs = asarray([60.0, 100, 450, 850]) ## microns
     nu_obs = speed_of_light/lambda_obs ### GHz
     data = []
@@ -68,10 +68,118 @@ def readfluxes_DLC(filename):
         sig  = obj[2:9:2]
         name = str(int(name))
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
-        
+
     return data
+
+
+
+
+def readfluxes_MRR(filename):
+    """
+    read fluxes from an MRR file. 
+    
+           read(4,135)nameIRAS, ra, dec, posFlag,
+         1 s12, s25, s60, s100, nq1, nq2, nq3, nq4,
+         2 am1, am2, am3, am4, am5, am6, am7, am8, em1, em2, em3, em4,
+         3 em5,em6, em7,em8, photFlag,FINT, EFINT,
+         4 zspec, zspecFlag, zneur, zneurerr, ztem,z,
+         5 j2, av1, err1, zneurFlag, amb2, alb,
+         6 alp1, alp2, alp3, alp4,alcirr, alsb, ala220, alagn, alir,
+         7 nirtem, errir3,als12, als25, als60, als90, als100, als110,
+         8 als140,als160, als250, als350,als500, als850,als1250,
+         1  als1380,nirflag,
+         2  ra1,dec1,s857,e857,s217,e217,s353,e353,s545,e545,
+         3  glon,glat,dist,
+         9 nedtp, sdsstp, nameNED, nameSDSS, name2MASS
+
+    135    format(a12,1x,2(f10.5,1x),i3,1x,4(f9.3,1x),4(i2,1x),3x,
+         1 16(f7.2,1x),i3,3x,f13.5,1x,f10.5,1x,f10.6,1x,i3,1x,
+         2 4(f10.6,1x),
+         2 i2,1x,f5.2,1x,f10.3,1x,i3,1x,f7.2,1x,f7.2,3x,4(f7.4,1x),
+         3 4(f7.2,1x),3x,f7.2,1x,i4,3x,f10.3,1x,14(f6.2,1x),i3,1x,
+         1  3x,2f10.5,8f11.2,2f10.5,f12.3,3x,
+         4 2(a6,1x),a23,1x,a22,1x,a22)
+
+
+    Most of the parameters are from the IIFSCz catalogue, for which there is a 
+    readme file at http://astro.ic.ac.uk/~mrr/fss/readmefss
+    
+    """
+    
+    ## field widths (including whitespace separators)
+    delims = (13, 11, 11, 4) + 4*(10,) + (3,3,3,6) +\
+             16*(8,) + (6,14,11,11,4) + \
+             4*(11,) + \
+             (3,6,11,4,8,10) + 4*(8,) +\
+             (8,8,8,11) + (8,7,11) + 14*(7,) + (7,) +\
+             2*(10,) + 8*(11,) + 2*(10,)+(15,)+\
+             2*(7,) + (24,23,22)
+    
+    dtype = {
+        'names': [
+            'nameIRAS', 'ra', 'dec', 'posFlag',
+            's12', 's25', 's60', 's100', 'nq1', 'nq2', 'nq3', 'nq4',
+            'am1', 'am2', 'am3', 'am4', 'am5', 'am6', 'am7', 'am8', 'em1', 'em2', 'em3', 'em4',
+            'em5', 'em6', 'em7', 'em8', 'photFlag', 'FINT', 'EFINT',
+            'zspec', 'zspecFlag', 'zneur', 'zneurerr', 'ztem', 'z',
+            'j2', 'av1', 'err1', 'zneurFlag', 'amb2', 'alb',
+            'alp1', 'alp2', 'alp3', 'alp4', 'alcirr', 'alsb', 'ala220', 'alagn', 'alir',
+            'nirtem', 'errir3', 'als12', 'als25', 'als60', 'als90', 'als100', 'als110',
+            'als140', 'als160', 'als250', 'als350', 'als500', 'als850', 'als1250',
+            'als1380', 'nirflag',
+            'ra1', 'dec1', 's857', 'e857', 's217', 'e217', 's353', 'e353', 's545', 'e545',
+            'glon', 'glat', 'dist',
+            'nedtp', 'sdsstp', 'nameNED', 'nameSDSS', 'name2MASS'
+        ],
+        'formats': 
+            ['a12'] + ['f']*2 + ['i'] + ['f']*4 + ['i']*4 +
+            ['f']*16 + ['i','f','f','f','i'] +
+            ['f']*4 +
+            ['i','f','f','i','f','f'] + ['f']*4 +
+            ['f']*4 + ['f','i','f'] + ['f']*14 +['i'] +
+            ['f']*2 +['f']*8 +['f']*2 + ['f'] + 
+            ['a6']*2  + ['a23','a22','a22']
+    }
+    
+    errfrac = 0.1   ### fractional error for IRAS
+    lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
+    err_IRAS = asarray([0, 1.0, 0.1, 0.1])
+    nu_Planck = asarray([857., 545., 353., 217.])  ## GHz
         
-        
+    IRAS_ignore=set()  ### indices 0...3 of IRAS wavelengths to ignore
+    
+    nu_IRAS = speed_of_light/lambda_IRAS  ## GHz
+    nu_obs = concatenate((nu_Planck, nu_IRAS))
+    
+    lines = np.genfromtxt(filename, dtype=dtype, delimiters=delims)
+    
+    data = []
+    for obj in lines:
+        z = obj['z']
+        nu_rest = (1+z)*nu_obs
+        name = obj['nameIRAS']
+        flux =  [1e-3*obj[i] for i in ['s%d' % int(f) for f in nu_Planck]] 
+        sig  =  [1e-3*obj[i] for i in ['e%d' % int(f) for f in nu_Planck]] 
+        for i,lam in enumerate(lambda_IRAS):
+            if i in IRAS_ignore: 
+                continue
+            nq = obj['nq%d' % (i+1)]
+            flx = obj['s%d' % int(lam)]
+            if nq == 1: # upperlimit
+                flux += [0.01*flx]
+                sig += [flx]
+            elif nq == 2:# low qual
+                flux += [flx]
+                sig += [flx]
+            elif nq == 3: # high qual
+                flux += [flx]
+                sig += [ef*flx]
+                
+        data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+
+    return data
+    
+
 def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
     """read fluxes from a TopCat file (complicated format)
     if upperlim, then convert detections at less than (upperlim*sigma) 
