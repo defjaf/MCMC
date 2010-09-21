@@ -175,9 +175,9 @@ def readfluxes_MRR(filename):
             elif nq == 3: # high qual -- sig = 0.1 * flux
                 flux += [flx]
                 sig += [0.1*flx]
-            elif nq == 5:  ##nb. don't know what '5' means!
+            elif nq == 5:  ##    IRAS Large Galaxy Catalogue, equivalent to 3
                 flux += [flx]
-                sig += [flx]
+                sig += [0.1*flx]
             else:
                 print 'got nq=%d at %s' % (nq, name)
                 

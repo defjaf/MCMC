@@ -13,6 +13,7 @@ import sys
 import os
 
 import operator
+import cPickle as pickle
 
 import numpy as np
 
@@ -28,7 +29,7 @@ import data
 import model
 import getdist
 
-import cPickle as pickle
+import joblib
 
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
@@ -36,6 +37,9 @@ import cPickle as pickle
 fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
+
+
+### TODO: add calculation of the likelihood/posterior of the posterior mean params
 
 def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True):
@@ -116,6 +120,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             fig=plt.figure(fig0+1)
             params = ana[0]
             meanmod = mod(*params)
+            meanlnProb = like.lnPr(meanmod) + mod.prior(*params) #### NOT TESTED
             MLmod = mod(*maxLikeParams)
             try:
                 meanmod.plot(dat, wavelength=True, logplot=True)
@@ -133,7 +138,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             ret.append((mcmc, ana, (maxlnLike, maxLikeParams), name)) 
         else:
             del mcmc
-            ret.append((ana, (maxlnLike, maxLikeParams), name)) 
+            ret.append((ana, (maxlnLike, maxLikeParams, meanlnProb), name)) 
     
     if len(ret) == 1:
         ret = ret[0]
@@ -145,9 +150,10 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
 # idata =[i*50 for i in range(6,29)]
 # nMC = (15000,100000)
 
-idata =[i*25 for i in range(12,57)]
+#idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
+idata = range(726)
 fil = "./ERCSCalliifscz4550850.dat"
 
 
@@ -179,6 +185,7 @@ def many(which = range(3), idata=idata, nMC = nMC, fil=fil):
     
 
 def postprocess(dirname="./"):
+    
     
     ret = []
     idxs = [[0,2,3,5], [0,1,2], [0,2]]
@@ -308,6 +315,15 @@ def plotter(sampler):
     #m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
     #c = c1*ell*(ell+1)/(2*N.pi)
     #pylab.plot(ell, c)
+    
+def simul():
+    """ supposed to do embarassingly parallel python launches, but doesn't appear to work... """
+    par = joblib.Parallel(n_jobs=3, verbose=1)
+    ret123 = par(joblib.delayed(many([w])) for w in range(3))
+    with open("out_123.pickle", 'w') as f:
+        pickle.dump(ret123, f)
+        
+    return ret123
 
 
 if __name__ == '__main__':
