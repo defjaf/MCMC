@@ -120,7 +120,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             fig=plt.figure(fig0+1)
             params = ana[0]
             meanmod = mod(*params)
-            meanlnProb = like.lnPr(meanmod) + mod.prior(*params) #### NOT TESTED
+            meanlnProb = like.lnPr(meanmod) + mod.prior(*params) #### AHJ: NOT TESTED
             MLmod = mod(*maxLikeParams)
             try:
                 meanmod.plot(dat, wavelength=True, logplot=True)
@@ -135,10 +135,10 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             fig0 += 2
     
         if retMCMC:
-            ret.append((mcmc, ana, (maxlnLike, maxLikeParams), name)) 
+            ret.append((mcmc, ana, (maxlnLike, maxLikeParams, meanlnProb), name))  ### meanlnProb added
         else:
             del mcmc
-            ret.append((ana, (maxlnLike, maxLikeParams, meanlnProb), name)) 
+            ret.append((ana, (maxlnLike, maxLikeParams, meanlnProb), name))
     
     if len(ret) == 1:
         ret = ret[0]
