@@ -121,7 +121,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             fig=plt.figure(fig0+1)
             params = ana[0]
             meanmod = mod(*params)
-            meanlnProb = like.lnPost(params)
+            meanlnProb = like.lnLike(params)
             print "ln Pr of mean = %f" % meanlnProb
             MLmod = mod(*maxLikeParams)
             try:
