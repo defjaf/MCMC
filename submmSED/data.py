@@ -161,26 +161,31 @@ def readfluxes_MRR(filename):
         sig  =  [1e-3*obj[i] for i in ['e%d' % int(f) for f in nu_Planck]] 
         for i,lam in enumerate(lambda_IRAS):
             if i in IRAS_ignore: 
-                continue
+                continue    ## don't include this frequency
                 
-            nu_obs += [speed_of_light/lam]
             nq = obj['nq%d' % (i+1)]
             flx = obj['s%d' % int(lam)]
+            
+            if flx <= 0:
+                print "skipping lamba=%f for object %s" % (lam, name)
+                continue
+            
             if nq == 1: # upperlimit 
-                flux += [0.0] ##[0.01*flx]
-                sig += [flx]
+                sg = flx
+                flx = 0.0 ##[0.01*flx
             elif nq == 2:# low qual -- sig = 0.5*flux 
-                flux += [flx]
-                sig += [0.5*flx]
+                sg = 0.5*flx
             elif nq == 3: # high qual -- sig = 0.1 * flux
-                flux += [flx]
-                sig += [0.1*flx]
+                sg = 0.1*flx
             elif nq == 5:  ##    IRAS Large Galaxy Catalogue, equivalent to 3
-                flux += [flx]
-                sig += [0.1*flx]
+                sg = 0.1*flx
             else:
                 print 'got nq=%d at %s' % (nq, name)
-                
+                            
+            nu_obs += [speed_of_light/lam]
+            flux += [flx]
+            sig += [sg]
+            
         nu_obs = asarray(nu_obs)
         nu_rest = (1+z)*nu_obs
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))

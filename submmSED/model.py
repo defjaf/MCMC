@@ -29,6 +29,8 @@ minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
 minb, maxb = 0., 3.
 
+
+## TODO: refactor blackbody (and greybody) for use as cython?
 def blackbody(T, nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
     
@@ -39,7 +41,19 @@ def blackbody(T, nu):
     with errstate(over='ignore'):
       #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
         return prefac*nu**3/(exp(x)-1)
-    
+
+def greybody(beta, T, nu):
+    """return the greykody flux at frequency nu for temperature T [CHECK UNITS]"""
+
+    # if T==0:
+    #     return 0
+
+    x = h_over_k*nu/T
+    with errstate(over='ignore'):
+      #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
+        return prefac*nu**(3+beta)/(exp(x)-1)
+
+
     
 class submmModel2(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
@@ -83,12 +97,12 @@ class submmModel2(object):
         return 1.0
 
     def at_nu(self, nu):
-        return asarray([nu**self.b1 * blackbody(self.T1, nu),
-                        nu**self.b2 * blackbody(self.T2, nu)])
+        return asarray([greybody(self.b1, self.T1, nu),
+                        greybody(self.b2, self.T2, nu)])
 
     def at(self, data):
-        return asarray([data.freq**self.b1 * blackbody(self.T1, data.freq), 
-                        data.freq**self.b2 * blackbody(self.T2, data.freq) ]).transpose()
+        return asarray([greybody(self.b1, self.T1, data.freq), 
+                        greybody(self.b2, self.T2, data.freq) ]).transpose()
         
     __call__ = at
 
@@ -137,10 +151,10 @@ class submmModel1(object):
 
 
     def at_nu(self, nu):
-        return nu**self.b * blackbody(self.T, nu) 
+        return greybody(self.b, self.T, nu) 
 
     def at(self, data):
-        return data.freq**self.b * blackbody(self.T, data.freq) 
+        return greybody(self.b, self.T, data.freq) 
         
     __call__ = at    
 
@@ -206,12 +220,12 @@ class submmModel_ratio(object):
         
         
     def at_nu(self, nu):
-        return nu**self.b1 * blackbody(self.T1, nu) + \
-               self.r12 * nu**self.b2 * blackbody(self.T2, nu) 
+        return greybody(self.b1, self.T1, nu) + \
+               self.r12 * greybody(self.b2, self.T2, nu) 
         
     def at(self, data):
-        return data.freq**self.b1 * blackbody(self.T1, data.freq) + \
-               self.r12 * data.freq**self.b2 * blackbody(self.T2, data.freq) 
+        return greybody(self.b1, self.T1, data.freq) + \
+               self.r12 * greybody(self.b2, self.T2, data.freq) 
         
     __call__ = at    
         
@@ -285,12 +299,12 @@ class submmModel2_normalized(object):
 
 
     def at_nu(self, nu):
-        return self.A1 * nu**self.b1 * blackbody(self.T1, nu) + \
-               self.A2 * nu**self.b2 * blackbody(self.T2, nu) 
+        return self.A1 * greybody(self.b1, self.T1, nu) + \
+               self.A2 * greybody(self.b2, self.T2, nu) 
 
     def at(self, data):
-        return self.A1 * data.freq**self.b1 * blackbody(self.T1, data.freq) + \
-               self.A2 * data.freq**self.b2 * blackbody(self.T2, data.freq) 
+        return self.A1 * greybody(self.b1, self.T1, data.freq) + \
+               self.A2 * greybody(self.b2, self.T2, data.freq) 
 
     __call__ = at    
 
@@ -401,10 +415,10 @@ class submmModel1_normalized(submmModel2_normalized):
 
 
     def at_nu(self, nu):
-        return self.A * nu**self.b * blackbody(self.T, nu)
+        return self.A * greybody(self.b, self.T, nu)
 
     def at(self, data):
-        return self.A * data.freq**self.b * blackbody(self.T, data.freq)
+        return self.A * greybody(self.b, self.T, data.freq)
 
     __call__ = at    
 

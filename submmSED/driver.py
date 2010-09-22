@@ -155,7 +155,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(726)
+idata = range(0,726)
 fil = "./ERCSCalliifscz4550850.dat"
 
 
@@ -212,7 +212,10 @@ def postprocess(dirname="./"):
             ('covar', np.float, (npar,npar)), 
             ('ML', np.float),
             ('ev', np.float),
-            ('MLpar', np.float, (npar,))
+            ('MLpar', np.float, (npar,)),
+            ('MeanL', np.float),
+            ('evMean', np.float),
+            ('dlnLike', np.float)
         ])
         ret_i = np.empty(nobj, dtype = dt)
         
@@ -220,7 +223,7 @@ def postprocess(dirname="./"):
         ## [ <for each object>... 
         ##   (
         ##     ([parameter means], [parameter sigmas], [normalized covar]),
-        ##     (ML, [ML params]),
+        ##     (ML, [ML params], meanL),  !!! meanL added recently
         ##     name    !!! added in recent versions
         #    )
         ## ...]
@@ -235,6 +238,13 @@ def postprocess(dirname="./"):
             ret_i[iobj]['ML'] = ML
             ret_i[iobj]['ev'] = ML + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
             ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
+            try:
+                meanL = obj[1][2]
+                ret_i[iobj]['ML'] = meanL
+                ret_i[iobj]['evMean'] = meanL + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
+                ret_i[iobj]['dlnLike'] = ML-meanL
+            except IndexError:
+                pass
         
         ret.append(ret_i)
     
@@ -242,7 +252,7 @@ def postprocess(dirname="./"):
 
 
 def writeTabAll(ret123, fbase, ext='.npy', dirname=None):
-    if dir is not None:
+    if dirname is not None:
         ret123 = postprocess(dirname)
         
     for i, r in enumerate(ret123):
@@ -262,8 +272,7 @@ def writeTab(ret, fname, names=None):
     except ValueError:
         anames = np.array(names)
 
-    anames.shape = (len(anames),1)
-    alls = np.hstack([anames, ret['MLpar'], ret['sig']])
+    alls = np.hstack([anames.reshape(-1,1), ret['MLpar'], ret['sig'], ret['dlnLike'].reshape(-1,1)])
         
     npar = len(ret['MLpar'][0])
     hdr = ['Name']
@@ -271,10 +280,12 @@ def writeTab(ret, fname, names=None):
         hdr.append("ML param %d" % i)
     for i in range(npar):
         hdr.append("sigma param %d" % i)
-    hdr = ("%19s "*(2*npar+1)) % tuple(hdr)
+    hdr.append("dlnLike")
+        
+    hdr = ("%20s "*(2*npar+2)) % tuple(hdr)
     with open(fname, 'w') as f:
         f.write(hdr + '\n')
-        np.savetxt(f, alls, fmt="%19s", delimiter=' ')
+        np.savetxt(f, alls, fmt="%20s", delimiter=' ')
         
         
 def plotter(sampler):
