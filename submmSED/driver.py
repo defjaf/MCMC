@@ -206,7 +206,7 @@ def postprocess(dirname="./"):
         npar = len(ix)
         
         dt = np.dtype([
-            ('name', 'S19'),
+            ('name', 'S21'),
             ('mean', np.float, (npar,)), 
             ('sig', np.float, (npar,)), 
             ('covar', np.float, (npar,npar)), 
@@ -272,20 +272,22 @@ def writeTab(ret, fname, names=None):
     except ValueError:
         anames = np.array(names)
 
-    alls = np.hstack([anames.reshape(-1,1), ret['MLpar'], ret['sig'], ret['dlnLike'].reshape(-1,1)])
+    alls = np.hstack([anames.reshape(-1,1), ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(-1,1)])
         
     npar = len(ret['MLpar'][0])
     hdr = ['Name']
     for i in range(npar):
         hdr.append("ML param %d" % i)
     for i in range(npar):
+        hdr.append("Mean param %d" % i)
+    for i in range(npar):
         hdr.append("sigma param %d" % i)
     hdr.append("dlnLike")
         
-    hdr = ("%20s "*(2*npar+2)) % tuple(hdr)
+    hdr = ("%21s "*(3*npar+2)) % tuple(hdr)
     with open(fname, 'w') as f:
         f.write(hdr + '\n')
-        np.savetxt(f, alls, fmt="%20s", delimiter=' ')
+        np.savetxt(f, alls, fmt="%21s", delimiter=' ')
         
         
 def plotter(sampler):
@@ -340,7 +342,8 @@ def simul():
 
 
 if __name__ == '__main__':
-    fdir = "./figs0921a/"
+    fdir = "./figs0922/"
+    odir = "./out0922/"
     which = []
     for s in reversed(sys.argv):
         try:
@@ -349,7 +352,7 @@ if __name__ == '__main__':
             break
     print "which=", which
     ret = many(which, fdir=fdir)
-    with open("out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
+    with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
         pickle.dump(ret, f)
     
     
