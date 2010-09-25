@@ -90,7 +90,7 @@ def figs(ret123=None, mean_or_ML='mean',lab=""):
     plt.plot([0,30], [0,30])
     plt.savefig("TwoT"+suff)
     
-    lowTobjs = ret123[0][:]['MLpar'][:][:,1]<10
+    lowTobjs = ret123[0][:][mean_or_ML][:][:,1]<10
     lowTnames = ret123[0][lowTobjs]['name'][:]
     with open("lowT.txt", 'w') as f:
         for n in lowTnames:
