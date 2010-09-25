@@ -243,7 +243,7 @@ def postprocess(dirname="./"):
             ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
             try:
                 meanL = obj[1][2]
-                ret_i[iobj]['ML'] = meanL
+                ret_i[iobj]['meanL'] = meanL
                 ret_i[iobj]['evMean'] = meanL + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
                 ret_i[iobj]['dlnLike'] = ML-meanL
             except IndexError:
