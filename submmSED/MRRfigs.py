@@ -74,7 +74,10 @@ def figs(ret123=None, mean_or_ML='mean',lab=""):
     plt.savefig("Tbeta"+suff)
 
     ifig+=1; plt.figure(ifig)
-    objs = np.logical_and(ret123[0][:][mean_or_ML][:][:,0] > -10, ret123[0][:][mean_or_ML][:][:,2] > -10)
+#    objs = np.logical_and(ret123[0][:][mean_or_ML][:][:,0] > -10, ret123[0][:][mean_or_ML][:][:,2] > -10)
+    ### below is not very sensitive to the limit used
+    objs = (ret123[0][:][mean_or_ML][:][:,0] - ret123[0][:][mean_or_ML][:][:,2] > -20)
+    print "got %d 2 T objs" % sum(objs)
     T1 = ret123[0][objs][mean_or_ML][:][:,1]
     T2 = ret123[0][objs][mean_or_ML][:][:,3]
     T1mean = np.mean(T1)
@@ -90,10 +93,13 @@ def figs(ret123=None, mean_or_ML='mean',lab=""):
     plt.plot([0,30], [0,30])
     plt.savefig("TwoT"+suff)
     
-    lowTobjs = ret123[0][:][mean_or_ML][:][:,1]<10
+    lowTobjs = np.logical_and(objs, ret123[0][:][mean_or_ML][:][:,1]<10)
     lowTnames = ret123[0][lowTobjs]['name'][:]
     with open("lowT.txt", 'w') as f:
         for n in lowTnames:
             f.write(n + "\n")
             
+            
+    return ret123
+    
     
