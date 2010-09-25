@@ -155,7 +155,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(0,726)
+idata = range(700)
 fil = "./ERCSCalliifscz4550850.dat"
 
 
@@ -191,6 +191,8 @@ def postprocess(dirname="./"):
     
     ret = []
     idxs = [[0,2,3,5], [0,1,2], [0,2]]
+    
+    
     for i in range(3):
         
         fname = dirname+"out_[%d].pickle" % i        
@@ -198,13 +200,13 @@ def postprocess(dirname="./"):
             with open(fname) as f:
                 ret0 = pickle.load(f)
         except IOError:
+            ret.append([])
             continue
             
         ix = idxs[i]
         ret0 = ret0[i]
         nobj = len(ret0)
         npar = len(ix)
-        
         dt = np.dtype([
             ('name', 'S21'),
             ('mean', np.float, (npar,)), 
@@ -217,6 +219,7 @@ def postprocess(dirname="./"):
             ('evMean', np.float),
             ('dlnLike', np.float)
         ])
+        
         ret_i = np.empty(nobj, dtype = dt)
         
         ### each of ret[i] has format
@@ -256,8 +259,9 @@ def writeTabAll(ret123, fbase, ext='.npy', dirname=None):
         ret123 = postprocess(dirname)
         
     for i, r in enumerate(ret123):
-        fname = fbase + str(i) + ext
-        writeTab(r, fname)
+        if len(r)>0:
+            fname = fbase + str(i) + ext
+            writeTab(r, fname)
         
     return ret123
         
@@ -342,8 +346,8 @@ def simul():
 
 
 if __name__ == '__main__':
-    fdir = "./figs0922/"
-    odir = "./out0922/"
+    fdir = "./figs0924/"
+    odir = "./out0924/"
     which = []
     for s in reversed(sys.argv):
         try:
