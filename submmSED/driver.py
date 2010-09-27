@@ -43,7 +43,7 @@ fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 
 def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./"):
+         fdir = "./", logplot=True):
         
         
     ret = []
@@ -125,8 +125,8 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
             print "ln Pr of mean = %f" % meanlnProb
             MLmod = mod(*maxLikeParams)
             try:
-                meanmod.plot(dat, wavelength=True, logplot=True)
-                MLmod.plot(dat, wavelength=True, logplot=True)
+                meanmod.plot(dat, wavelength=True, logplot=logplot)
+                MLmod.plot(dat, wavelength=True, logplot=logplot)
                 plt.suptitle(name)    
             except AttributeError:
                 pass

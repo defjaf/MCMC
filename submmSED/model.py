@@ -59,7 +59,8 @@ except ImportError:
         x = h_over_k*nu/T
         with errstate(over='ignore'):
           #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
-            return prefac*nu**(3+beta)/(exp(x)-1)
+#          return prefac*nu**(3+beta)/(exp(x)-1)
+          return (1e8)*prefac*(nu/100.0)**(3+beta)/(exp(x)-1)
 
 
     

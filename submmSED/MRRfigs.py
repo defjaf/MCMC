@@ -70,7 +70,7 @@ def figs(ret123=None, mean_or_ML='mean',lab=""):
     ifig+=1; plt.figure(ifig)
     plt.plot(T, beta, ',')
     plt.xlabel("Temperature (K)")
-    plt.ylabel(r"\beta")
+    plt.ylabel(r"$\beta$")
     plt.savefig("Tbeta"+suff)
 
     ifig+=1; plt.figure(ifig)
