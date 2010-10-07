@@ -43,7 +43,7 @@ fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 
 def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, DLC_ul=True):
+         fdir = "./", logplot=True, DLC_ul=False):
         
         
     ret = []
@@ -57,10 +57,11 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
     if DLC:
         alldata = data.readfluxes_DLC(filename)
     elif MRR:
-		if DLC_ul:
-			alldata = data.readfluxes_MRR(filename, IRAS_ignore=set(0), Planck_ignore=set(3), DLC_ul=True)
-		else:
-        	alldata = data.readfluxes_MRR(filename)
+        if DLC_ul:
+            print "Removing 12micron and 217GHz; 25micron UL"
+            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True)
+        else:
+            alldata = data.readfluxes_MRR(filename)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -162,9 +163,11 @@ idata = range(700)
 fil = "./ERCSCalliifscz4550850.dat"
 
 
-def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./"):
+def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./", **keywords):
 
     print "Using file %s" % fil
+    
+    print "keywords:", keywords
     
     ret1 = ret2 = ret3 = []
 
@@ -172,19 +175,19 @@ def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./"):
         print "Two-Component beta = 2"
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
-                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir)
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir, **keywords)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir)
+                    nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir, **keywords)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir)
+                    nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir, **keywords)
                 
     return ret1, ret2, ret3
     
@@ -349,8 +352,9 @@ def simul():
 
 
 if __name__ == '__main__':
-    fdir = "./figs0924/"
-    odir = "./out0924/"
+    fdir = "./figs_MRR_UL/"
+    odir = "./out_MRR_UL/"
+    DLC_ul = True
     which = []
     for s in reversed(sys.argv):
         try:
@@ -358,7 +362,7 @@ if __name__ == '__main__':
         except ValueError:
             break
     print "which=", which
-    ret = many(which, fdir=fdir)
+    ret = many(which, fdir=fdir, DLC_ul=DLC_ul)
     with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
         pickle.dump(ret, f)
     
