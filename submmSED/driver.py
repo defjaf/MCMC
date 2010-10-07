@@ -43,7 +43,7 @@ fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 
 def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True):
+         fdir = "./", logplot=True, DLC_ul=True):
         
         
     ret = []
@@ -57,7 +57,10 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
     if DLC:
         alldata = data.readfluxes_DLC(filename)
     elif MRR:
-        alldata = data.readfluxes_MRR(filename)
+		if DLC_ul:
+			alldata = data.readfluxes_MRR(filename, IRAS_ignore=set(0), Planck_ignore=set(3), DLC_ul=True)
+		else:
+        	alldata = data.readfluxes_MRR(filename)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         

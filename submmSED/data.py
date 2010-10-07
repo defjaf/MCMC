@@ -77,7 +77,7 @@ def readfluxes_DLC(filename):
 
 
 
-def readfluxes_MRR(filename):
+def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False):
     """
     read fluxes from an MRR file. 
     
@@ -145,11 +145,15 @@ def readfluxes_MRR(filename):
     }
     
     errfrac = 0.1   ### fractional error for IRAS high-quality
-    IRAS_ignore=set()  ### indices 0...3 of IRAS wavelengths to ignore
+    if IRAS_ignore is None:
+		IRAS_ignore = set()  ### indices 0...3 of IRAS wavelengths to ignore
+	if Planck_ignore is None:
+		Planck_ignore = set()
 
     lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
-    nu_Planck = asarray([857., 545., 353., 217.])  ## GHz
-        
+    nu_Planck_all = [857., 545., 353., 217.]  ## GHz
+	nu_Planck = asarray([nu for i, nu in enumerate(nu_Planck_all) if i not in Planck_ignore])
+	        
     lines = np.genfromtxt(filename, dtype=dtype, delimiter=delims)
     
     data = []
@@ -165,6 +169,10 @@ def readfluxes_MRR(filename):
                 
             nq = obj['nq%d' % (i+1)]
             flx = obj['s%d' % int(lam)]
+
+			if DLC_ul:
+				if int(lam)==25:
+					nq=0
             
             if flx <= 0:
                 print "skipping lamba=%f for object %s" % (lam, name)
