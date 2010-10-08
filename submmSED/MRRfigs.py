@@ -16,14 +16,14 @@ import driver
 import matplotlib.pyplot as plt
 import numpy as np
 
-def figs(ret123=None, mean_or_ML='mean',lab=""):
+def figs(ret123=None, mean_or_ML='mean',lab="", fdir="./out_MRR/"):
     
     # with open("out_MRR/out_[0].pickle") as f: r0=pickle.load(f)[0]
     # with open("out_MRR/out_[1].pickle") as f: r1=pickle.load(f)[1]
     # with open("out_MRR/out_[2].pickle") as f: r2=pickle.load(f)[2]
     
     if ret123 is None:
-        ret123 = driver.postprocess("./out_MRR/")
+        ret123 = driver.postprocess(fdir)
     
     ifig = 0
         
