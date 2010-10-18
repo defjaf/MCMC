@@ -22,6 +22,11 @@ expmax = 750.0
 
 ## note that nu is at least possibly a numpy array of floats
 
+## the grey body function is (v/v0)^b v^3/(e^x-1)    w/x=hv/kT
+## the integral of the grey body function is 
+###(2h/c^2) (kT/h)^4 (kT/(hv0))^b Gamma[4 + b] Zeta[4 + b]
+#### Gamma[4]=6, Zeta[4]=pi^4/90
+
 ## TODO: refactor blackbody (and greybody) for use as cython?
 def blackbody(T, np.ndarray[np.float64_t, ndim=1] nu):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
