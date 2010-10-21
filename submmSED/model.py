@@ -5,7 +5,7 @@ import math
 
 import matplotlib.pyplot as plt
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max
-
+from scipy import special,integrate
 #import numexpr as ne
 
 speed_of_light = 299792.458 ### micron GHz
@@ -23,7 +23,8 @@ import Proposal
 ####  TODO: use amplitude>0 prior???
 
 h_over_k = 0.04799237 ###  K/Ghz
-prefac = 1.0e-10 #### FIXME: find a physical definition to go here
+prefac = 1.0e-2 #### FIXME: find a physical definition to go here
+nu0 = 100.0
 
 minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
@@ -32,7 +33,7 @@ minb, maxb = 0., 3.
 
 try:
 
-    from blackbody import greybody, blackbody
+    from blackbody import greybody, blackbody, totalflux
 
     print "Got blackbody.pyx"
 
@@ -48,8 +49,9 @@ except ImportError:
         
         with errstate(over='ignore'):
           #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
-            return prefac*nu**3/(exp(x)-1)
-
+          return prefac * nu**3/(exp(x)-1)
+          
+          
     def greybody(beta, T, nu):
         """return the greykody flux at frequency nu for temperature T [CHECK UNITS]"""
 
@@ -60,8 +62,20 @@ except ImportError:
         with errstate(over='ignore'):
           #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
 #          return prefac*nu**(3+beta)/(exp(x)-1)
-          return (1e8)*prefac*(nu/100.0)**(3+beta)/(exp(x)-1)
+          return prefac * nu0**(-beta) * nu**(3+beta)/(exp(x)-1)
 
+    def totalflux(beta, T, nu1=None, nu2=None):
+      """
+      calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
+      """
+
+      if nu1 is None and nu2 is None:
+          ## return analytic expression for bolometric flux
+          return prefac * nu0**(-beta) * (T/h_over_k)**(4+beta) * \
+                 special.gamma(4+beta)*special.zeta(4+beta,1)
+      else:
+          ## do numeric integral
+          return integrate.quad(lambda nu: greybody(beta, T, nu), nu1, nu2)
 
     
 class submmModel2(object):
