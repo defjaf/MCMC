@@ -77,7 +77,7 @@ def readfluxes_DLC(filename):
 
 
 
-def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False):
+def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False, old_MRR=False):
     """
     read fluxes from an MRR file. 
     
@@ -102,6 +102,12 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False)
          3 4(f7.2,1x),3x,f7.2,1x,i4,3x,f10.3,1x,14(f6.2,1x),i3,1x,
          1  3x,2f10.5,8f11.2,2f10.5,f12.3,3x,
          4 2(a6,1x),a23,1x,a22,1x,a22)
+         
+   NEW VERSION for file ERCSCiifsczbg.dat
+       3  glon,glat,next,dist,
+                    ^^^^^
+       1  3x,2f10.5,8f11.2,2f10.5,i3,f12.3,3x,
+                                  ^^^
 
 
     Most of the parameters are from the IIFSCz catalogue, for which there is a 
@@ -110,7 +116,7 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False)
     """
     
     ## field widths (including whitespace separators)
-    delims = (13, 11, 11, 4) + 4*(10,) + (3,3,3,6) +\
+    delims1 = (13, 11, 11, 4) + 4*(10,) + (3,3,3,6) +\
              16*(8,) + (6,14,11,11,4) + \
              4*(11,) + \
              (3,6,11,4,8,10) + 4*(8,) +\
@@ -118,7 +124,7 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False)
              2*(10,) + 8*(11,) + 2*(10,)+(15,)+\
              2*(7,) + (24,23,22)
     
-    dtype = {
+    dtype1 = {
         'names': [
             'nameIRAS', 'ra', 'dec', 'posFlag',
             's12', 's25', 's60', 's100', 'nq1', 'nq2', 'nq3', 'nq4',
@@ -143,6 +149,46 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False)
             ['f']*2 +['f']*8 +['f']*2 + ['f'] + 
             ['a6']*2  + ['a23','a22','a22']
     }
+    
+    delims2 = (13, 11, 11, 4) + 4*(10,) + (3,3,3,6) +\
+             16*(8,) + (6,14,11,11,4) + \
+             4*(11,) + \
+             (3,6,11,4,8,10) + 4*(8,) +\
+             (8,8,8,11) + (8,7,11) + 14*(7,) + (7,) +\
+             2*(10,) + 8*(11,) + 2*(10,)+ (3,) + (15,)+\
+             2*(7,) + (24,23,22)
+    
+    dtype2 = {
+        'names': [
+            'nameIRAS', 'ra', 'dec', 'posFlag',
+            's12', 's25', 's60', 's100', 'nq1', 'nq2', 'nq3', 'nq4',
+            'am1', 'am2', 'am3', 'am4', 'am5', 'am6', 'am7', 'am8', 'em1', 'em2', 'em3', 'em4',
+            'em5', 'em6', 'em7', 'em8', 'photFlag', 'FINT', 'EFINT',
+            'zspec', 'zspecFlag', 'zneur', 'zneurerr', 'ztem', 'z',
+            'j2', 'av1', 'err1', 'zneurFlag', 'amb2', 'alb',
+            'alp1', 'alp2', 'alp3', 'alp4', 'alcirr', 'alsb', 'ala220', 'alagn', 'alir',
+            'nirtem', 'errir3', 'als12', 'als25', 'als60', 'als90', 'als100', 'als110',
+            'als140', 'als160', 'als250', 'als350', 'als500', 'als850', 'als1250',
+            'als1380', 'nirflag',
+            'ra1', 'dec1', 's857', 'e857', 's217', 'e217', 's353', 'e353', 's545', 'e545',
+            'glon', 'glat', 'next', 'dist',
+            'nedtp', 'sdsstp', 'nameNED', 'nameSDSS', 'name2MASS'
+        ],
+        'formats': 
+            ['a12'] + ['f']*2 + ['i'] + ['f']*4 + ['i']*4 +
+            ['f']*16 + ['i','f','f','f','i'] +
+            ['f']*4 +
+            ['i','f','f','i','f','f'] + ['f']*4 +
+            ['f']*4 + ['f','i','f'] + ['f']*14 +['i'] +
+            ['f']*2 +['f']*8 +['f']*2 + ['i'] + ['f'] + 
+            ['a6']*2  + ['a23','a22','a22']
+    }
+    
+    
+    if old_MRR:
+        delims, dtype = delims1, dtype1
+    else
+        delims, dtype = delims2, dtype2
     
     errfrac = 0.1   ### fractional error for IRAS high-quality
     if IRAS_ignore is None:

@@ -22,9 +22,11 @@ import Proposal
 ####  (not checked for more than one amplitude)
 ####  TODO: use amplitude>0 prior???
 
+##### TODO: get the total far-IR luminosity [for each component] of an object with a given model
+
 h_over_k = 0.04799237 ###  K/Ghz
-prefac = 1.0e-2 #### FIXME: find a physical definition to go here
-nu0 = 100.0
+prefac = 1.0e-9 #### FIXME: find a physical definition to go here
+nu0 = 1000.0
 
 minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
@@ -75,7 +77,7 @@ except ImportError:
                  special.gamma(4+beta)*special.zeta(4+beta,1)
       else:
           ## do numeric integral
-          return integrate.quad(lambda nu: greybody(beta, T, nu), nu1, nu2)
+          return integrate.quad(lambda nu: greybody(beta, T, nu), nu1, nu2)[0]
 
     
 class submmModel2(object):
@@ -180,6 +182,7 @@ class submmModel1(object):
         return greybody(self.b, self.T, data.freq) 
         
     __call__ = at    
+
 
     @classmethod
     def prior(cls, b, T):
@@ -331,6 +334,12 @@ class submmModel2_normalized(object):
 
     __call__ = at    
 
+    
+    def flux(self, nu1=None, nu2=None):
+        """return the flux between the given frequencies for each component"""
+        return asarray([self.A1*totalflux(self.b1, self.T1, nu1, nu2), self.A2*totalflux(self.b2, self.T2, nu1, nu2)])
+        
+
     @classmethod
     def prior(cls, A1, b1, T1, A2, b2, T2):
         """get the unnormalized prior for the parameters
@@ -444,6 +453,11 @@ class submmModel1_normalized(submmModel2_normalized):
         return self.A * greybody(self.b, self.T, data.freq)
 
     __call__ = at    
+
+    def flux(self, nu1=None, nu2=None):
+        """return the flux between the given frequencies for each component"""
+        return array([self.A*totalflux(self.b, self.T, nu1, nu2)])   ### return a scalar?
+
 
     @classmethod
     def prior(cls, A, b, T):

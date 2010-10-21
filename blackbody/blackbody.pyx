@@ -14,12 +14,11 @@ Refactored out for conversion to cython
 import numpy as np
 cimport numpy as np
 
-from scipy import integrate, special
-from scipy cimport integrate, special
+from scipy import integrate, special   # can't do cimport here
 
 cdef float h_over_k = 0.04799237 ###  K/Ghz
-cdef float prefac = 1.0e-2 #### FIXME: find a physical definition to go here
-cdef float nu0 = 100.0
+cdef float prefac = 1.0e-9 #### FIXME: find a physical definition to go here
+cdef float nu0 = 1000.0
 
 expmax = 750.0
 
@@ -60,7 +59,9 @@ def greybody(beta, T, np.ndarray[np.float64_t, ndim=1] nu):
   #      #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
   #      return prefac*nu**(3+beta)/(np.exp(x)-1)
   
-  def totalflux(beta, T, nu1=None, nu2=None):
+  
+### FIXME following does not work, due to mismatch of ndarray argument nu in greybody
+def totalflux(beta, T, nu1=None, nu2=None):
     """
     calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
     """

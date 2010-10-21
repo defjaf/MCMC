@@ -41,18 +41,21 @@ fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 
-def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
+def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
          fdir = "./", logplot=True, DLC_ul=False):
         
         
     ret = []
         
-    if not operator.isSequenceType(i):
+    
+    if i is None:
+        idata = i    
+    elif not operator.isSequenceType(i):
         idata = [i]
     else:
         idata = i
-        
+    
     ## read the data
     if DLC:
         alldata = data.readfluxes_DLC(filename)
@@ -65,14 +68,19 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
+    if idata is None:
+        idata = range(len(alldata))
+        
     for i in idata:
         
         try:
             dat = alldata[i]
             name = dat.name + "(z=%4.2f)" % (dat.z)
+            singleObject = True
         except TypeError:
             dat = [alldata[j] for j in i]
             name = " + ".join(str(int(d.name)) for d in dat)
+            singleObject = False
         
         print "Object[s] %s" % name
     
@@ -140,11 +148,25 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
                 
             fig0 += 2
     
+        ret_i= (ana, (maxlnLike, maxLikeParams, meanlnProb), name) ### meanlnProb added
+
+        if singleObject:
+            ### collect further information to return
+            speedOfLight = 299792.  ## micron GHz
+            nu1, nu2 = speedOfLight/8.0, speedOfLight/1000.0 ### rest-frame microns -> GHz
+
+            ret_i += (dat.z,)
+            ret_i += (zip(dat.d, dat.sig),)
+            ret_i += (MLmod.flux(nu1, nu2),)
+    
+    
         if retMCMC:
-            ret.append((mcmc, ana, (maxlnLike, maxLikeParams, meanlnProb), name))  ### meanlnProb added
+            ret.append((mcmc,)+ret_i) 
         else:
             del mcmc
-            ret.append((ana, (maxlnLike, maxLikeParams, meanlnProb), name))
+            ret.append(ret_i)
+            
+            
     
     if len(ret) == 1:
         ret = ret[0]
@@ -159,7 +181,7 @@ def main(filename=fname_MRR, i=0, rotateParams=False, onecomponent=True, getNorm
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(700)
+idata = [0,300,700] ##None
 fil = "./ERCSCalliifscz4550850.dat"
 
 
@@ -352,8 +374,10 @@ def simul():
 
 
 if __name__ == '__main__':
-    fdir = "./figs_MRR_UL/"
-    odir = "./out_MRR_UL/"
+    # fdir = "./figs_MRR_UL_XX/"
+    # odir = "./out_MRR_UL_XX/"
+    fdir = "./figs_XX/"
+    odir = "./out_XX/"
     DLC_ul = True
     which = []
     for s in reversed(sys.argv):

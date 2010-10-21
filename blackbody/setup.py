@@ -13,4 +13,4 @@ setup(
 )
 
 
-### easiest way to use this is to run python setup.py build; mv --force build/lib*/blackbody.so ../submmSED/
+### easiest way to use this is to run python setup.py build; mv -f build/lib*/blackbody.so ../submmSED/
