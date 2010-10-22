@@ -43,19 +43,14 @@ fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, DLC_ul=False):
+         fdir = "./", logplot=True, DLC_ul=False, check=None):
         
         
+    speedOfLight = 299792.  ## micron GHz
+    nu2, nu1 = speedOfLight/8.0, speedOfLight/1000.0 ### rest-frame microns -> GHz
+    
     ret = []
         
-    
-    if i is None:
-        idata = i    
-    elif not operator.isSequenceType(i):
-        idata = [i]
-    else:
-        idata = i
-    
     ## read the data
     if DLC:
         alldata = data.readfluxes_DLC(filename)
@@ -68,14 +63,18 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
-    if idata is None:
+    if i is None:
         idata = range(len(alldata))
+    elif not operator.isSequenceType(i):
+        idata = [i]
+    else:
+        idata = i
         
     for i in idata:
-        
+
         try:
             dat = alldata[i]
-            name = dat.name + "(z=%4.2f)" % (dat.z)
+            name = dat.name + "(z=%5.3f)" % (dat.z)
             singleObject = True
         except TypeError:
             dat = [alldata[j] for j in i]
@@ -152,9 +151,6 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 
         if singleObject:
             ### collect further information to return
-            speedOfLight = 299792.  ## micron GHz
-            nu1, nu2 = speedOfLight/8.0, speedOfLight/1000.0 ### rest-frame microns -> GHz
-
             ret_i += (dat.z,)
             ret_i += (zip(dat.d, dat.sig),)
             ret_i += (MLmod.flux(nu1, nu2),)
@@ -165,6 +161,10 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         else:
             del mcmc
             ret.append(ret_i)
+            
+        if check is not None:
+            with open(check, 'w') as f:
+                pickle.dump(ret, f)
             
             
     
@@ -181,7 +181,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = None   #[0,300,700] #
+idata = range(700) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
 fil = "./ERCSCiifsczbg.dat"
 
@@ -198,26 +198,30 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", **keyword
         print "Two-Component beta = 2"
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
-                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir, **keywords)
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir,
+                    check="check0.npy", **keywords)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir, **keywords)
+                    nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir,
+                    check="check1.npy",**keywords)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
-                    nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir, **keywords)
+                    nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir,
+                    check="check2.npy",**keywords)
                 
                 
     if 3 in which:
         print "Two-Component"
         ret4 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,2,2, 1, 2, 2), retMCMC=False,
-                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir, **keywords)
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
+                    check="check3.npy",**keywords)
 
 
     return ret1, ret2, ret3, ret4
