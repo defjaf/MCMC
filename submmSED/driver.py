@@ -36,8 +36,8 @@ import joblib
 
 fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
-fname_MRR = "./submmSED/ERCSCalliifscz4550850.dat"
-
+fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
+fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 
@@ -181,11 +181,12 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = [0,300,700] ##None
-fil = "./ERCSCalliifscz4550850.dat"
+idata = None   #[0,300,700] #
+# fil = "./ERCSCalliifscz4550850.dat"
+fil = "./ERCSCiifsczbg.dat"
 
 
-def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./", **keywords):
+def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", **keywords):
 
     print "Using file %s" % fil
     
@@ -211,14 +212,24 @@ def many(which = range(3), idata=idata, nMC = nMC, fil=fil, fdir="./", **keyword
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir, **keywords)
                 
-    return ret1, ret2, ret3
+                
+    if 3 in which:
+        print "Two-Component"
+        ret4 = main(fil, getNorm=True, i = idata, 
+                    start=(1,2.,10,0.1,2.,20), sigmas=(1,2,2, 1, 2, 2), retMCMC=False,
+                    nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir, **keywords)
+
+
+    return ret1, ret2, ret3, ret4
     
 
 def postprocess(dirname="./"):
     
     
+    #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes)
+    
     ret = []
-    idxs = [[0,2,3,5], [0,1,2], [0,2]]
+    idxs = [[0,2,3,5], [0,1,2], [0,2], [0,1,2,3,4,5]]  ## final one is for full 2T-2beta fit
     
     
     for i in range(3):
@@ -298,6 +309,7 @@ def writeTab(ret, fname, names=None):
     """ write the output of the postprocess function to a text file 
         run separately on each of the elements of postprocess()
      """
+     #### TODO: write more information for DLC (z, fluxes, error, evidence, total fluxes)
      
     try:
         anames = ret['name']

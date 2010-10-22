@@ -187,7 +187,7 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
     
     if old_MRR:
         delims, dtype = delims1, dtype1
-    else
+    else:
         delims, dtype = delims2, dtype2
     
     errfrac = 0.1   ### fractional error for IRAS high-quality
