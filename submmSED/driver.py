@@ -50,6 +50,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     speedOfLight = 299792.  ## micron GHz
     nu2, nu1 = speedOfLight/8.0, speedOfLight/1000.0 ### rest-frame microns -> GHz
     
+    noHist = False  
+    
     ret = []
         
     ## read the data
@@ -118,7 +120,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 
             fig = plt.figure(fig0)
             lnLike = []
-            maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1])
+            maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1], noPlot=noHist)
             plt.suptitle(name)
     
             if savefig:
@@ -131,7 +133,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                     fig.savefig(fname+"_0.png")
                     plt.close(fig)
                 except Exception as err:  ## dangerous -- catch anything!
-                    print "CAUGHT Exception!!--SAVING %s" % fname+"_0.png"
+                    print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png"
                     print "Error Info: "
                     print type(err)     # the exception instance
                     print err.args      # arguments stored in .args
@@ -154,7 +156,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                     fig.savefig(fname+"_1.png")
                     plt.close(fig)
                 except Exception as err:   ## dangerous -- catch anything!
-                    print "CAUGHT Exception!!--SAVING %s" % fname+"_1.png"
+                    print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png"
                     print "Error Info: "
                     print type(err)     # the exception instance
                     print err.args      # arguments stored in .args

@@ -149,7 +149,7 @@ def scatter2d(MCMC, params, **kwargs):
 
     return axis.scatter(s1,s2, s=.01, edgecolors='none', **kwargs)
 
-def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True, maxlnLike=[]):
+def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True, maxlnLike=[], noPlot=False):
     """
     make a 2d grid of histograms and scatterplots of the selected parameters
     """
@@ -166,6 +166,9 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         maxLikeParams = s[lnLike.argmax()]
         print 'Max ln likelihood %f at parameters:' % maxlnLike
         print maxLikeParams
+        
+    if noPlot and lnLike is not None:  ### hmmmm, should refactor?
+        return (maxlnLike, maxLikeParams)
         
     if params is None:
         # try:   ### removed June 2010 to deal with derived parmaters. Don't need this case?
