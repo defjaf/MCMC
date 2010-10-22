@@ -20,6 +20,7 @@ import numpy as np
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use("AGG")
+    print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
     
 import matplotlib.pyplot as plt
 
@@ -126,8 +127,15 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                 except TypeError:
                     fname = fdir+name
                     
-                fig.savefig(fname+"_0.png")
-                plt.close(fig)
+                try:     ### move close to finally clause? 
+                    fig.savefig(fname+"_0.png")
+                    plt.close(fig)
+                except Exception as err:  ## dangerous -- catch anything!
+                    print "CAUGHT Exception!!--SAVING %s" % fname+"_0.png"
+                    print "Error Info: "
+                    print type(err)     # the exception instance
+                    print err.args      # arguments stored in .args
+                    print err
     
             fig=plt.figure(fig0+1)
             params = ana[0]
@@ -142,8 +150,16 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             except AttributeError:
                 pass
             if savefig:
-                fig.savefig(fname+"_1.png")
-                plt.close(fig)
+                try:     ### move close to finally clause? 
+                    fig.savefig(fname+"_1.png")
+                    plt.close(fig)
+                except Exception as err:   ## dangerous -- catch anything!
+                    print "CAUGHT Exception!!--SAVING %s" % fname+"_1.png"
+                    print "Error Info: "
+                    print type(err)     # the exception instance
+                    print err.args      # arguments stored in .args
+                    print err
+                
                 
             fig0 += 2
     
