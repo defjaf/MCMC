@@ -276,6 +276,12 @@ def postprocess(dirname="./", multiple=None):
             ret0 = ret0[i]
             nobj = len(ret0)
             npar = len(ix)
+            try:
+                ndat = len(ret0[0][4])
+            except IndexError:
+                ndat = 0
+            
+            
             dt = np.dtype([
                 ('name', 'S21'),
                 ('mean', np.float, (npar,)), 
@@ -288,7 +294,7 @@ def postprocess(dirname="./", multiple=None):
                 ('evMean', np.float),
                 ('dlnLike', np.float),
                 ('z', np.float),
-                ('dat', np.float, (nt[i],2)),
+                ('dat', np.float, (ndat,2)),
                 ('flux', np.float, (nt[i],))
             ])
         
@@ -315,21 +321,22 @@ def postprocess(dirname="./", multiple=None):
                 ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
                 try:
                     meanL = obj[1][2]
-                    ret_i[iobj]['meanL'] = meanL
+                    ret_i[iobj]['MeanL'] = meanL
                     ret_i[iobj]['evMean'] = meanL + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
                     ret_i[iobj]['dlnLike'] = ML-meanL
                     
                     ### new DLC information
-                    ret_i[iobj]['z'] = obj[3]
+                    ret_i[iobj]['z'] = np.array(obj[3])
                     ret_i[iobj]['dat'] = np.array(obj[4])
                     ret_i[iobj]['flux'] = np.array(obj[5])
                 except IndexError:
                     pass
                     
+                    
             ret[i].append(ret_i)
             
         # concatenate different output files (in different directories as written)
-        if len(ret[i]) > 1:
+        if ret[i]:
             ret[i] = np.concatenate(ret[i])
     
     return ret
@@ -358,10 +365,26 @@ def writeTab(ret, fname, names=None):
     except ValueError:
         anames = np.array(names)
 
-    alls = np.hstack([anames.reshape(-1,1), ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(-1,1)])
-        
+    nn = ret.shape[0]
     npar = len(ret['MLpar'][0])
-    hdr = ['Name']
+    
+    try:
+        nt = ret['flux'].shape[1]
+    
+        alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
+              ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
+              ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1),
+              ret['dat'].reshape(nn,-1), ret['flux'].reshape(nn,-1)    ### remove these two lines for old files
+              ])
+    except ValueError:
+        alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
+              ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
+              ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1)
+              ])
+        nt = 0
+        
+        
+    hdr = ['Name', 'z']
     for i in range(npar):
         hdr.append("ML param %d" % i)
     for i in range(npar):
@@ -369,8 +392,16 @@ def writeTab(ret, fname, names=None):
     for i in range(npar):
         hdr.append("sigma param %d" % i)
     hdr.append("dlnLike")
+    hdr.append("evidence1")
+    hdr.append("evidence2")
+    for i in range(nt):
+        hdr.append("flux %d" % i)
+        hdr.append("sigflux %d" % i)
+    for i in range(nt):
+        hdr.append("greybody flux %d" % i)
         
-    hdr = ("%21s "*(3*npar+2)) % tuple(hdr)
+    nhead = len(hdr)
+    hdr = ("%21s "*nhead) % tuple(hdr)
     with open(fname, 'w') as f:
         f.write(hdr + '\n')
         np.savetxt(f, alls, fmt="%21s", delimiter=' ')
@@ -427,6 +458,8 @@ def simul():
     return ret123
 
 
+
+### TODO: allow setting directory and idata from the command line
 if __name__ == '__main__':
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
