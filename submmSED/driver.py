@@ -280,6 +280,9 @@ def postprocess(dirname="./", multiple=None):
                 ndat = len(ret0[0][4])
             except IndexError:
                 ndat = 0
+                
+            print 'nobj, npar, ndat = ', nobj, npar, ndat
+                
             
             
             dt = np.dtype([
@@ -326,8 +329,8 @@ def postprocess(dirname="./", multiple=None):
                     ret_i[iobj]['dlnLike'] = ML-meanL
                     
                     ### new DLC information
-                    ret_i[iobj]['z'] = np.array(obj[3])
-                    ret_i[iobj]['dat'] = np.array(obj[4])
+                    ret_i[iobj]['z'] = obj[3]
+                    ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
                     ret_i[iobj]['flux'] = np.array(obj[5])
                 except IndexError:
                     pass
@@ -367,22 +370,25 @@ def writeTab(ret, fname, names=None):
 
     nn = ret.shape[0]
     npar = len(ret['MLpar'][0])
+    ndat = len(ret['dat'][0])
     
-    try:
-        nt = ret['flux'].shape[1]
     
-        alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
-              ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
-              ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1),
-              ret['dat'].reshape(nn,-1), ret['flux'].reshape(nn,-1)    ### remove these two lines for old files
-              ])
-    except ValueError:
-        alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
-              ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
-              ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1)
-              ])
-        nt = 0
-        
+#    try:
+    nt = ret['flux'].shape[1]
+    
+    alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
+          ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
+          ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1),
+          ret['dat'].reshape(nn,-1), ret['flux'].reshape(nn,-1)    ### remove these two lines for old files
+          ])
+   # except ValueError:
+    #      alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
+    #            ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
+    #            ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1)
+    #            ])
+    #      nt = 0
+         
+    print 'nn, npar, ndat, nt = ', nn, npar, ndat, nt
         
     hdr = ['Name', 'z']
     for i in range(npar):
@@ -394,7 +400,7 @@ def writeTab(ret, fname, names=None):
     hdr.append("dlnLike")
     hdr.append("evidence1")
     hdr.append("evidence2")
-    for i in range(nt):
+    for i in range(ndat):
         hdr.append("flux %d" % i)
         hdr.append("sigflux %d" % i)
     for i in range(nt):
