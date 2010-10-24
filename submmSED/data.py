@@ -243,6 +243,9 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
         nu_obs = asarray(nu_obs)
         nu_rest = (1+z)*nu_obs
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+        
+    print "Using data in nu_obs order [GHz]:", nu_obs
+    print "Using data in lambda_obs order [mu]:", speed_of_light/nu_obs
 
     return data
     
