@@ -20,7 +20,7 @@ import numpy as np
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use("AGG")
-    print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
+    #print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
     
 import matplotlib.pyplot as plt
 
@@ -199,7 +199,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(700) #None   #[0,300,700] #
+idata = range(700,1400) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
 fil = "./ERCSCiifsczbg.dat"
 
@@ -245,72 +245,92 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", **keyword
     return ret1, ret2, ret3, ret4
     
 
-def postprocess(dirname="./"):
+def postprocess(dirname="./", multiple=None):
     
     
-    #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes)
+    #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes) DONE
+    #### allow combining different pickle files DONE
     
-    ret = []
+    nrun = 4
+    
+    ret = [[] for i in range(nrun)]
     idxs = [[0,2,3,5], [0,1,2], [0,2], [0,1,2,3,4,5]]  ## final one is for full 2T-2beta fit
+    nt = [2,1,1,2]  ## number of temperature components
     
     
-    for i in range(3):
+    if not multiple:
+        dirname = [dirname]
+    
+    for i in range(nrun):
         
-        fname = dirname+"out_[%d].pickle" % i        
-        try:
-            with open(fname) as f:
-                ret0 = pickle.load(f)
-        except IOError:
-            ret.append([])
-            continue
-            
-        ix = idxs[i]
-        ret0 = ret0[i]
-        nobj = len(ret0)
-        npar = len(ix)
-        dt = np.dtype([
-            ('name', 'S21'),
-            ('mean', np.float, (npar,)), 
-            ('sig', np.float, (npar,)), 
-            ('covar', np.float, (npar,npar)), 
-            ('ML', np.float),
-            ('ev', np.float),
-            ('MLpar', np.float, (npar,)),
-            ('MeanL', np.float),
-            ('evMean', np.float),
-            ('dlnLike', np.float)
-        ])
+        for dirn in dirname:
         
-        ret_i = np.empty(nobj, dtype = dt)
-        
-        ### each of ret[i] has format
-        ## [ <for each object>... 
-        ##   (
-        ##     ([parameter means], [parameter sigmas], [normalized covar]),
-        ##     (ML, [ML params], meanL),  !!! meanL added recently
-        ##     name    !!! added in recent versions
-        #    )
-        ## ...]
- 
-        for iobj, obj in enumerate(ret0):
-            ret_i[iobj]['name'] = obj[2]
-            ret_i[iobj]['mean'][:] = np.array(obj[0][0])[ix]
-            ret_i[iobj]['sig'][:] = np.array(obj[0][1])[ix]
-            covar = np.array(obj[0][2])[:,ix][ix]
-            ML = obj[1][0]
-            ret_i[iobj]['covar'][:,:] = covar
-            ret_i[iobj]['ML'] = ML
-            ret_i[iobj]['ev'] = ML + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
-            ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
+            fname = dirn+"out_[%d].pickle" % i        
             try:
-                meanL = obj[1][2]
-                ret_i[iobj]['meanL'] = meanL
-                ret_i[iobj]['evMean'] = meanL + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
-                ret_i[iobj]['dlnLike'] = ML-meanL
-            except IndexError:
-                pass
+                with open(fname) as f:
+                    ret0 = pickle.load(f)
+            except IOError:
+                continue
+            
+            ix = idxs[i]
+            ret0 = ret0[i]
+            nobj = len(ret0)
+            npar = len(ix)
+            dt = np.dtype([
+                ('name', 'S21'),
+                ('mean', np.float, (npar,)), 
+                ('sig', np.float, (npar,)), 
+                ('covar', np.float, (npar,npar)), 
+                ('ML', np.float),
+                ('ev', np.float),
+                ('MLpar', np.float, (npar,)),
+                ('MeanL', np.float),
+                ('evMean', np.float),
+                ('dlnLike', np.float),
+                ('z', np.float),
+                ('dat', np.float, (nt[i],2)),
+                ('flux', np.float, (nt[i],))
+            ])
         
-        ret.append(ret_i)
+            ret_i = np.empty(nobj, dtype = dt)
+        
+            ### each of ret[i] has format
+            ## [ <for each object>... 
+            ##   (
+            ##     ([parameter means], [parameter sigmas], [normalized covar]),
+            ##     (ML, [ML params], meanL),  !!! meanL added recently
+            ##     name    !!! added in recent versions
+            #    )
+            ## ...]
+ 
+            for iobj, obj in enumerate(ret0):
+                ret_i[iobj]['name'] = obj[2]
+                ret_i[iobj]['mean'][:] = np.array(obj[0][0])[ix]
+                ret_i[iobj]['sig'][:] = np.array(obj[0][1])[ix]
+                covar = np.array(obj[0][2])[:,ix][ix]
+                ML = obj[1][0]
+                ret_i[iobj]['covar'][:,:] = covar
+                ret_i[iobj]['ML'] = ML
+                ret_i[iobj]['ev'] = ML + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
+                ret_i[iobj]['MLpar'][:] = obj[1][1][ix]
+                try:
+                    meanL = obj[1][2]
+                    ret_i[iobj]['meanL'] = meanL
+                    ret_i[iobj]['evMean'] = meanL + 0.5*np.linalg.det(covar) + npar*0.5*np.log(2*np.pi)
+                    ret_i[iobj]['dlnLike'] = ML-meanL
+                    
+                    ### new DLC information
+                    ret_i[iobj]['z'] = obj[3]
+                    ret_i[iobj]['dat'] = np.array(obj[4])
+                    ret_i[iobj]['flux'] = np.array(obj[5])
+                except IndexError:
+                    pass
+                    
+            ret[i].append(ret_i)
+            
+        # concatenate different output files (in different directories as written)
+        if len(ret[i]) > 1:
+            ret[i] = np.concatenate(ret[i])
     
     return ret
 
@@ -410,8 +430,8 @@ def simul():
 if __name__ == '__main__':
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
-    fdir = "./figs_XX/"
-    odir = "./out_XX/"
+    fdir = "./figs_XX2/"
+    odir = "./out_XX2/"
     DLC_ul = True
     which = []
     for s in reversed(sys.argv):
