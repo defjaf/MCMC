@@ -12,6 +12,8 @@ from __future__ import division
 import sys
 import os
 
+import getopt
+
 import operator
 import cPickle as pickle
 
@@ -464,24 +466,106 @@ def simul():
     return ret123
 
 
+class Usage(Exception):
+    def __init__(self, msg):
+        self.msg = msg
 
-### TODO: allow setting directory and idata from the command line
-if __name__ == '__main__':
+def mainmain(argv=None):
+    """
+    run submmSED MCMC
+    
+    python driver [options] which0 [which1 ...]
+    --fdir, -f: figure directory
+    --odir, -o: output numpy pickle files
+    --idata, -i: comma/space-separated list in python slice format (start, stop, step) of which data to use
+    --UL: use DLC upper-limit calculation
+    which = 0: 2 comp b=2
+            1: 1 comp floating b
+            2: 1 comp b=2
+            3: 2 comp floating b
+    """
+    
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
     fdir = "./figs_XX3/"
     odir = "./out_XX3/"
     DLC_ul = True
     which = []
-    for s in reversed(sys.argv):
+    
+    longopts = ["help", "fdir=", "odir=", "idata=", "UL"]
+    shortopts = "hf:o:i:"
+    if argv is None:
+        argv = sys.argv
+    try:
         try:
-            which.append(int(s))
-        except ValueError:
-            break
-    print "which=", which
-    ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir)
-    with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
-        pickle.dump(ret, f)
+            opts, args = getopt.getopt(argv[1:], shortopts, longopts)
+        except getopt.GetoptError as msg:
+             raise Usage(msg)
+
+        print "normal behaviour"
+        for o, a in opts:
+            if o in ("-h", "--help"):
+                print mainmain.__doc__
+                sys.exit(0)
+            elif o in ("--fdir", "f"):
+                fdir = a
+                print "fdir=%s"%fdir
+            elif o in ("--odir", "o"):
+                odir = a
+                print "odir=%s"%odir 
+            elif o in ("-i", "--idata"):
+                datslice = [int(i) for i in a.replace(","," ").split()]
+                print "idata = range(",datslice,")"
+                idata = range(*datslice)
+            elif o in ["--UL"]:
+                DLC_ul = True
+                
+        try:
+            os.mkdir(odir)
+            os.mkdir(fdir)
+        except OSError:
+            pass
+        
+                
+        # process arguments
+        for s in reversed(args):
+            try:
+                which.append(int(s))
+            except ValueError:
+                break
+        print "which=", which
+        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir)
+        with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
+            pickle.dump(ret, f)
+            
+    except Usage, err:
+        print >>sys.stderr, err.msg
+        print >>sys.stderr, "for help use --help"
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(mainmain())
+# 
+# 
+# ### TODO: allow setting directory and idata from the command line
+# if __name__ == '__main__':
+#     # fdir = "./figs_MRR_UL_XX/"
+#     # odir = "./out_MRR_UL_XX/"
+#     fdir = "./figs_XX3/"
+#     odir = "./out_XX3/"
+#     DLC_ul = True
+#     which = []
+#     for s in reversed(sys.argv):
+#         try:
+#             which.append(int(s))
+#         except ValueError:
+#             break
+#     print "which=", which
+#     ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir)
+#     with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
+#         pickle.dump(ret, f)
+    
     
     
 
