@@ -204,34 +204,34 @@ idata = range(1400,1717) #None   #[0,300,700] #
 fil = "./ERCSCiifsczbg.dat"
 
 
-def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", **keywords):
+def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", **keywords):
 
     print "Using file %s" % fil
     
     print "keywords:", keywords
     
-    ret1 = ret2 = ret3 = []
+    ret1 = ret2 = ret3 =  ret4 = []
 
     if 0 in which:
         print "Two-Component beta = 2"
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir,
-                    check="check0.npy", **keywords)
+                    check=cdir+"check0.npy", **keywords)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir,
-                    check="check1.npy",**keywords)
+                    check=cdir+"check1.npy",**keywords)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir,
-                    check="check2.npy",**keywords)
+                    check=cdir+"check2.npy",**keywords)
                 
                 
     if 3 in which:
@@ -239,7 +239,7 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", **keyword
         ret4 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,2,2, 1, 2, 2), retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
-                    check="check3.npy",**keywords)
+                    check=cdir+"check3.npy",**keywords)
 
 
     return ret1, ret2, ret3, ret4
@@ -479,7 +479,7 @@ if __name__ == '__main__':
         except ValueError:
             break
     print "which=", which
-    ret = many(which, fdir=fdir, DLC_ul=DLC_ul)
+    ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir)
     with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
         pickle.dump(ret, f)
     
