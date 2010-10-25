@@ -199,7 +199,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(700,1400) #None   #[0,300,700] #
+idata = range(1400,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
 fil = "./ERCSCiifsczbg.dat"
 
@@ -469,8 +469,8 @@ def simul():
 if __name__ == '__main__':
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
-    fdir = "./figs_XX2/"
-    odir = "./out_XX2/"
+    fdir = "./figs_XX3/"
+    odir = "./out_XX3/"
     DLC_ul = True
     which = []
     for s in reversed(sys.argv):
