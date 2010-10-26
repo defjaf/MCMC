@@ -22,7 +22,9 @@ import Proposal
 ####  (not checked for more than one amplitude)
 ####  TODO: use amplitude>0 prior???
 
-##### TODO: get the total far-IR luminosity [for each component] of an object with a given model
+##### TODO: get the total far-IR luminosity [for each component] of an object with a given model DONE
+
+##### TODO: correctly normalized prior
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here

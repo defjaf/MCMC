@@ -249,9 +249,10 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
 
 def postprocess(dirname="./", multiple=None):
     
-    
     #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes) DONE
     #### allow combining different pickle files DONE
+    #### TODO: fix the normalization on the evidence calculations (priors are currently incorrect)
+    ####        can use Savage-Dickey?
     
     nrun = 4
     
@@ -268,6 +269,7 @@ def postprocess(dirname="./", multiple=None):
         for dirn in dirname:
         
             fname = dirn+"out_[%d].pickle" % i        
+            print fname
             try:
                 with open(fname) as f:
                     ret0 = pickle.load(f)
@@ -287,7 +289,7 @@ def postprocess(dirname="./", multiple=None):
                 
             
             
-            dt = np.dtype([
+            dt = np.dtype([A
                 ('name', 'S21'),
                 ('mean', np.float, (npar,)), 
                 ('sig', np.float, (npar,)), 
