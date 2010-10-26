@@ -60,9 +60,12 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     if DLC:
         alldata = data.readfluxes_DLC(filename)
     elif MRR:
-        if DLC_ul:
+        if DLC_ul==1:
             print "Removing 12micron and 217GHz; 25micron UL"
             alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True)
+        elif DLC_ul==2:
+            print "Removing 12micron, 353 GHz, 217GHz; 25micron UL"
+            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[2,3], DLC_ul=True)
         else:
             alldata = data.readfluxes_MRR(filename)
     else:
@@ -489,12 +492,13 @@ def mainmain(argv=None):
     
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
-    fdir = "./figs_XX3/"
-    odir = "./out_XX3/"
+    fdir = "./figs_DLC2_1/"
+    odir = "./out_DLC2_1/"
     DLC_ul = True
     which = []
+    datslice=(0,700)
     
-    longopts = ["help", "fdir=", "odir=", "idata=", "UL"]
+    longopts = ["help", "fdir=", "odir=", "idata=", "UL="]
     shortopts = "hf:o:i:"
     if argv is None:
         argv = sys.argv
@@ -511,23 +515,30 @@ def mainmain(argv=None):
                 sys.exit(0)
             elif o in ("--fdir", "f"):
                 fdir = a
-                print "fdir=%s"%fdir
             elif o in ("--odir", "o"):
                 odir = a
-                print "odir=%s"%odir 
             elif o in ("-i", "--idata"):
                 datslice = [int(i) for i in a.replace(","," ").split()]
-                print "idata = range(",datslice,")"
                 idata = range(*datslice)
             elif o in ["--UL"]:
-                DLC_ul = True
+                DLC_ul = int(a)
                 
-        try:
-            os.mkdir(odir)
-            os.mkdir(fdir)
-        except OSError:
-            pass
+            if not fdir.endswith('/'): fdir+='/'
+            if not odir.endswith('/'): odir+='/'
+
+            try:
+                os.mkdir(odir)
+            except OSError:
+                pass
+            try:
+                os.mkdir(fdir)
+            except OSError:
+                pass
         
+        print "fig dir: %s" % fdir
+        print "out dir: %s" % odir
+        print "data range", datslice
+        print "DLC_UL = %d" % DLC_ul
                 
         # process arguments
         for s in reversed(args):
