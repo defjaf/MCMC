@@ -513,9 +513,9 @@ def mainmain(argv=None):
             if o in ("-h", "--help"):
                 print mainmain.__doc__
                 sys.exit(0)
-            elif o in ("--fdir", "f"):
+            elif o in ("--fdir", "-f"):
                 fdir = a
-            elif o in ("--odir", "o"):
+            elif o in ("--odir", "-o"):
                 odir = a
             elif o in ("-i", "--idata"):
                 datslice = [int(i) for i in a.replace(","," ").split()]
