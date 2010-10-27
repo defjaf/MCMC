@@ -292,7 +292,7 @@ def postprocess(dirname="./", multiple=None):
                 
             
             
-            dt = np.dtype([A
+            dt = np.dtype([
                 ('name', 'S21'),
                 ('mean', np.float, (npar,)), 
                 ('sig', np.float, (npar,)), 
@@ -547,7 +547,7 @@ def mainmain(argv=None):
             except ValueError:
                 break
         print "which=", which
-        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir)
+        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir, idata=idata)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             
