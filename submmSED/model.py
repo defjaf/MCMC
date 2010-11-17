@@ -23,6 +23,8 @@ import Proposal
 ####  TODO: use amplitude>0 prior???
 
 ##### TODO: get the total far-IR luminosity [for each component] of an object with a given model DONE
+##### NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
+
 
 ##### TODO: correctly normalized prior
 
@@ -71,7 +73,7 @@ except ImportError:
     def totalflux(beta, T, nu1=None, nu2=None):
       """
       calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
-      CHECK: the integral is done dnu in GHz so need to multiply by 1e9 to convert to 
+      NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
       """
 
       if nu1 is None and nu2 is None:
