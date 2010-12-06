@@ -125,7 +125,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 
             fig = plt.figure(fig0)
             lnLike = []
-            maxlnLike, maxLikeParams = getdist.histgrid(mcmc[-1], noPlot=noHist)
+            maxlnLike, maxLikeParams = getdist.histgrid(
+                                         mcmc[-1], noPlot=noHist, params=np.where(np.array(sigmas)>0)[0])
             plt.suptitle(name)
     
             if savefig:

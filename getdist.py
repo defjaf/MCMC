@@ -208,6 +208,8 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
                 ax.set_yticklabels([])
             elif labels is not None:
                 ax.set_ylabel(labels[par1])
+                ax.set_yticks(ax.get_ylim())
+                
                 
     for ipar, par in enumerate(params):
         ax=fig.add_subplot(nrow, ncol, npar*(npar-1)+ipar+1)
@@ -215,8 +217,12 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         hist(MCMC, par, nbins=nbins, axis=ax)
         if ipar != 0:
             ax.set_yticklabels([])
+        else:
+            ax.set_yticks(ax.get_ylim())
+
         if labels is not None:
             ax.set_xlabel(labels[par])
+            ax.set_xticks(ax.get_xlim())
             
     if not quiet: plt.draw()
     
