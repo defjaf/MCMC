@@ -56,6 +56,9 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     
     ret = []
         
+    start = np.array(start) + np.array(sigmas)*np.random.randn(len(start))
+    print "randomizing start:", start
+            
     ## read the data
     if DLC:
         alldata = data.readfluxes_DLC(filename)
