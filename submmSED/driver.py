@@ -56,7 +56,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     
     ret = []
         
-    start = np.array(start) + np.array(sigmas)*np.random.randn(len(start))
+    start = np.array(start) + 0.5*np.array(sigmas)*np.random.randn(len(start))
     print "randomizing start:", start
             
     ## read the data
