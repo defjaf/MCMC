@@ -208,7 +208,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #idata =[i*25 for i in range(12,57)]
 nMC = (15000,100000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(1400,1717) #None   #[0,300,700] #
+idata = range(0,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
 fil = "./ERCSCiifsczbg.dat"
 
@@ -500,7 +500,7 @@ def mainmain(argv=None):
     odir = "./out_DLC2_1/"
     DLC_ul = True
     which = []
-    datslice=(0,700)
+    datslice=(0,1717)
     
     longopts = ["help", "fdir=", "odir=", "idata=", "UL="]
     shortopts = "hf:o:i:"
