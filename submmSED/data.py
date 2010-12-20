@@ -12,6 +12,12 @@ from GaussianData import GaussianData
 
 ##  multiple SEDs -- should just require initialization with a list of data...
 
+#color corrections
+# 857GHz    1.02 
+# 545GHz    1.1
+# 353GHz    1.13
+
+
 speed_of_light = 299792.458 ### micron GHz
 
 class submmData(GaussianData):
@@ -77,7 +83,7 @@ def readfluxes_DLC(filename):
 
 
 
-def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False, old_MRR=False):
+def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False, old_MRR=False, next0=True, colorx=[1.02, 1.1, 1.13, 1, 1, 1]):
     """
     read fluxes from an MRR file. 
     
@@ -112,6 +118,9 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
 
     Most of the parameters are from the IIFSCz catalogue, for which there is a 
     readme file at http://astro.ic.ac.uk/~mrr/fss/readmefss
+    
+    ### colorx gives the factor with which to divide the Planck fluxes at 
+         857, 545, 353, 217 (usu. only first three matter?)
     
     """
     
@@ -199,16 +208,25 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
     lambda_IRAS = asarray([12.0, 25.0, 60.0, 100.0]) ## microns
     nu_Planck_all = [857., 545., 353., 217.]  ## GHz
     nu_Planck = asarray([nu for i, nu in enumerate(nu_Planck_all) if i not in Planck_ignore])
+    if colorx is not None:
+        cx = asarray([c for i, c in enumerate(colorx) if i not in Planck_ignore])
+    else:
+        cx = 1.0
             
     lines = np.genfromtxt(filename, dtype=dtype, delimiter=delims)
     
     data = []
     for obj in lines:
+        if next0 and obj['next']==0:
+            continue ## ignore anything w/o next==0
+            
         z = obj['z']
         name = obj['nameIRAS']
         nu_obs = list(nu_Planck)
-        flux =  [1e-3*obj[i] for i in ['s%d' % int(f) for f in nu_Planck]] 
-        sig  =  [1e-3*obj[i] for i in ['e%d' % int(f) for f in nu_Planck]] 
+        flux = [1e-3*obj[i] for i in ['s%d' % int(f) for f in nu_Planck]]
+        sig  = [1e-3*obj[i] for i in ['e%d' % int(f) for f in nu_Planck]]
+        flux = [fi/cxi for fi,cxi in zip(flux, cx)]
+        sig  = [si/cxi for si,cxi in zip(sig, cx)]
         for i,lam in enumerate(lambda_IRAS):
             if i in IRAS_ignore: 
                 continue    ## don't include this frequency
