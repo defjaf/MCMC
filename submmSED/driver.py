@@ -43,7 +43,6 @@ fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
-
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
          fdir = "./", logplot=True, DLC_ul=False, check=None):
@@ -56,8 +55,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     
     ret = []
         
-    start = np.array(start) + 0.5*np.array(sigmas)*np.random.randn(len(start))
-    print "randomizing start:", start
+#    start = np.array(start) + 0.5*np.array(sigmas)*np.random.randn(len(start))
+#    print "randomizing start:", start
             
     ## read the data
     if DLC:

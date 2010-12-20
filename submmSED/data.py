@@ -83,7 +83,7 @@ def readfluxes_DLC(filename):
 
 
 
-def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False, old_MRR=False, next0=True, colorx=[1.02, 1.1, 1.13, 1, 1, 1]):
+def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False, old_MRR=False, next0=True, colorx=[1.02, 1.1, 1.13, 1.0]):
     """
     read fluxes from an MRR file. 
     
@@ -211,7 +211,10 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
     if colorx is not None:
         cx = asarray([c for i, c in enumerate(colorx) if i not in Planck_ignore])
     else:
-        cx = 1.0
+        cx = asarray(1.0)
+        
+    if np.any(cx != np.asarray([1.0])):
+        print "color corrections:", cx
             
     lines = np.genfromtxt(filename, dtype=dtype, delimiter=delims)
     
