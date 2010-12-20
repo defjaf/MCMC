@@ -13,6 +13,10 @@ from __future__ import division
 ### 10 June 2010: added derived parameters -- likelihood needs getDerived(*params), nDerived, derivedTexNames
 ###   should just keep them in the parameter samples array or treat separately????
 
+### Dec 2010: Allow randomized starting points. 
+##            currently, setStart just returns if given a bad starting point, which fails later on.
+##            should allow some sort of loop?
+
 import math
 
 from progressbar import ProgressBar

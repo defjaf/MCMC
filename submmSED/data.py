@@ -220,7 +220,8 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
     
     data = []
     for obj in lines:
-        if next0 and obj['next']==0:
+        if next0 and obj['next']!=0:
+            print "Skipping object %s" % obj['nameIRAS']
             continue ## ignore anything w/o next==0
             
         z = obj['z']
