@@ -90,6 +90,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             dat = [alldata[j] for j in i]
             name = " + ".join(str(int(d.name)) for d in dat)
             singleObject = False
+        except IndexError:
+            continue   ## could probably just break?
         
         print "Object[s] %s" % name
     
