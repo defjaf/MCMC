@@ -1,0 +1,9 @@
+MRR data -  ERCSCiifsczbg.dat
+
+out_MRR_UL: all frequencies included
+out_UL1: DLC_UL=1 Removing 12micron and 217GHz; 25micron UL
+out_UL2: DLC_UL=2 Removing 12micron, 353 GHz, 217GHz; 25micron UL
+         (unfortunately, not sure what all the individual subfiles with overlapping names are...)
+out_next0: DLC_UL=1 with next=0 flag only (no extended sources) AND color correction
+           two separate runs due to memory errors (and index errors so no final out_[?].pickle files produced)
+           writeTabAll run on the check{0,1}.npy files and combined by hand to produce the final tables
