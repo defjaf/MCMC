@@ -91,7 +91,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             name = " + ".join(str(int(d.name)) for d in dat)
             singleObject = False
         except IndexError:
-            continue   ## could probably just break?
+            print "Got IndexError -- no more objects at i=%d" % i
+            break   ## or continue?
         
         print "Object[s] %s" % name
     
