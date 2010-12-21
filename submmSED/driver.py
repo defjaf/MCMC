@@ -204,7 +204,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     
     
 def recover():
-    """ to recover from checkpoint files """
+    """ to recover from checkpoint files -- UNFINISHED, but note that postprocess now works on checkpoints"""
     with open("./submmSED/out_next0/check0.npy") as f:
         ret0 = pickle.load(f)
     with open("./submmSED/out_next0/check1.npy") as f:
