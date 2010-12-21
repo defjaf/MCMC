@@ -200,6 +200,14 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     return ret
     
     
+def recover():
+    """ to recover from checkpoint files """
+    with open("./submmSED/out_next0/check0.npy") as f:
+        ret0 = pickle.load(f)
+    with open("./submmSED/out_next0/check1.npy") as f:
+        ret1 = pickle.load(f)
+        
+    
 
 # idata =[i*50 for i in range(6,29)]
 # nMC = (15000,100000)
@@ -253,12 +261,17 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     return ret1, ret2, ret3, ret4
     
 
-def postprocess(dirname="./", multiple=None):
-    
+def postprocess(dirname="./", multiple=None, check=False):
+    """
+    process the pickle files returned by main() and many() routines.
+    Can also deal with the slightly-different format of the checkpoint files.
+    """    
     #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes) DONE
     #### allow combining different pickle files DONE
+    
     #### TODO: fix the normalization on the evidence calculations (priors are currently incorrect)
     ####        can use Savage-Dickey?
+    
     
     nrun = 4
     
@@ -274,7 +287,10 @@ def postprocess(dirname="./", multiple=None):
         
         for dirn in dirname:
         
-            fname = dirn+"out_[%d].pickle" % i        
+            if check:
+                fname = dirn+"check%d.npy" % i                        
+            else:
+                fname = dirn+"out_[%d].pickle" % i        
             print fname
             try:
                 with open(fname) as f:
@@ -283,7 +299,8 @@ def postprocess(dirname="./", multiple=None):
                 continue
             
             ix = idxs[i]
-            ret0 = ret0[i]
+            if not check: 
+                ret0 = ret0[i]
             nobj = len(ret0)
             npar = len(ix)
             try:
@@ -355,9 +372,9 @@ def postprocess(dirname="./", multiple=None):
     return ret
 
 
-def writeTabAll(ret123, fbase, ext='.npy', dirname=None):
+def writeTabAll(ret123, fbase, ext='.npy', dirname=None, check=False):
     if dirname is not None:
-        ret123 = postprocess(dirname)
+        ret123 = postprocess(dirname, check=check)
         
     for i, r in enumerate(ret123):
         if len(r)>0:
