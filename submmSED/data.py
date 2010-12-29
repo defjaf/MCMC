@@ -42,7 +42,7 @@ class submmData(GaussianData):
         """ plot the data """
         if wavelength:
             x = speed_of_light/self.freq
-            xlab = "wavelength [microns]"
+            xlab = "wavelength [$\mu$m]"
         else:
             x = self.freq
             xlab = "frequency [GHz]"

@@ -44,7 +44,7 @@ fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 
-wavelength = False ### Planck format
+wavelength = True ### Planck format
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
