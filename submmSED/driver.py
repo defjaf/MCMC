@@ -22,6 +22,8 @@ import numpy as np
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use("AGG")
+    plottype = "png"
+    
     #print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
     
 import matplotlib.pyplot as plt
@@ -42,10 +44,12 @@ fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 
+wavelength = False ### Planck format
+
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, DLC_ul=False, check=None):
+         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True):
         
         
     speedOfLight = 299792.  ## micron GHz
@@ -64,10 +68,10 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     elif MRR:
         if DLC_ul==1:
             print "Removing 12micron and 217GHz; 25micron UL"
-            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True)
+            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True, next0=next0)
         elif DLC_ul==2:
             print "Removing 12micron, 353 GHz, 217GHz; 25micron UL"
-            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[2,3], DLC_ul=True)
+            alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[2,3], DLC_ul=True, next0=next0)
         else:
             alldata = data.readfluxes_MRR(filename)
     else:
@@ -130,9 +134,13 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 
             fig = plt.figure(fig0)
             lnLike = []
+            plt.subplots_adjust(wspace=0.3, hspace=0.25)
             maxlnLike, maxLikeParams = getdist.histgrid(
-                                         mcmc[-1], noPlot=noHist, params=np.where(np.array(sigmas)>0)[0])
-            plt.suptitle(name)
+                                         mcmc[-1], noPlot=noHist, params=np.where(np.array(sigmas)>0)[0],
+                                         burn=0.2, stride=1)
+            plt.subplots_adjust()
+
+            #plt.suptitle(name)
     
             if savefig:
                 try:
@@ -141,7 +149,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                     fname = fdir+name
                     
                 try:     ### move close to finally clause? 
-                    fig.savefig(fname+"_0.png")
+                    fig.savefig(fname+"_0."+plottype)
                     plt.close(fig)
                 except Exception as err:  ## dangerous -- catch anything!
                     print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png"
@@ -157,14 +165,14 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             print "ln Pr of mean = %f" % meanlnProb
             MLmod = mod(*maxLikeParams)
             try:
-                meanmod.plot(dat, wavelength=True, logplot=logplot)
-                MLmod.plot(dat, wavelength=True, logplot=logplot)
-                plt.suptitle(name)    
+                meanmod.plot(dat, wavelength=wavelength, logplot=logplot)
+                MLmod.plot(dat, wavelength=wavelength, logplot=logplot)
+                # plt.suptitle(name)    
             except AttributeError:
                 pass
             if savefig:
                 try:     ### move close to finally clause? 
-                    fig.savefig(fname+"_1.png")
+                    fig.savefig(fname+"_1."+plottype)
                     plt.close(fig)
                 except Exception as err:   ## dangerous -- catch anything!
                     print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png"
@@ -223,7 +231,7 @@ idata = range(0,1717) #None   #[0,300,700] #
 fil = "./ERCSCiifsczbg.dat"
 
 
-def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", **keywords):
+def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
 
     print "Using file %s" % fil
     
@@ -236,21 +244,21 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir,
-                    check=cdir+"check0.npy", **keywords)
+                    check=cdir+"check0.npy", next0=next0, **keywords)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir,
-                    check=cdir+"check1.npy",**keywords)
+                    check=cdir+"check1.npy", next0=next0, **keywords)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir,
-                    check=cdir+"check2.npy",**keywords)
+                    check=cdir+"check2.npy", next0=next0, **keywords)
                 
                 
     if 3 in which:
@@ -258,7 +266,7 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
         ret4 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(1,2,2, 1, 2, 2), retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
-                    check=cdir+"check3.npy",**keywords)
+                    check=cdir+"check3.npy", next0=next0, **keywords)
 
 
     return ret1, ret2, ret3, ret4
@@ -517,9 +525,13 @@ def mainmain(argv=None):
     # odir = "./out_MRR_UL_XX/"
     fdir = "./figs_DLC2_1/"
     odir = "./out_DLC2_1/"
+    
+    fdir = "./figs_Planckfinal/"
+    odir = "./out_Planckfinal/"
     DLC_ul = True
     which = []
     datslice=(0,1717)
+    next0 = False ### usually want True, but need this for indexing by the line numbers in the file
     
     longopts = ["help", "fdir=", "odir=", "idata=", "UL="]
     shortopts = "hf:o:i:"
@@ -570,7 +582,7 @@ def mainmain(argv=None):
             except ValueError:
                 break
         print "which=", which
-        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir, idata=idata)
+        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir, idata=idata, next0=next0)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             

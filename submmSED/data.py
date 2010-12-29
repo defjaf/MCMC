@@ -57,11 +57,13 @@ class submmData(GaussianData):
         sigs = self.sig
         plt.errorbar(x, self.d, sigs, fmt=fmt)
         if lab:
-            plt.xlabel(xlab)
-            plt.ylabel("flux")
+            plt.xlabel(xlab, size='x-large')
+            plt.ylabel("flux density [Jy]", size='x-large')
             
         plt.ylim(ymin=self.d[self.d>0].min()/10.)
-
+        plt.tick_params(labelsize='large')
+        
+        
 
 def readfluxes_DLC(filename):
     """read fluxes from a DLC file: each line is [name f1 e1 f2 e2 f3 e3 f3 e4 z]"""

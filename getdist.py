@@ -4,6 +4,9 @@ instance of class MCMC.MCMC or a shape=(nsamples, nparams) array of samples
 (and possibly a 1-d array of lnPr
 
 """
+
+### TODO: reorder the histgrid plot to put the histograms along the diagonal???A
+
 from __future__ import division
 
 import sys
@@ -19,14 +22,19 @@ from itertools import islice, groupby
 def GaussPDF(x, mean=0, stdev=1):
     return np.exp(-0.5*(x-mean)**2/stdev**2)/np.sqrt(2*np.pi)/stdev
 
-def getallsamples(MCMC, derived=True):
+def getallsamples(MCMC, burn=0, stride=1, derived=True):
     try:
         s = MCMC.samples
         if derived and MCMC.nDerived:
             s = np.hstack([s,MCMC.derived])
     except AttributeError:
         s = MCMC
-    return s
+        
+    if 0<burn<1:
+        burn *= len(s)
+
+    return s[burn::stride]
+
 
 def printvals(MCMC, params=None, lnLike=None, derived=True):
     """ like loop over hist(), but don't plot """
@@ -91,10 +99,10 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
     
     
 def hists(MCMC, nbins=30, params=None, orientation='vertical',
-          nrow=None, ncol=None, derived=True):
+          nrow=None, ncol=None, derived=True, burn=0, stride=1):
     """ plot histograms of samples """
     
-    s = getallsamples(MCMC, derived=derived)        
+    s = getallsamples(MCMC, derived=derived, burn=burn, stride=stride)        
 
     if params is None:
         npar = s.shape[1]
@@ -115,7 +123,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
         hist(s, ip, nbins=nbins, orientation=orientation)
     
 
-def scatter2d(MCMC, params, **kwargs):
+def scatter2d(MCMC, params, burn=0, stride=1, **kwargs):
     """
     make a 2d scatterplot of params[0], params[1] from the MCMC.
 
@@ -127,7 +135,7 @@ def scatter2d(MCMC, params, **kwargs):
     """
 
     derived = kwargs.setdefault('derived', False)
-    s = getallsamples(MCMC, derived=derived)
+    s = getallsamples(MCMC, derived=derived, burn=burn, stride=stride)
     del kwargs['derived']
 
 
@@ -136,6 +144,8 @@ def scatter2d(MCMC, params, **kwargs):
 
     lnLike = kwargs.get('lnLike', None)
     if lnLike is not None:
+        if 0<burn<1: burn*=len(lnLike)
+        lnLike = lnLike[burn::stride]
         lnLike=copy.copy(lnLike)  ### necessary? following modifies lnLike
         lnLike -= max(lnLike)  ## normalize to P=1 at the maximum
         del kwargs['lnLike']
@@ -149,13 +159,15 @@ def scatter2d(MCMC, params, **kwargs):
 
     return axis.scatter(s1,s2, s=.01, edgecolors='none', **kwargs)
 
-def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True, maxlnLike=[], noPlot=False):
+def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False, derived=True, maxlnLike=[], noPlot=False,
+            burn=0, stride=1):
     """
     make a 2d grid of histograms and scatterplots of the selected parameters
     """
 
-    s = getallsamples(MCMC, derived=derived)
-        
+    s = getallsamples(MCMC, derived=derived)  
+    ## get all the samples so we can search for the max like
+
     try:
         if lnLike is None: lnLike = MCMC.lnPr
     except AttributeError:
@@ -166,6 +178,11 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         maxLikeParams = s[lnLike.argmax()]
         print 'Max ln likelihood %f at parameters:' % maxlnLike
         print maxLikeParams
+        
+    if burn>0 or stride>1:
+        if 0<burn<1: burn*=len(s)
+        s = s[burn::stride,:]
+
         
     if noPlot and lnLike is not None:  ### hmmmm, should refactor?
         return (maxlnLike, maxLikeParams)
@@ -201,28 +218,32 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
             ax=fig.add_subplot(nrow, ncol, npar*ipar1+ipar2+1)
             ax.hold(False)
             #splot = \ 
-            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, derived=derived)
+            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, 
+                      derived=derived, burn=burn, stride=stride)
                     ### par2, par1 since x-axis along columns
             ax.set_xticklabels([])
             if ipar2 != 0:
                 ax.set_yticklabels([])
             elif labels is not None:
-                ax.set_ylabel(labels[par1])
+                ax.set_ylabel(labels[par1], size='x-large')
                 ax.set_yticks(ax.get_ylim())
-                
+            ax.tick_params(labelsize='x-large')
+            
                 
     for ipar, par in enumerate(params):
         ax=fig.add_subplot(nrow, ncol, npar*(npar-1)+ipar+1)
         ax.hold(False)
         hist(MCMC, par, nbins=nbins, axis=ax)
-        if ipar != 0:
-            ax.set_yticklabels([])
-        else:
-            ax.set_yticks(ax.get_ylim())
+        ax.set_yticklabels([])
+        # if ipar != 0:
+        #     ax.set_yticklabels([])
+        # else:
+        #     ax.set_yticks(ax.get_ylim())
 
         if labels is not None:
-            ax.set_xlabel(labels[par])
+            ax.set_xlabel(labels[par], size='x-large')
             ax.set_xticks(ax.get_xlim())
+        ax.tick_params(labelsize='x-large')
             
     if not quiet: plt.draw()
     
