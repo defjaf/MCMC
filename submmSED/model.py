@@ -4,7 +4,7 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max
+from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max, vectorize
 from scipy import special,integrate
 #import numexpr as ne
 
@@ -70,6 +70,7 @@ except ImportError:
 #          return prefac*nu**(3+beta)/(exp(x)-1)
           return prefac * nu0**(-beta) * nu**(3+beta)/(exp(x)-1)
 
+    @vectorize
     def totalflux(beta, T, nu1=None, nu2=None):
       """
       calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
