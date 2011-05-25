@@ -369,7 +369,7 @@ def postprocess(dirname="./", multiple=None, check=False):
                     ### new DLC information
                     ret_i[iobj]['z'] = obj[3]
                     ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
-                    ret_i[iobj]['flux'] = np.array(obj[5])
+                    ret_i[iobj]['flux'] = np.array(obj[5])  ### AHJ: PROBLEM HERE?????
                 except IndexError:
                     pass
                     
@@ -441,7 +441,7 @@ def writeTab(ret, fname, names=None):
     for i in range(ndat):
         hdr.append("flux %d" % i)
         hdr.append("sigflux %d" % i)
-    for i in range(nt):
+    for i in range(nt):   ### at least one of these is printed incorrectly!!!
         hdr.append("greybody flux %d" % i)
         
     nhead = len(hdr)
