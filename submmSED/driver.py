@@ -224,7 +224,7 @@ def recover():
 # nMC = (15000,100000)
 
 #idata =[i*25 for i in range(12,57)]
-nMC = (15000,100000)
+nMC = (15000,300000)
 #    fil = "./ercsc_iifscz.txt"
 idata = range(0,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
