@@ -34,7 +34,7 @@ import data
 import model
 import getdist
 
-import joblib
+# import joblib
 
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
@@ -49,7 +49,7 @@ wavelength = True ### Planck format
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True):
+         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0):
         
         
     speedOfLight = 299792.  ## micron GHz
@@ -64,7 +64,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             
     ## read the data
     if DLC:
-        alldata = data.readfluxes_DLC(filename)
+        alldata = data.readfluxes_DLC(filename, format=format)
     elif MRR:
         if DLC_ul==1:
             print "Removing 12micron and 217GHz; 25micron UL"
@@ -492,14 +492,14 @@ def plotter(sampler):
     #c = c1*ell*(ell+1)/(2*N.pi)
     #pylab.plot(ell, c)
     
-def simul():
-    """ supposed to do embarassingly parallel python launches, but doesn't appear to work... """
-    par = joblib.Parallel(n_jobs=3, verbose=1)
-    ret123 = par(joblib.delayed(many([w])) for w in range(3))
-    with open("out_123.pickle", 'w') as f:
-        pickle.dump(ret123, f)
-        
-    return ret123
+# def simul():
+#     """ supposed to do embarassingly parallel python launches, but doesn't appear to work... """
+#     par = joblib.Parallel(n_jobs=3, verbose=1)
+#     ret123 = par(joblib.delayed(many([w])) for w in range(3))
+#     with open("out_123.pickle", 'w') as f:
+#         pickle.dump(ret123, f)
+#         
+#     return ret123
 
 
 class Usage(Exception):
@@ -511,10 +511,12 @@ def mainmain(argv=None):
     run submmSED MCMC
     
     python driver [options] which0 [which1 ...]
+    --file: input data filename
     --fdir, -f: figure directory
     --odir, -o: output numpy pickle files
     --idata, -i: comma/space-separated list in python slice format (start, stop, step) of which data to use
     --UL: use DLC upper-limit calculation
+    --format: DLC file format (default 0; see data.py)
     which = 0: 2 comp b=2
             1: 1 comp floating b
             2: 1 comp b=2
@@ -529,11 +531,14 @@ def mainmain(argv=None):
     fdir = "./figs_Planckfinal/"
     odir = "./out_Planckfinal/"
     DLC_ul = True
+    DLC = False
     which = []
     datslice=(0,1717)
+    format=None
+    filename = fil
     next0 = False ### usually want True, but need this for indexing by the line numbers in the file
     
-    longopts = ["help", "fdir=", "odir=", "idata=", "UL="]
+    longopts = ["help", "fdir=", "odir=", "idata=", "UL=", "format=", "file="]
     shortopts = "hf:o:i:"
     if argv is None:
         argv = sys.argv
@@ -557,6 +562,11 @@ def mainmain(argv=None):
                 idata = range(*datslice)
             elif o in ["--UL"]:
                 DLC_ul = int(a)
+            elif o in ["--format"]:
+                format = int(a)
+            elif o in ["--file"]:
+                filename = a
+                
                 
             if not fdir.endswith('/'): fdir+='/'
             if not odir.endswith('/'): odir+='/'
@@ -570,10 +580,15 @@ def mainmain(argv=None):
             except OSError:
                 pass
         
+        if format is not None:
+            DLC=True
+
+        print "filename: %s" % filename 
         print "fig dir: %s" % fdir
         print "out dir: %s" % odir
         print "data range", datslice
         print "DLC_UL = %d" % DLC_ul
+        print "format = %d" % format
                 
         # process arguments
         for s in reversed(args):
@@ -582,7 +597,8 @@ def mainmain(argv=None):
             except ValueError:
                 break
         print "which=", which
-        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, cdir=odir, idata=idata, next0=next0)
+        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, DLC=DLC, cdir=odir, idata=idata, next0=next0, 
+                   fil=filename, format=format)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             

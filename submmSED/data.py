@@ -65,23 +65,64 @@ class submmData(GaussianData):
         
         
 
-def readfluxes_DLC(filename):
-    """read fluxes from a DLC file: each line is [name f1 e1 f2 e2 f3 e3 f3 e4 z]"""
-    lines = loadtxt(filename, skiprows=2)
+def readfluxes_DLC(filename, format=0):
+    """read fluxes from a DLC file: each line is 
+    
+    format 0: [name f1 e1 f2 e2 f3 e3 f3 e4 z]
+    format 1: [z f1 e1 f2 e2 f3]
+    format 2: [name f1 ... f10 e1 ... e10]   z~0, 
 
-    lambda_obs = asarray([60.0, 100, 450, 850]) ## microns
-    nu_obs = speed_of_light/lambda_obs ### GHz
-    data = []
-    for obj in lines:
-        name, f1, e1, f2, e2, f3, e3, f3, e4, z = obj
-        nu_rest = nu_obs*(1.0+z)
-        flux = obj[1:9:2]
-        sig  = obj[2:9:2]
-        name = str(int(name))
-        data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+
+    headers: Fxxx = xxx micron flux
+             Fxxx_yyy = xxx micron = yyy GHz flux
+    
+    """
+    
+    if format == 0:
+        lines = loadtxt(filename, skiprows=2)
+
+        lambda_obs = asarray([60.0, 100, 450, 850]) ## microns
+        nu_obs = speed_of_light/lambda_obs ### GHz
+        data = []
+        for obj in lines:
+            name, f1, e1, f2, e2, f3, e3, f3, e4, z = obj
+            nu_rest = nu_obs*(1.0+z)
+            flux = obj[1:9:2]
+            sig  = obj[2:9:2]
+            name = str(int(name))
+            data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+
+    elif format == 1:
+        lines = loadtxt(filename, skiprows=1)
+        
+        lambda_obs = asarray([250., 350., 500.])
+        nu_obs = speed_of_light/lambda_obs ### GHz
+        for i,obj in enumerate(lines):
+            z = obj[0]
+            nu_rest = nu_obs*(1.0+z)            
+            flux = obj[1::2]
+            sig  = obj[2::2]
+            name = str(i)+"_"+str(z)
+            data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+            
+    elif format == 2:
+        lines = loadtxt(filename, skiprows=1)
+
+        lambda_obs = asarray([25.0, 60, 100, 250, 350, 350, 500, 550, 850, 1400])
+        nu_obs = speed_of_light/lambda_obs ### GHz
+        data = []
+        nband = len(lambda_obs)
+        for obj in lines:
+            name = obj[0]
+            z = 0
+            nu_rest = nu_obs  ## z=0 for these
+            flux = obj[1:nband+1]
+            sig  = obj[nband+1:]
+            name = str(int(name))
+            data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+        
 
     return data
-
 
 
 
