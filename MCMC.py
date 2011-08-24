@@ -27,6 +27,7 @@ from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
 from numpy.random import uniform, seed
 from numpy.linalg import LinAlgError
 from numpy import empty, isnan, isfinite, isneginf, isinf
+import numpy as np
 
 from Likelihood import ZeroPosterior
 
@@ -496,21 +497,24 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
             try:
                 ana = chain_analyze(new_s.samples[(ntot//burnfrac)::stride,:],
                                     params=params)
+                means = array(ana[0])[params]
+                stdvs = array(ana[1])[params]
             except ZeroDivisionError:
                 print 'ZeroDivisionError; resampling'
                 continue
             
             #check for very small variance...
             eps = 1.e-9
-            try:
-                if max(array(ana[1])/array(ana[0])) < eps:
-                    print 'small relative variance; resampling'
-                    continue
-            except ZeroDivisionError:
-                idx = where(abs(array(ana[0]))<1.e-11)
-                if max(ana[1][idx]) < eps:
-                    print 'small absolute variance; continuing'
-                    continue
+            with np.errstate(invalid='raise'):
+                try:
+                    if max(stdvs/means) < eps:
+                        print 'small relative variance; resampling'
+                        continue
+                except (ZeroDivisionError, FloatingPointError):
+                    idx = abs(means)<1.e-11
+                    if max(stdvs[idx]) < eps:
+                        print 'small absolute variance; continuing'
+                        continue
             
             
             break   # if you get to here, you're done!

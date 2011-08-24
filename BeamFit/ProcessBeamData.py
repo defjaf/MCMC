@@ -8,8 +8,9 @@ import sys
 import math
 import operator
 import pylab
+import matplotlib.pyplot as plt
 
-import numpy
+import numpy as np
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
                     arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
@@ -31,9 +32,9 @@ import getdist
 def plot(data):
     """ contour the Beam data """
     x, y, d = regrid(data.x, data.y, data.d)
-    return pylab.gca().imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
+    return plt.gca().imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
                  interpolation='nearest', origin='lower', aspect='free')
-    #return pylab.contour(x, y, ma.log(d))    
+    #return plt.contour(x, y, ma.log(d))    
 
 
 def regrid(x, y, data, fill=0):
@@ -108,7 +109,7 @@ def plotter(sampler):
     print sampler.fmtstring % tuple(ana[1])
     print ana[2]
         
-    pylab.cla()
+    plt.cla()
     #for d in data: plotMod(d, vals, mod)
     try:
         plotMod(data[0], vals, mod)
@@ -117,6 +118,7 @@ def plotter(sampler):
     except:
         print 'Unknown error: Cannot plot results for this data:'
         print sys.exc_info()[0]
+        raise
 
 
 
@@ -126,7 +128,7 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
     setup the sampler using data over the range xyrange
     """
 
-    numpy.set_printoptions(precision=4, linewidth=150, suppress=True)
+    np.set_printoptions(precision=4, linewidth=150, suppress=True)
 
 #### set likelihood, model
 
@@ -211,11 +213,11 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
         ### can't do this with -= etc
         ###            since those chase 'singleton' class variable each time!
 
-        mod.paramBlocks = [0,1,2,3,4,5,6]
+        mod.paramBlocks = [0,1,2,3,4,5,6]    # offset only?
         mod.nBlock = 7
-#        mod.paramBlocks = [0,1,2,3,4,5,6,7,8]
-#        mod.nBlock = 9
-   #     mod.paramBlocks = [0,1,2,3,4,5]
+   #     mod.paramBlocks = [0,1,2,3,4,5,6,7,8]  ## offset and grad
+   #     mod.nBlock = 9
+   #     mod.paramBlocks = [0,1,2,3,4,5]      ## no offset, no grad
    #     mod.nBlock = 6
 
     print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
@@ -228,21 +230,21 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
 def get_likelihood_grid(like, params):
     """calculate the likelihood in an x,y grid with other params set as in params
     """
-    xx = numpy.linspace(like.data[0].x.min(), like.data[0].x.max())
-    yy = numpy.linspace(like.data[0].y.min(), like.data[0].y.max())
-    xg,yg = pylab.meshgrid(xx,yy)
+    xx = np.linspace(like.data[0].x.min(), like.data[0].x.max())
+    yy = np.linspace(like.data[0].y.min(), like.data[0].y.max())
+    xg,yg = plt.meshgrid(xx,yy)
     
     def mylike(x1,y1):
         myparams = [(x1,y1)]
         myparams.extend(params[1:])
         return like(tuple(myparams))
     
-    ll = numpy.array([mylike(x,y) for x in xx for y in yy])
+    ll = np.array([mylike(x,y) for x in xx for y in yy])
     ll.shape=(len(xx),len(yy))
-    ax = pylab.gca()
+    ax = plt.gca()
     #ax.pcolor(xx, yy, d, shading='flat', hold='true')
-    ax.pcolor(xg, yg, numpy.transpose(ll), shading='flat')
-    pylab.show()
+    ax.pcolor(xg, yg, np.transpose(ll), shading='flat')
+    plt.show()
     return xg, yg, ll
                 
 
@@ -282,13 +284,15 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
         vals = like.model.package(ana[0])
         sigs = like.model.package(ana[1])
         
-        pylab.gca().cla()
+        plt.gca().cla()
         for d in data: plotMod(d, vals, mod)
 
 
-def plotMod(data, params=None, model=None, hold=False):
+def plotMod_OLD(data, params=None, model=None, hold=False):
     """ plot the data with params 
     actually, doesn't use the model parameter"""
+    print "in plotMod; returning right away."
+    return
     x, y, d = regrid(data.x, data.y, data.d)
     ### make full 2d x, y arrays (there's probably a more clever way to do this!)
     ij = 0
@@ -299,16 +303,31 @@ def plotMod(data, params=None, model=None, hold=False):
             xx[ij] = x[i]
             yy[ij] = y[j]
             ij += 1
-    pylab.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
+    plt.imshow(ma.filled(d,0), extent=[min(x), max(x), min(y), max(y)],
                  interpolation='nearest', origin='lower', aspect='auto', hold=hold)
     ## aspect = 'preserve' for square pixels; can't do that with contour however
-    #pylab.contour(x, y, ma.log(d))
+    #plt.contour(x, y, ma.log(d))
     if params is not None:
         vals = model(*params).atxy(xx, yy)
         vals.shape = d.shape
-        pylab.contour(x, y, vals)
+        plt.contour(x, y, vals)
 
 
+
+def plotMod(data, params=None, model=None, hold=False):
+    """ plot the data with params 
+    actually, doesn't use the model parameter"""
+
+    plt.scatter(data.x, data.y, s=0.3, c=data.d, linewidth=0)
+
+    if params is not None and model is not None:
+        shape = (150, 150)
+        xx = np.linspace(data.x.min(), data.x.max(), num=shape[0])
+        yy = np.linspace(data.y.min(), data.y.max(), num=shape[1])
+        xg, yg = np.meshgrid(xx, yy)
+        vals = model(*params).atxy(xg.flatten(), yg.flatten())
+        vals.shape = shape
+        plt.contour(xx, yy, vals)
 
 
 class DataSizeError(Exception):
