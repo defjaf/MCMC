@@ -8,10 +8,9 @@ from __future__ import division
     
     mostly works. todo:
     
-       don't plot hists for fixed params (see submm dir?)
        check paramblock functionality. better to do all in one block after 1st run?
-       
-    
+       data/contour plot aspect ratio       
+       better proposal width?
     
 
 """
@@ -20,7 +19,7 @@ import sys
 import math
 import os.path
 import pickle
-import pylab
+import matplotlib.pyplot as plt
 import gzip
 from itertools import izip, repeat
 
@@ -90,7 +89,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 for MC in MCs:
                     ib += 1
                     print 'file: %s, iter: %d, MC: %d' % (f, it, MC)
-                    fig=pylab.figure(irun*ntotrun+nfig*run)
+                    fig=plt.figure(irun*ntotrun+nfig*run)
                     ax=fig.add_subplot(nrow, ncol, ib+1)
                     ax.cla()
 
@@ -105,7 +104,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                                            noCorrelations=noCorrelations,
                                            doBlock=doBlock))
 
-                    fig=pylab.figure(irun*ntotrun+nfig*run+1)
+                    fig=plt.figure(irun*ntotrun+nfig*run+1)
                     ax=fig.add_subplot(nrow, ncol, ib+1)
                     samples = cat([ s.samples for s in res[-1][0] ])
                     for var in samples.transpose(): ax.plot(var)
@@ -152,7 +151,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
                 res[ib] = []
                 startres = []
     
-                fig=pylab.figure(0)
+                fig=plt.figure(0)
                 ax=fig.add_subplot(nrow, ncol, ib+1)
                 ax.cla()
     
@@ -179,7 +178,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
     
     
                     sys.stdout.flush()
-                    fig=pylab.figure(1)
+                    fig=plt.figure(1)
                     ax=fig.add_subplot(nrow, ncol, ib+1)
                     samples = cat([ s.samples for s in res[ib][-1][0] ])
     
@@ -187,9 +186,12 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
                     if figName:
                         fig.savefig(figf+str(fig.number).strip()+'.png')
     
-                    fig=pylab.figure(2)
-                    getdist.histgrid(res[ib][-1][0][-1])
-    
+                    fig=plt.figure(2)
+                    plt.subplots_adjust(wspace=0.3, hspace=0.25)
+                    pidx = np.where(like.model.unpackage(prop_sigmas)>0)[0]                    
+                    getdist.histgrid(res[ib][-1][0][-1], params=pidx)
+                    plt.subplots_adjust()
+
                     if figName:
                         fig.savefig(figf+str(fig.number).strip()+'.png')
     
@@ -200,9 +202,9 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
                 ib += 1
                     
 
-        if closeFigs: pylab.close('all')
+        if closeFigs: plt.close('all')
 
-    pylab.show()
+    plt.show()
     return res
 
 
