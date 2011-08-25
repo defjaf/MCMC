@@ -149,7 +149,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
         for it in iters:
             for MC in MCs:
                 print 'File: %s, iter: %d, MC: %d' % (f, it, MC)
-                figf = '_'.join(['',figName, f, str(MC).strip(), str(it).strip(), ''])
+                figf = '_'.join([figName, f, str(MC).strip(), str(it).strip(), ''])
                 
                 res[ib] = []
                 startres = []
