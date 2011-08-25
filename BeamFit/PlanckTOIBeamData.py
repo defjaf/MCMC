@@ -64,6 +64,9 @@ def read_data_Planck_TOI(files=None, sigma=None):
     return data, xyrange
 
 
+### not sure what the difference between "sampleall" and "testPlanck". 
+###   the latter explicitly makes a plot...
+
 ## rewritten for Planck -- just the very inner loop is generic
 def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
               noCorrelations=True, fac=None, doBlock=True, nhits=None):
