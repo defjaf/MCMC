@@ -4,12 +4,12 @@ from __future__ import division
     read and process TOI data from Planck (based on original from MAXIPOL
        modified for Planck IMG2D data). This version uses flat files from A Chamballu 
     
-    need white noise level? 
+    need white noise level from data RMS. (Not ideal)
     
     mostly works. todo:
     
        check paramblock functionality. better to do all in one block after 1st run?
-       data/contour plot aspect ratio       
+       data/contour plot aspect ratio
        better proposal width?
     
 
@@ -18,22 +18,16 @@ from __future__ import division
 import sys
 import math
 import os.path
-import pickle
 import matplotlib.pyplot as plt
-import gzip
 import itertools as itt
 
-import numpy
+import numpy as np
 from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace,
                    arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
-import numpy as np
-
 from BeamData import BeamData
-
 from ProcessBeamData import setup_sampler, sample1beam, plotter
-
 import getdist
 
 sigminmax=[0,10]
@@ -41,12 +35,9 @@ sigminmax=[0,10]
                
 def read_data_Planck_TOI(files=None, sigma=None):
     """
-    
     read TOI data. 
-
     """
     
-   
     data = []
     for fset in files:
         x, y, img, model = np.loadtxt(fset, unpack=True)
@@ -128,22 +119,20 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
     
     reslist = []
     nfig=2
-    ntotrun = nfig
 
     if MCs is None: MCs = [1]
 
     fdir = os.path.expanduser("~/FPtesting/Beams/TOIs/")
     files = ["model_10_143_5.dat", "model_84_217_4.dat"]
 
-    ntot = len(files) * len(iters) * len(MCs)
+    ntot = len(files) * len(MCs)
     nrow = ncol = int(math.sqrt(ntot))
     if nrow*ncol < ntot: ncol += 1
     if nrow*ncol < ntot: nrow += 1
 
-
     res={}
     for ib, (f, MC) in enumerate(itt.product(files, MCs)):
-        print 'File: %s, iter: %d, MC: %d' % (f, MC)
+        print 'File: %s, MC: %d' % (f, MC)
         figf = '_'.join([figName, f, str(MC).strip()])
         
         res[ib] = []

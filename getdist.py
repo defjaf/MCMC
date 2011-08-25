@@ -65,7 +65,7 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
     return (maxlnLike, maxLikeParams)
     
 
-def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, derived=True):
+def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, derived=True, label=None):
     """
     for the MCMC output (or just the list of samples),
     use pylab to make a histograms of parameter number=param
@@ -80,12 +80,14 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
     if axis is None: 
         axis=plt.gca()
 
+
     hist = axis.hist(s1,  bins=nbins, orientation=orientation)
 
     if gauss:
+        if label is None: label = ""
         stdv = s1.std()  ## stddev(s1)
         mean = s1.mean()
-        print 'mean = %f +- %f' % (mean, stdv)
+        print '%10s mean = %f +- %f' % (label, mean, stdv)
         if stdv > 0:
             smin, smax = min(hist[1]), max(hist[1])
             norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
@@ -233,7 +235,8 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
     for ipar, par in enumerate(params):
         ax=fig.add_subplot(nrow, ncol, npar*(npar-1)+ipar+1)
         ax.hold(False)
-        hist(MCMC, par, nbins=nbins, axis=ax)
+        label = labels[par].strip().strip("$") if labels is not None else None
+        hist(MCMC, par, nbins=nbins, axis=ax, label=label)
         ax.set_yticklabels([])
         # if ipar != 0:
         #     ax.set_yticklabels([])
