@@ -21,7 +21,7 @@ import os.path
 import pickle
 import matplotlib.pyplot as plt
 import gzip
-from itertools import izip, repeat
+import itertools as itt
 
 import numpy
 from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace,
@@ -119,7 +119,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 #  corrected for Planck ##MAXI
 def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, 
-            iters=None, MCs=None,
+            MCs=None,
             nhits=None, rangeScale=None, 
             closeFigs=False, figName=None, startParams=None):
     """
@@ -130,9 +130,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
     nfig=2
     ntotrun = nfig
 
-    
-    if iters is None: iters = [1] ##range(1,3)
-    if MCs is None: MCs = range(20)
+    if MCs is None: MCs = [1]
 
     fdir = os.path.expanduser("~/FPtesting/Beams/TOIs/")
     files = ["model_10_143_5.dat", "model_84_217_4.dat"]
@@ -144,66 +142,61 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
 
 
     res={}
-    ib = 0
-    for f in files:
-        for it in iters:
-            for MC in MCs:
-                print 'File: %s, iter: %d, MC: %d' % (f, it, MC)
-                figf = '_'.join([figName, f, str(MC).strip(), str(it).strip(), ''])
-                
-                res[ib] = []
-                startres = []
-    
-                fig=plt.figure(0)
-                ax=fig.add_subplot(nrow, ncol, ib+1)
-                ax.cla()
-    
-                try:                
-                    ## need to run this to get the correct likelihood.
-                    ##   therefore may need to adjust prior ranges
-    
-                    data, xyrange = read_data_Planck_TOI([fdir+f])
-                                                                    
-                    like, prop_sigmas, start_params = setup_sampler(
-                        data, xyrange,
-                        useNormalizedBeam=useNormalizedBeam,sigminmax=sigminmax,
-                        rangeScale=rangeScale)
-                        
-                    if startParams is not None:
-                        start_params=startParams
+    for ib, (f, MC) in enumerate(itt.product(files, MCs):)
+        print 'File: %s, iter: %d, MC: %d' % (f, MC)
+        figf = '_'.join([figName, f, str(MC).strip()])
         
-                    res[ib].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
-                                           start_params=start_params, fac=fac, 
-                                           noCorrelations=noCorrelations, doBlock=doBlock))
-        
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
-    
-    
-                    sys.stdout.flush()
-                    fig=plt.figure(1)
-                    ax=fig.add_subplot(nrow, ncol, ib+1)
-                    samples = cat([ s.samples for s in res[ib][-1][0] ])
-    
-                    for var in samples.transpose(): ax.plot(var)
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
-    
-                    fig=plt.figure(2)
-                    plt.subplots_adjust(wspace=0.3, hspace=0.25)
-                    pidx = np.where(like.model.unpackage(prop_sigmas)>0)[0]                    
-                    getdist.histgrid(res[ib][-1][0][-1], params=pidx)
-                    plt.subplots_adjust()
+        res[ib] = []
+        startres = []
 
-                    if figName:
-                        fig.savefig(figf+str(fig.number).strip()+'.png')
-    
-                except None:
-                    print "Unexpected error:", sys.exc_info()[0]
-                    print "... when running File: %s, iter: %d, MC: %d" % (file, it, MC)
-                    
-                ib += 1
-                    
+        fig=plt.figure(0)
+        ax=fig.add_subplot(nrow, ncol, ib+1)
+        ax.cla()
+
+        try:                
+            ## need to run this to get the correct likelihood.
+            ##   therefore may need to adjust prior ranges
+
+            data, xyrange = read_data_Planck_TOI([fdir+f])
+                                                            
+            like, prop_sigmas, start_params = setup_sampler(
+                data, xyrange,
+                useNormalizedBeam=useNormalizedBeam,sigminmax=sigminmax,
+                rangeScale=rangeScale)
+                
+            if startParams is not None:
+                start_params=startParams
+
+            res[ib].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
+                                   start_params=start_params, fac=fac, 
+                                   noCorrelations=noCorrelations, doBlock=doBlock))
+
+            if figName:
+                fig.savefig(figf+str(fig.number).strip()+'.png')
+
+
+            sys.stdout.flush()
+            fig=plt.figure(1)
+            ax=fig.add_subplot(nrow, ncol, ib+1)
+            samples = cat([ s.samples for s in res[ib][-1][0] ])
+
+            for var in samples.transpose(): ax.plot(var)
+            if figName:
+                fig.savefig(figf+str(fig.number).strip()+'.png')
+
+            fig=plt.figure(2)
+            plt.subplots_adjust(wspace=0.3, hspace=0.25)
+            pidx = np.where(like.model.unpackage(prop_sigmas)>0)[0]                    
+            getdist.histgrid(res[ib][-1][0][-1], params=pidx)
+            plt.subplots_adjust()
+
+            if figName:
+                fig.savefig(figf+str(fig.number).strip()+'.png')
+
+        except None:
+            print "Unexpected error:", sys.exc_info()[0]
+            print "... when running File: %s, iter: %d, MC: %d" % (file, it, MC)
+                                
 
         if closeFigs: plt.close('all')
 
