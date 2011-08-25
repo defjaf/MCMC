@@ -142,7 +142,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
 
 
     res={}
-    for ib, (f, MC) in enumerate(itt.product(files, MCs):
+    for ib, (f, MC) in enumerate(itt.product(files, MCs)):
         print 'File: %s, iter: %d, MC: %d' % (f, MC)
         figf = '_'.join([figName, f, str(MC).strip()])
         
