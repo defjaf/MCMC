@@ -1,3 +1,7 @@
+restrict angle?
+restrict sigma1>sigma2?
+
+
 Lots of FP errors with use_xy = True
 
 possibly a problem with rho ~ +/-1?
