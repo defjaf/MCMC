@@ -9,7 +9,6 @@ from __future__ import division
     mostly works. todo:
     
        check paramblock functionality. better to do all in one block after 1st run?
-       data/contour plot aspect ratio
        better proposal width?
     
 
@@ -84,7 +83,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                     ib += 1
                     print 'file: %s, iter: %d, MC: %d' % (f, it, MC)
                     fig=plt.figure(irun*ntotrun+nfig*run)
-                    ax=fig.add_subplot(nrow, ncol, ib+1)
+                    ax=fig.add_subplot(nrow, ncol, ib+1, adjustable='box',aspect='equal')
                     ax.cla()
 
                     data, xyrange = read_data_Planck_TOI(f[dir+f])
@@ -139,7 +138,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
         startres = []
 
         fig=plt.figure(0)
-        ax=fig.add_subplot(nrow, ncol, ib+1)
+        ax=fig.add_subplot(nrow, ncol, ib+1, adjustable='box',aspect='equal')
         ax.cla()
 
         try:                

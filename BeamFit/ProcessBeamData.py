@@ -319,6 +319,7 @@ def plotMod(data, params=None, model=None, hold=False):
     actually, doesn't use the model parameter"""
 
     plt.scatter(data.x, data.y, s=0.3, c=data.d, linewidth=0)
+#     plt.axes().set_aspect('equal', 'box')
 
     if params is not None and model is not None:
         shape = (150, 150)
@@ -328,6 +329,8 @@ def plotMod(data, params=None, model=None, hold=False):
         vals = model(*params).atxy(xg.flatten(), yg.flatten())
         vals.shape = shape
         plt.contour(xx, yy, vals)
+
+
 
 
 class DataSizeError(Exception):
