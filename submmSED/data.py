@@ -109,6 +109,7 @@ def readfluxes_DLC(filename, format=0):
         lines = loadtxt(filename, skiprows=1)
 
         lambda_obs = asarray([25.0, 60, 100, 250, 350, 350, 500, 550, 850, 1400])
+        print "converting 25u to upper limit"
         nu_obs = speed_of_light/lambda_obs ### GHz
         data = []
         nband = len(lambda_obs)
@@ -118,6 +119,8 @@ def readfluxes_DLC(filename, format=0):
             nu_rest = nu_obs  ## z=0 for these
             flux = obj[1:nband+1]
             sig  = obj[nband+1:]
+            sig[0] = flux[0]   ## convert detection to 1-sigma upper limit
+            flux[0] = 0.0
             name = str(int(name))
             data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
         
