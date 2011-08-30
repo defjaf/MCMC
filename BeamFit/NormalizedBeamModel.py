@@ -39,7 +39,7 @@ class NormalizedBeamModel(G2D):
         set the parameters from
             (x, y), (sigma_major, sigma_minor), angle, amplitude
         """
-        super(OffsetNormalizedBeamModel, self).__init__(center, sigmas, angle)
+        super(NormalizedBeamModel, self).__init__(center, sigmas, angle)
         self.amplitude = amplitude
         sqrtdet = sigmas[0]*sigmas[1]    
         #self.norm = amplitude/sqrtdet/2/math.pi   ### CHECK THIS

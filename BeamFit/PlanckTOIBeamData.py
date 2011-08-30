@@ -59,7 +59,7 @@ def read_data_Planck_TOI(files=None, sigma=None):
 
 ## rewritten for Planck -- just the very inner loop is generic
 def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
-              noCorrelations=True, fac=None, doBlock=True, nhits=None):
+              noCorrelations=True, fac=None, doBlock=True, nhits=None, rotateParams=False):
     """
     run the sampler nruns times 
     """
@@ -94,7 +94,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
         
                     res.append(sample1beam(like, nMC=nMC,  fac=fac,
                                            prop_sigmas=prop_sigmas, start_params=start_params,
-                                           noCorrelations=noCorrelations,
+                                           noCorrelations=noCorrelations, rotateParams=rotateParams,
                                            doBlock=doBlock))
 
                     fig=plt.figure(irun*ntotrun+nfig*run+1)
@@ -109,7 +109,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
 #  corrected for Planck ##MAXI
 def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
             noCorrelations=True, fac=None, doBlock=True, 
-            MCs=None,
+            MCs=None, rotateParams=False,
             nhits=None, rangeScale=None, 
             closeFigs=False, figName=None, startParams=None):
     """
@@ -156,7 +156,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
                 start_params=startParams
 
             res[ib].append(sample1beam(like, nMC=nMC, prop_sigmas=prop_sigmas,
-                                   start_params=start_params, fac=fac, 
+                                   start_params=start_params, fac=fac, rotateParams=rotateParams,
                                    noCorrelations=noCorrelations, doBlock=doBlock))
 
             if figName:

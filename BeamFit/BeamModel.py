@@ -23,6 +23,12 @@ import math
 import Proposal
 
 
+separate_sigma12 = False
+
+if separate_sigma12:
+    print "requiring sigma1>sigma2 in prior"
+
+
 class GaussianBeamModel2D(object):
     """
     model of an unnormalized 2d gaussian beam; parameters
@@ -174,6 +180,9 @@ class GaussianBeamModel2D(object):
         
         if cls.sigMax is not None and max(sigmas) > cls.sigMax:
             return 0    # too restrictive?
+            
+        if separate_sigma12 and sigma2>sigma1:
+            return 0
         
         return 1
     

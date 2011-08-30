@@ -15,8 +15,15 @@ Warning: overflow encountered in true_divide
 and get this every time 
 Warning: invalid value encountered in true_divide
  I think due to some zeros in the statistics (/ana[0]) when some parameters are fixed??
+FIXED, I think...
+
 
 need to be able to specify use_xy in processbeamdata
 
 but otherwise the _xy version is much more sensible, as there's no angle ambiguity.
 
+MORE GENERAL:
+   try rotateParams=True/noCorrelations=False --> DONE, seems to give correct answers
+      (possibly not for alpha)
+   optionally turn off blocks when rotateParams is set?
+   

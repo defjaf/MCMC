@@ -7,7 +7,6 @@ from __future__ import division
 import sys
 import math
 import operator
-import pylab
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -249,7 +248,7 @@ def get_likelihood_grid(like, params):
                 
 
 def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000), 
-                fac=None, plotRes=None, noCorrelations=False, doBlock=False):
+                fac=None, plotRes=None, noCorrelations=False, rotateParams=False, doBlock=False):
     """
     return the full MCMC sample class as well as the summary
     statistics for the last run
