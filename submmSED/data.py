@@ -65,7 +65,7 @@ class submmData(GaussianData):
         
         
 
-def readfluxes_DLC(filename, format=0):
+def readfluxes_DLC(filename, format=0, delnu=None):
     """read fluxes from a DLC file: each line is 
     
     format 0: [name f1 e1 f2 e2 f3 e3 f3 e4 z]
@@ -123,6 +123,9 @@ def readfluxes_DLC(filename, format=0):
             flux[0] = 0.0
             name = str(int(name))
             data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+            
+    elif format == 3:
+        data = readfluxes_peel(filename, delnu=delnu)
         
 
     return data
@@ -406,3 +409,24 @@ def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
                               nu_obs=nu_obs, z_alt=z, name_alt=name_alt))
 
     return data
+
+def readfluxes_peel(filename,delnu=None):
+    ### peel format: # i j 217 Err 353 Err 545 Err 857 Err 1763 Err 1870 Err 3000 Err 4280 Err 5000 Err 12000 Err 12490 Err 25000 Err
+    ### assume z=0??
+    nu_obs = np.array([217,353,545,857,1763,1870,3000,4280,5000,12000,12490,25000])
+    nnu = len(nu_obs)
+    
+    data = []
+    lines = np.loadtxt(filename)
+    for i,obj in enumerate(lines):
+        z = 0.0
+        nu_rest = nu_obs*(1.0+z)            
+        flux = obj[2::2]
+        sig  = obj[3::2]
+        if delnu is not None:
+            flux = np.delete(flux, np.searchsorted(nu_obs,delnu))
+            sig  = np.delete(sig,  np.searchsorted(nu_obs,delnu))
+        name = '_'.join(str(int(c)) for c in [i,obj[0],obj[1]])
+        data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
+    return data
+            

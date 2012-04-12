@@ -43,13 +43,17 @@ fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
+fname_Peel = "./submmSED/pixelfit.dat"
+delnu = 1763
+
+
 
 wavelength = True ### Planck format
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, DLC=False, MRR=True, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0):
+         nMC=(10000,10000), nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
+         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
         
         
     speedOfLight = 299792.  ## micron GHz
@@ -63,9 +67,9 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
 #    print "randomizing start:", start
             
     ## read the data
-    if DLC:
-        alldata = data.readfluxes_DLC(filename, format=format)
-    elif MRR:
+    if filetype.upper() == 'DLC':
+        alldata = data.readfluxes_DLC(filename, format=format, delnu=delnu)   ### nb. format=3 is PEEL
+    elif filetype.upper() == 'MRR':
         if DLC_ul==1:
             print "Removing 12micron and 217GHz; 25micron UL"
             alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True, next0=next0)
@@ -74,6 +78,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[2,3], DLC_ul=True, next0=next0)
         else:
             alldata = data.readfluxes_MRR(filename)
+    elif filetype.upper() == 'PEEL':    ### can also read with DLC format=3
+        alldata = data.readfluxes_peel(filename, delnu=delnu)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -531,7 +537,7 @@ def mainmain(argv=None):
     fdir = "./figs_Planckfinal/"
     odir = "./out_Planckfinal/"
     DLC_ul = True
-    DLC = False
+    filetype = 'MRR'
     which = []
     datslice=(0,1717)
     format=None
@@ -581,7 +587,7 @@ def mainmain(argv=None):
                 pass
         
         if format is not None:
-            DLC=True
+            filetype = 'DLC'
 
         print "filename: %s" % filename 
         print "fig dir: %s" % fdir
@@ -589,6 +595,7 @@ def mainmain(argv=None):
         print "data range", datslice
         print "DLC_UL = %d" % DLC_ul
         print "format = %d" % format
+        print "filetype = %s" % filetype
                 
         # process arguments
         for s in reversed(args):
@@ -597,7 +604,7 @@ def mainmain(argv=None):
             except ValueError:
                 break
         print "which=", which
-        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, DLC=DLC, cdir=odir, idata=idata, next0=next0, 
+        ret = many(which, fdir=fdir, DLC_ul=DLC_ul, filetype=filetype, cdir=odir, idata=idata, next0=next0, 
                    fil=filename, format=format)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
