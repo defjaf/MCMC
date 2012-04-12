@@ -245,24 +245,27 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     
     ret1 = ret2 = ret3 =  ret4 = []
 
+    ### proposition sigmas ###
+    sA, sB, sT = 4, 8, 8   ## was 1,2,2
+
     if 0 in which:
         print "Two-Component beta = 2"
         ret1 = main(fil, getNorm=True, i = idata, 
-                    start=(1,2.,10,0.1,2.,20), sigmas=(1,0,2, 1, 0, 2), retMCMC=False,
+                    start=(1,2.,10,0.1,2.,20), sigmas=(sA,0,sT)*2, retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir,
                     check=cdir+"check0.npy", next0=next0, **keywords)
 
     if 1 in which:
         print "One-Component"
         ret2 = main(fil, getNorm=True, i = idata, 
-                    start=(1,2.,10), sigmas=(1,2,2), retMCMC=False,
+                    start=(1,2.,10), sigmas=(sA,sB,sT), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir,
                     check=cdir+"check1.npy", next0=next0, **keywords)
                 
     if 2 in which:
         print "One-Component beta = 2"
         ret3 = main(fil, getNorm=True, i = idata, 
-                    start=(1,2.,10), sigmas=(1,0,2), retMCMC=False,
+                    start=(1,2.,10), sigmas=(sA,0,sT), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir,
                     check=cdir+"check2.npy", next0=next0, **keywords)
                 
@@ -270,7 +273,7 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     if 3 in which:
         print "Two-Component"
         ret4 = main(fil, getNorm=True, i = idata, 
-                    start=(1,2.,10,0.1,2.,20), sigmas=(1,2,2, 1, 2, 2), retMCMC=False,
+                    start=(1,2.,10,0.1,2.,20), sigmas=(sA,sB,sT)*2, retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
                     check=cdir+"check3.npy", next0=next0, **keywords)
 
