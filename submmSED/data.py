@@ -418,14 +418,20 @@ def readfluxes_peel(filename,delnu=None):
     
     data = []
     lines = np.loadtxt(filename)
+    if delnu is not None:
+        didx = np.searchsorted(nu_obs,delnu)
+        print "deleting: ", delnu
+        print "at indices: ", didx
+        nu_obs = np.delete(nu_obs, didx)
+        
     for i,obj in enumerate(lines):
         z = 0.0
         nu_rest = nu_obs*(1.0+z)            
         flux = obj[2::2]
         sig  = obj[3::2]
         if delnu is not None:
-            flux = np.delete(flux, np.searchsorted(nu_obs,delnu))
-            sig  = np.delete(sig,  np.searchsorted(nu_obs,delnu))
+            flux = np.delete(flux, didx)
+            sig  = np.delete(sig,  didx)
         name = '_'.join(str(int(c)) for c in [i,obj[0],obj[1]])
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
     return data
