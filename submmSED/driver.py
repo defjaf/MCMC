@@ -378,7 +378,7 @@ def postprocess(dirname="./", multiple=None, check=False):
                     ### new DLC information
                     ret_i[iobj]['z'] = obj[3]
                     ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
-                    ret_i[iobj]['flux'][:] = np.array(obj[5])[:]  ### AHJ: PROBLEM HERE?????
+                    ret_i[iobj]['flux'][:] = np.array(obj[5])[:]  ### AHJ: PROBLEM HERE-- fixed with [:]
                 except IndexError:
                     pass
                     
