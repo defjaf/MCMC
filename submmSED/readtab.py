@@ -8,6 +8,25 @@ may require hacking the text files to make sure there is a space before the (z=*
 import numpy as np
 import matplotlib.pyplot as plt
 
+def readtab(f):
+    with open(f) as fp:
+        hdr = fp.readline()
+        
+        ## header is names separated by >1 space
+        names = [s.strip() for s in hdr.split("  ") if s]
+        
+        ret = np.genfromtxt(fp, names=names)
+        
+    for col in ret.dtype.fields.iterkeys():
+        print "%s = %f +- %f" % (col, ret[col].mean(), ret[col].std())
+
+    return ret
+        
+def plotpeel(f="./out_peel/0.npy", col="Mean_param_1", dat="./pixelfit.dat"):
+    tab = readtab(f)
+    i,j = np.loadtxt(dat, usecols=[0,1], unpack=True)
+    plt.scatter(i,j,40,c=tab[col],marker='s')
+    return i,j, tab
 
 def getdat():
 
