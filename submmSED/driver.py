@@ -44,6 +44,7 @@ fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 fname_Peel = "./submmSED/pixelfit.dat"
+fname_Mortier = "./submmSED/print_seds_mergers"
 delnu = 1763
 
 
@@ -80,6 +81,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             alldata = data.readfluxes_MRR(filename)
     elif filetype.upper() == 'PEEL':    ### can also read with DLC format=3
         alldata = data.readfluxes_peel(filename, delnu=delnu)
+    elif filetype.upper() == 'MORTIER':
+        alldata = data.readfluxes_mortier(filename)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         

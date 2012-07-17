@@ -2,6 +2,8 @@ from __future__ import division
 
 from numpy import asarray, float64, log, where, nonzero, math, loadtxt, genfromtxt, concatenate
 import numpy as np
+import os
+import fnmatch
 from numpy.random import uniform, normal
 
 import matplotlib.pyplot as plt
@@ -436,3 +438,18 @@ def readfluxes_peel(filename,delnu=None):
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
     return data
             
+
+def readfluxes_mortier(dirname,delnu=None):
+    """ read files in Angela Mortier's format (directory with individual files) """
+
+    data = []
+    for file in fnmatch.filter(os.listdir(dirname), "*.txt"):
+        name = file.split('_')[3]
+        fname = os.path.join(dirname,file)
+        nu, flux, err = np.loadtxt(fname, skiprows=1, unpack=True)
+        data.append(submmData(nu, flux, err, name, 0.0))
+        
+    return data
+        
+            
+        
