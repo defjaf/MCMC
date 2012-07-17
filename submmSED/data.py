@@ -447,6 +447,9 @@ def readfluxes_mortier(dirname,delnu=None):
         name = file.split('_')[3]
         fname = os.path.join(dirname,file)
         nu, flux, err = np.loadtxt(fname, skiprows=1, unpack=True)
+        flux *= 1e3 ## convert fluxes to mJy from Jy
+        err *= 1e3
+        nu /= 1e9   ## convert frequencies from Hz to GHz
         data.append(submmData(nu, flux, err, name, 0.0))
         
     return data

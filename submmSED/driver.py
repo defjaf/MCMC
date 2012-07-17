@@ -575,7 +575,11 @@ def mainmain(argv=None):
             elif o in ["--UL"]:
                 DLC_ul = int(a)
             elif o in ["--format"]:
-                format = int(a)
+                try:
+                    format = int(a)
+                except ValueError:
+                    format = None
+                    filetype = a
             elif o in ["--file"]:
                 filename = a
                 
@@ -594,6 +598,8 @@ def mainmain(argv=None):
         
         if format is not None:
             filetype = 'DLC'
+        else:
+            format = 0 ### placeholder
 
         print "filename: %s" % filename 
         print "fig dir: %s" % fdir
