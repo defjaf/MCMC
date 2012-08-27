@@ -13,7 +13,8 @@ speed_of_light = 299792458 ### meter / Second
 c2 = speed_of_light**2
 kB = 1.38065e-23 ## Joule/Kelvin  ### boltzmann
 h = 6.62607e-34  ## Joule Second ### Planck
-Tcmb = 2.726   # CMB temperature (K)
+Tcmb = 2.72548   # CMB temperature (K)
+solid_angle = 0.00382794 # Sr
 
 ## nb. 1 Jy = 1e-26 Joule / m^2 
  
@@ -61,7 +62,7 @@ lognu_AME, logflux_AME = setup_AME()
 def AME(nu_GHz, lognu_AME=lognu_AME, logflox_AME=logflux_AME):
     return np.exp(np.interp(np.log(nu_GHz), lognu_AME, logflux_AME))
 
-def freefree(EM, nu_GHz, Te=8000.0, Omega=0.00382794):
+def freefree(EM, nu_GHz, Te=8000.0, Omega=solid_angle):
     ### nb, [nu] = GHz; output in Jy = 1e26 Joule / m^2
     nu2 = nu_GHz * nu_GHz
     g_ff = np.log(4.955e-2/nu_GHz) + 1.5*np.log(Te)
@@ -70,15 +71,27 @@ def freefree(EM, nu_GHz, Te=8000.0, Omega=0.00382794):
     Sff = 2*kB*Tff * Omega * nu2*1e18/c2  ## 1e18 converts nu2 to Hz^2
     return 1e26*Sff  ### 1e26 converts to Jy
     
+def Bnu(nu_Hz, T_K=Tcmb):
+    """ black body, in W/m^2 """  ## not used
+    return 2*h*nu_Hz**3/c2/expm1(h*nu_Hz/(kB*T_K))
     
-def cmb(nu_GHz, Omega=0.00382794):
+def dBnu(nu_Hz, dT_K, T_K=Tcmb):
+    """ Bnu(T+dT) - Bnu(T), black body, in W/m^2 """
+    xT = h*nu_Hz/kB
+    return 2*h*nu_Hz**3/c2 * (1/expm1(xT/(T_K+dT_K))-1/expm1(xT/T_K))
+
+def cmb(nu_GHz, dT, T0_K=Tcmb, Omega=solid_angle):
     nu = nu_GHz * 1e9   ## Hz
-    return 2.0e26 *kB*Omega*nu*nu/c2      ## is this right?  ## should use explicit equation above?
+    return 1e26*Omega*dBnu(nu, 1e-6*dT, T0_K)
+    
+def cmb_RJ(nu_GHz, dT_muK, Omega=solid_angle):
+    nu = nu_GHz * 1e9   ## Hz
+    return 1e-6*dT_muK*2.0e26 *kB*Omega*nu*nu/c2      ## is this right?  ## should use explicit equation above?
     
 def synch(alpha, nu_GHz):
     return nu_GHz**alpha
     
-def dust(tau_250, beta, T_dust, nu_GHz, Omega=0.00382794):
+def dust(tau_250, beta, T_dust, nu_GHz, Omega=solid_angle):
 #     return tau_250*greybody(beta, T_dust, nu_GHz)*Omega
     nu = 1e9*nu_GHz  ## Hz
     x = h*nu/(kB*T_dust)
@@ -120,11 +133,11 @@ class M31model(submmModel2_normalized):
             
     def at_nu(self, nu_GHz):
         return dust(self.tau250, self.beta_dust, self.T_dust, nu_GHz) + freefree(self.EM, nu_GHz) +\
-               self.DT_CMB*1e-6 * cmb(nu_GHz) + self.A_synch * synch(self.alpha_synch, nu_GHz) + self.A_ame * AME(nu_GHz)
+               cmb_RJ(nu_GHz, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, nu_GHz) + self.A_ame * AME(nu_GHz)
                
     def at(self, data):
         return dust(self.tau250, self.beta_dust, self.T_dust, data.freq) + freefree(self.EM, data.freq) +\
-               self.DT_CMB*1e-6 * cmb(data.freq) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
+               cmb_RJ(data.freq, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
                
     __call__ = at    
 

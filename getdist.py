@@ -60,7 +60,7 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
         
         mean = s1.mean()
         stdv = s1.std()  ## stddev(s1)
-        print 'mean = %f +- %f | ML = %f' % (mean, stdv, ML)        
+        print 'mean = %g +- %g | ML = %g' % (mean, stdv, ML)        
         
     return (maxlnLike, maxLikeParams)
     
@@ -87,7 +87,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
         if label is None: label = ""
         stdv = s1.std()  ## stddev(s1)
         mean = s1.mean()
-        print '%10s mean = %f +- %f' % (label, mean, stdv)
+        print '%20s mean = %g +- %g' % (label, mean, stdv)
         if stdv > 0:
             smin, smax = min(hist[1]), max(hist[1])
             norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
