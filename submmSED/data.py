@@ -415,6 +415,8 @@ def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
 def readfluxes_peel(filename,delnu=None):
     ### peel format: # i j 217 Err 353 Err 545 Err 857 Err 1763 Err 1870 Err 3000 Err 4280 Err 5000 Err 12000 Err 12490 Err 25000 Err
     ### assume z=0??
+    ### fluxes in Jy (but really want per Sr?)
+    ### AHJ Aug 2012: convert to mJy (but not really needed?)
     nu_obs = np.array([217,353,545,857,1763,1870,3000,4280,5000,12000,12490,25000])
     nnu = len(nu_obs)
     
@@ -438,6 +440,29 @@ def readfluxes_peel(filename,delnu=None):
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
     return data
             
+
+
+def readfluxes_M31(filename="M31/M31Flux.dat",delnu=None):
+    ### single SED for M31
+
+    nu, flux, err = np.loadtxt(filename, unpack=True)   #GHz, Jy, Jy
+    nnu = len(nu)
+    z = 0.0
+#     flux *= 1e3 ## convert fluxes to mJy from Jy
+#     err *= 1e3
+
+    if delnu is not None:
+        didx = np.searchsorted(nu,delnu)
+        print "deleting: ", delnu
+        print "at indices: ", didx
+        nu = np.delete(nu, didx)
+        flux = np.delete(flux, didx)
+        err = np.delete(err, didx)
+
+    nu_rest = nu_obs = nu
+
+    return [submmData(nu_rest, flux, err, "M31", z, nu_obs=nu_obs)]
+
 
 def readfluxes_mortier(dirname,delnu=None):
     """ read files in Angela Mortier's format (directory with individual files) """

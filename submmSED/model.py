@@ -4,7 +4,8 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max, vectorize
+from numpy import (array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, 
+                    min, max, vectorize, expm1)
 from scipy import special,integrate
 #import numexpr as ne
 
@@ -55,7 +56,7 @@ except ImportError:
         
         with errstate(over='ignore'):
           #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
-          return prefac * nu**3/(exp(x)-1)
+          return prefac * nu**3/expm1(x)
           
           
     def greybody(beta, T, nu):

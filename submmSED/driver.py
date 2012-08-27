@@ -32,6 +32,7 @@ import MCMC
 import likelihood
 import data
 import model
+import M31model
 import getdist
 
 # import joblib
@@ -43,8 +44,9 @@ fname_DLC = "./submmSED.txt"
 fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
 fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
-fname_Peel = "./submmSED/pixelfit.dat"
+fname_Peel = "./submmSED/M31/pixelfit.dat"
 fname_Mortier = "./submmSED/print_seds_mergers"
+fname_M31 = "./submmSED/M31/M31Flux.dat"
 delnu = 1763
 
 
@@ -83,6 +85,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         alldata = data.readfluxes_peel(filename, delnu=delnu)
     elif filetype.upper() == 'MORTIER':
         alldata = data.readfluxes_mortier(filename)
+    elif filetype.upper() == "M31":
+        alldata = data.readfluxes_M31()
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -110,7 +114,11 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         print "Object[s] %s" % name
     
         ## initialize the model (with a class, not an object)
-        if getNorm:
+        
+        if filetype.upper() == "M31":
+            mod = M31model.M31model
+            like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
+        elif getNorm:
             if onecomponent:
                 mod = model.submmModel1_normalized_logA
             else:

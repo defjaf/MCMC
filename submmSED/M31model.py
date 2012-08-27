@@ -4,19 +4,22 @@ from __future__ import division
 import math
 
 import matplotlib.pyplot as plt
-from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max, vectorize
+from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max, vectorize, expm1, logspace
 from scipy import special,integrate
+import numpy as np
 #import numexpr as ne
 
-speed_of_light = 299792.458 ### micron GHz
+speed_of_light = 299792458 ### meter / Second
 c2 = speed_of_light**2
-kB = 0.0  ### boltzmann
-h = 0.0 ### Planck
+kB = 1.38065e-23 ## Joule/Kelvin  ### boltzmann
+h = 6.62607e-34  ## Joule Second ### Planck
 Tcmb = 2.726   # CMB temperature (K)
 
+## nb. 1 Jy = 1e-26 Joule / m^2 
+ 
 import Proposal
 
-from model import greybody
+from model import greybody, submmModel2_normalized
 
 # 
 # The model that I'm currently fitting is (in IDL code):
@@ -49,31 +52,46 @@ from model import greybody
 # 
 # The solid_angle for this aperture is 0.00382794.
 
-def freefree(nu, Te=8000.0, Omega=0.00382794):
-    g_ff = np.log(4.955e-2/nu) + 1.5*np.log(Te)
-    tau_ff = 3.014e-2 * Te**(-1.5) * g_ff
-    Tff = Te*(1-np.exp(-tau_ff))    ### need to deal with small tau? see above...
-    Sff = 2*kB*Tff * Omega * nu*nu/c2
-    return Sff
-    
-    
-def cmb(nu, Omega=0.00382794):
-    Scmb = 2*kB*Omega*nu*nu/c2   ## is this right?  ## should use explicit equation above?
-    
-def synch(alpha, nu):
-    return nu**alpha
-    
-def ame(nu):
-    pass
+def setup_AME(fname="M31/spdust2_wim.dat"):
+    nu_GHz, flux = np.loadtxt(fname, unpack=True)
+    return np.log(nu_GHz), np.log(flux)
 
+lognu_AME, logflux_AME = setup_AME()
 
-class M31Model(object):
+def AME(nu_GHz, lognu_AME=lognu_AME, logflox_AME=logflux_AME):
+    return np.exp(np.interp(np.log(nu_GHz), lognu_AME, logflux_AME))
+
+def freefree(EM, nu_GHz, Te=8000.0, Omega=0.00382794):
+    ### nb, [nu] = GHz; output in Jy = 1e26 Joule / m^2
+    nu2 = nu_GHz * nu_GHz
+    g_ff = np.log(4.955e-2/nu_GHz) + 1.5*np.log(Te)
+    tau_ff = 3.014e-2 * Te**(-1.5) * g_ff * EM / nu2
+    Tff = -Te*np.expm1(-tau_ff)  # nb. expm1(x) = exp(x)-1 
+    Sff = 2*kB*Tff * Omega * nu2*1e18/c2  ## 1e18 converts nu2 to Hz^2
+    return 1e26*Sff  ### 1e26 converts to Jy
+    
+    
+def cmb(nu_GHz, Omega=0.00382794):
+    nu = nu_GHz * 1e9   ## Hz
+    return 2.0e26 *kB*Omega*nu*nu/c2      ## is this right?  ## should use explicit equation above?
+    
+def synch(alpha, nu_GHz):
+    return nu_GHz**alpha
+    
+def dust(tau_250, beta, T_dust, nu_GHz, Omega=0.00382794):
+#     return tau_250*greybody(beta, T_dust, nu_GHz)*Omega
+    nu = 1e9*nu_GHz  ## Hz
+    x = h*nu/(kB*T_dust)
+    S_dust = tau_250*2*(h*nu*nu*nu/c2)/expm1(x)*(nu/1.2e12)**beta
+    return 1e26*S_dust*Omega   ## convert to Jy 
+
+class M31model(submmModel2_normalized):
     nparam = 8
     fmtstring = "%.3f "*nparam
     paramBlocks =  range(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\tau_{250}$", r"$\beta_{dust}$", r"$T_{dust}$", r"EM", r"$\Delta T_{CMB}$", r"$A_{synch}$", 
-                r"\alpha_{synch}$", r"$A_{AME}$"]
+                r"$\alpha_{synch}$", r"$A_{AME}$"]
 
     def __init__(self, tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame):
 
@@ -87,24 +105,66 @@ class M31Model(object):
         self.A_ame = A_ame
 
     @classmethod
-    def prior(cls, A_dust, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame):
+    def prior(cls, tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame):
 
-        if A_dust<0 or EM<0 or A_synch<0 or A_ame<0:
+        if tau250<0 or EM<0 or A_synch<0 or A_ame<0:
             return 0
             
-        if sync_amp <-2.0 or sync_amp>-0.5:
+        if alpha_synch <-2.0 or alpha_synch>-0.5:
             return 0
             
         if DT_CMB<-200 or DT_CMB>200:  ### muK -- check units...
             return 0
             
-    def at_nu(self, nu):
-        return self.A_dust * greybody(self.b1, self.T1, nu) + EM * freefree(nu) +\
-               DT_CMB * cmb(nu) + A_synch * synch(alpha_synch, nu) + A_ame * ame(nu)
+        return 1
+            
+    def at_nu(self, nu_GHz):
+        return dust(self.tau250, self.beta_dust, self.T_dust, nu_GHz) + freefree(self.EM, nu_GHz) +\
+               self.DT_CMB*1e-6 * cmb(nu_GHz) + self.A_synch * synch(self.alpha_synch, nu_GHz) + self.A_ame * AME(nu_GHz)
                
     def at(self, data):
-        return self.A_dust * greybody(self.b1, self.T1, data.freq) + EM * freefree(data.freq) + \
-               DT_CMB * cmb(data.freq) + A_synch * synch(alpha_synch, data.freq) + A_ame * ame(data.freq)
+        return dust(self.tau250, self.beta_dust, self.T_dust, data.freq) + freefree(self.EM, data.freq) +\
+               self.DT_CMB*1e-6 * cmb(data.freq) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
                
-
     __call__ = at    
+
+
+### most of the following are generic and could be inherited
+    def unpackage(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        return asarray( param_seqs, dtype=float64)
+
+    package = asarray
+
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package,
+                                                unpackage=unpackage)
+
+## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
+    def plot(self, data, logplot=True, wavelength=False):
+        """plot the data and the model"""
+        if not logplot:
+            f = linspace(min(data.freq), max(data.freq), 100)
+        else:
+            f = logspace(np.log10(min(data.freq)), np.log10(max(data.freq)), 100, 10)
+        model_flux = self.at_nu(f)
+        data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
+        if wavelength:
+            f = speed_of_light/f
+        plt.plot(f, model_flux)
+
+        
+    @classmethod
+    def startfrom(cls, data=None, random=None):
+        """
+        generate a set of starting parameters for the model:
+        tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame
+        """
+        if random is not None:
+            cls.start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 1.0)  ## careful of units
+        else:
+            pass
+        return cls.start_params
