@@ -137,7 +137,7 @@ class M31model(submmModel2_normalized):
                
     def at(self, data):
         return dust(self.tau250, self.beta_dust, self.T_dust, data.freq) + freefree(self.EM, data.freq) +\
-               cmb_RJ(data.freq, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
+               cmb(data.freq, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
                
     __call__ = at    
 
