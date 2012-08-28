@@ -214,24 +214,8 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
 
     fig = plt.gcf()
 
-    for ipar1, par1 in enumerate(islice(params, 1, npar)):        ### rows 
-        for ipar2, par2 in enumerate(islice(params, ipar1+1)):          ### columns
-                  
-            ax=fig.add_subplot(nrow, ncol, npar*ipar1+ipar2+1)
-            ax.hold(False)
-            #splot = \ 
-            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, 
-                      derived=derived, burn=burn, stride=stride)
-                    ### par2, par1 since x-axis along columns
-            ax.set_xticklabels([])
-            if ipar2 != 0:
-                ax.set_yticklabels([])
-            elif labels is not None:
-                ax.set_ylabel(labels[par1], size='x-large')
-                ax.set_yticks(ax.get_ylim())
-            ax.tick_params(labelsize='x-large')
-            
-                
+    xlims = []
+    ylims = []
     for ipar, par in enumerate(params):
         ax=fig.add_subplot(nrow, ncol, npar*(npar-1)+ipar+1)
         ax.hold(False)
@@ -247,6 +231,29 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
             ax.set_xlabel(labels[par], size='x-large')
             ax.set_xticks(ax.get_xlim())
         ax.tick_params(labelsize='x-large')
+        
+        xlims.append(ax.get_xlim())
+        ylims.append(ax.get_ylim())
+        
+
+    for ipar1, par1 in enumerate(islice(params, 1, npar)):        ### rows 
+        for ipar2, par2 in enumerate(islice(params, ipar1+1)):          ### columns
+                  
+            ax=fig.add_subplot(nrow, ncol, npar*ipar1+ipar2+1)
+            ax.hold(False)
+            #splot = \ 
+            scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, 
+                      derived=derived, burn=burn, stride=stride)
+                    ### par2, par1 since x-axis along columns
+            ax.set_ylim(xlims[ipar1+1])
+            ax.set_xlim(xlims[ipar2])
+            ax.set_xticklabels([])
+            if ipar2 != 0:
+                ax.set_yticklabels([])
+            elif labels is not None:
+                ax.set_ylabel(labels[par1], size='x-large')
+                ax.set_yticks(ax.get_ylim())
+            ax.tick_params(labelsize='x-large')
             
     if not quiet: plt.draw()
     
