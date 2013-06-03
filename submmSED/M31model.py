@@ -133,7 +133,7 @@ class M31model(submmModel2_normalized):
             
     def at_nu(self, nu_GHz):
         return dust(self.tau250, self.beta_dust, self.T_dust, nu_GHz) + freefree(self.EM, nu_GHz) +\
-               cmb_RJ(nu_GHz, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, nu_GHz) + self.A_ame * AME(nu_GHz)
+               cmb(nu_GHz, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, nu_GHz) + self.A_ame * AME(nu_GHz)
                
     def at(self, data):
         return dust(self.tau250, self.beta_dust, self.T_dust, data.freq) + freefree(self.EM, data.freq) +\

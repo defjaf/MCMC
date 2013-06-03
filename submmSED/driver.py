@@ -46,7 +46,7 @@ fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
 fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 fname_Peel = "./submmSED/M31/pixelfit.dat"
 fname_Mortier = "./submmSED/print_seds_mergers"
-fname_M31 = "./submmSED/M31/M31Flux.dat"
+fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
 delnu = 1763
 
 

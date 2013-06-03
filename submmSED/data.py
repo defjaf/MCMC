@@ -442,7 +442,7 @@ def readfluxes_peel(filename,delnu=None):
             
 
 
-def readfluxes_M31(filename="M31/M31Flux.dat",delnu=None):
+def readfluxes_M31(filename="M31/M31Flux-v2.dat",delnu=None):
     ### single SED for M31
 
     nu, flux, err = np.loadtxt(filename, unpack=True)   #GHz, Jy, Jy
