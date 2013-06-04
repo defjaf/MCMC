@@ -106,7 +106,7 @@ def M31(rotateParams=False, start=None, sigmas=None,
         print "ln Pr of mean = %f" % meanlnProb
         MLmod = mod(*maxLikeParams)
         try:
-            meanmod.plot(dat, wavelength=wavelength, logplot=logplot)
+            meanmod.plot(dat, wavelength=wavelength, logplot=logplot, components=False)
             MLmod.plot(dat, wavelength=wavelength, logplot=logplot)
             # plt.suptitle(name)    
         except AttributeError:

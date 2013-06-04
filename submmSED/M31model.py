@@ -139,6 +139,14 @@ class M31model(submmModel2_normalized):
         return dust(self.tau250, self.beta_dust, self.T_dust, data.freq) + freefree(self.EM, data.freq) +\
                cmb(data.freq, self.DT_CMB) + self.A_synch * synch(self.alpha_synch, data.freq) + self.A_ame * AME(data.freq)
                
+    def all_at_nu(self, nu_GHz):
+        return np.array([dust(self.tau250, self.beta_dust, self.T_dust, nu_GHz),
+                         freefree(self.EM, nu_GHz),
+                         cmb(nu_GHz, self.DT_CMB),
+                         self.A_synch * synch(self.alpha_synch, nu_GHz),
+                         self.A_ame * AME(nu_GHz)
+                         ])
+               
     __call__ = at    
 
 
@@ -157,7 +165,7 @@ class M31model(submmModel2_normalized):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data, logplot=True, wavelength=False):
+    def plot(self, data, logplot=True, wavelength=False, components=True):
         """plot the data and the model"""
         if not logplot:
             f = linspace(min(data.freq), max(data.freq), 100)
@@ -168,6 +176,10 @@ class M31model(submmModel2_normalized):
         if wavelength:
             f = speed_of_light/f
         plt.plot(f, model_flux)
+        if components:            ## plot the individual components
+            model_flux_comps = self.all_at_nu(f).transpose()
+            plt.plot(f, model_flux_comps)
+            ## legend???
 
         
     @classmethod
