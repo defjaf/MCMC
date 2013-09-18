@@ -39,9 +39,13 @@ import getdist
 
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
+
+## added random and randomrestart params
+
 def M31(rotateParams=False, start=None, sigmas=None, 
          nMC=(10000,10000), noPlots=False, fig0=0, savefig=False, retMCMC=True,
-         fdir = "./", logplot=True, check=None, wavelength=False, doBlock=True):
+         fdir = "./", logplot=True, check=None, wavelength=False, doBlock=True,
+         random=False, randomrestart=False):
         
         
     speedOfLight = 299792.  ## micron GHz
@@ -62,14 +66,15 @@ def M31(rotateParams=False, start=None, sigmas=None,
     
     mod = M31model.M31model
     like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
-    start_params = np.asarray(mod.startfrom(random=False))
+    start_params = np.asarray(mod.startfrom(random=random))
     if sigmas is None:
         sigmas = prop_sigmas = np.abs(start_params)/4.0
     else:
         prop_sigmas = sigmas
     
     mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
-                        fac=None, noCorrelations=True, doBlock=doBlock, rotateParams=rotateParams)
+                        fac=None, noCorrelations=True, doBlock=doBlock, rotateParams=rotateParams,
+                        randomrestart=randomrestart)
 
     if not noPlots:
 

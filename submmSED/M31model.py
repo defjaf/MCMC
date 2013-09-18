@@ -188,8 +188,10 @@ class M31model(submmModel2_normalized):
         generate a set of starting parameters for the model:
         tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame
         """
-        if random is not None:
-            cls.start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 1.0)  ## careful of units
-        else:
-            pass
+        cls.start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 50.0)  ## careful of units
+        if random:
+            ## these are all typically 1-2sigma 
+            stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 20)
+            cls.start_params += np.random.randn(len(stds))*stds
+            
         return cls.start_params
