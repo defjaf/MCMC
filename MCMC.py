@@ -17,6 +17,11 @@ from __future__ import division
 ##            currently, setStart just returns if given a bad starting point, which fails later on.
 ##            should allow some sort of loop?
 
+### AHJ 09/13 -- if random, randomize the restart position (by a certain number of sigma?)
+###              see newMCMC
+###  TODO      multiple chains -- gelman-rubin convergence test?
+
+
 import math
 
 from progressbar import ProgressBar
@@ -309,7 +314,7 @@ class MCMC(object):
     
     
     def newMCMC(self, burn=0, stride=1, fac=None, nMC=None, noCorrelations=False,
-                      doBlock=None, rotateParams=False):
+                      doBlock=None, rotateParams=False, random=False):
         """
         start a new chain based on the mean and variances of the present one.
         
@@ -324,11 +329,15 @@ class MCMC(object):
         [[ TODO: allow setting the rotation explicitly?? ]]
         
         """
+        ### AHJ 09/13 -- if random, randomize the restart position (by a certain number of sigma?)
         
         params = where(self.prop.sigmas>0)[0]  # where returns a tuple
         
         newStart = self.mean(burn, stride)
         stdevs = self.stdev(burn, stride)
+        
+        if random: newStart += np.random.randn(len(stdevs))*stdevs
+        
         try:
             covar = self.covar(burn, stride, params=params)
         except ZeroDivisionError:
@@ -441,7 +450,7 @@ def chain_analyze(chain, params=None):
     return means, stdevs, covar
 
 def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
-            noCorrelations=False, doBlock=False, rotateParams=False):
+            noCorrelations=False, doBlock=False, rotateParams=False, randomrestart=False):
     """
     sample from the likelihood with a series of MCMC runs given by the
     sequence nMC, using the endpoint of one as the start of the
@@ -471,7 +480,8 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
         else:
             new_s = sampler[isamp-1].newMCMC(burn=nMC[isamp-1]//burnfrac,
                                              stride=stride, nMC=0, fac=fac,
-                                             noCorrelations=noCorr1, rotateParams=rotateParams)
+                                             noCorrelations=noCorr1, rotateParams=rotateParams,
+                                             random=randomrestart)
         
         burnfrac = nMC1
         

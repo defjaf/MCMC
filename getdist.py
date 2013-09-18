@@ -15,6 +15,7 @@ import os.path
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 from itertools import islice, groupby
 
@@ -210,7 +211,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
     nrow = ncol = npar
 
     #norm = plt.normalize(vmin=-10, vmax=0)
-    norm = plt.normalize()
+    norm = matplotlib.colors.Normalize()
 
     fig = plt.gcf()
 
