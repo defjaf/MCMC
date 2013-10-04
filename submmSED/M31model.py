@@ -16,6 +16,8 @@ h = 6.62607e-34  ## Joule Second ### Planck
 Tcmb = 2.72548   # CMB temperature (K)
 solid_angle = 0.00382794 # Sr
 
+### how can I parameterize the model rather than hardcode the prior as below?
+
 ## nb. 1 Jy = 1e-26 Joule / m^2 
  
 import Proposal
@@ -105,6 +107,13 @@ class M31model(submmModel2_normalized):
     nBlock = max(paramBlocks)+1
     texNames = [r"$\tau_{250}$", r"$\beta_{dust}$", r"$T_{dust}$", r"EM", r"$\Delta T_{CMB}$", r"$A_{synch}$", 
                 r"$\alpha_{synch}$", r"$A_{AME}$"]
+                
+    # default prior params -- change with set_prior below
+    EM_inv_sigma2 = 0.0   #(0.5)**(-2.0)
+    EM_mean = 7.7
+    alpha_synch_inv_sigma2 = 0.0 # (0.3)**(-2.0)
+    alpha_synch_mean = -0.9
+
 
     def __init__(self, tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame):
 
@@ -116,6 +125,20 @@ class M31model(submmModel2_normalized):
         self.A_synch = A_synch
         self.alpha_synch = alpha_synch
         self.A_ame = A_ame
+        
+
+    @classmethod
+    def set_prior(cls, EM_inv_sigma2, EM_mean, alpha_synch_inv_sigma2, alpha_synch_mean):
+        if EM_inv_sigma2 > 0:
+            print "setting EM prior to %f +- %f" % (EM_mean, EM_inv_sigma2**(-0.5))
+            
+        if alpha_synch_inv_sigma2 > 0:
+            print "setting alpha_synch prior to %f +- %f" % (alpha_synch_mean, alpha_synch_inv_sigma2**(-0.5))
+            
+        cls.EM_inv_sigma2 = EM_inv_sigma2
+        cls.EM_mean = EM_mean
+        cls.alpha_synch_inv_sigma2 = alpha_synch_inv_sigma2
+        cls.alpha_synch_mean = alpha_synch_mean
 
     @classmethod
     def prior(cls, tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame):
@@ -128,8 +151,17 @@ class M31model(submmModel2_normalized):
             
         if DT_CMB<-200 or DT_CMB>200:  ### muK -- check units...
             return 0
+
+        pri = 1
+                    
+        if cls.EM_inv_sigma2 > 0:
+            pri = np.exp(-0.5*cls.EM_inv_sigma2*(EM-cls.EM_mean)**2)
             
-        return 1
+        if cls.alpha_synch_inv_sigma2 > 0:
+            pri *= np.exp(-0.5*cls.alpha_synch_inv_sigma2*(alpha_synch-cls.alpha_synch_mean)**2)
+            
+        return pri
+            
             
     def at_nu(self, nu_GHz):
         return dust(self.tau250, self.beta_dust, self.T_dust, nu_GHz) + freefree(self.EM, nu_GHz) +\
@@ -165,12 +197,13 @@ class M31model(submmModel2_normalized):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data, logplot=True, wavelength=False, components=True):
+    def plot(self, data, logplot=True, wavelength=False, components=True, textfile=None):
         """plot the data and the model"""
+        npt = 100
         if not logplot:
-            f = linspace(min(data.freq), max(data.freq), 100)
+            f = linspace(min(data.freq), max(data.freq), npt)
         else:
-            f = logspace(np.log10(min(data.freq)), np.log10(max(data.freq)), 100, 10)
+            f = logspace(np.log10(min(data.freq)), np.log10(max(data.freq)), npt, 10)
         model_flux = self.at_nu(f)
         data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
         if wavelength:
@@ -180,6 +213,12 @@ class M31model(submmModel2_normalized):
             model_flux_comps = self.all_at_nu(f).transpose()
             plt.plot(f, model_flux_comps)
             ## legend???
+            
+        if textfile:
+            header = "lambda" if wavelength else "nu"
+            header += "\t" + "\t".join(['dust', 'ff', 'cmb', 'synch', 'AME'])
+            np.savetxt(textfile, np.hstack((f.reshape(npt,1), model_flux_comps)), header=header)
+            
 
         
     @classmethod
