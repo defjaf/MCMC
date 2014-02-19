@@ -24,7 +24,20 @@ import Proposal
 
 from model import greybody, submmModel2_normalized
 
+# UPDATED model (Feb 2014)
+# g_ff = alog(exp(5.960 - (sqrt(3d)/!DPI)*alog(1d*nu*(Te/10000d)^(-3d/2d))) + 2.71828)
+# tau_ff = 5.468d-2 * Te^(-1.5) * nu^(-2d) * EM * g_ff
+# T_ff = Te * (1d - exp(-tau_ff))
+# smalltau = where(tau_ff LT 1.0e-10)
+# IF (smalltau[0] GE 0) THEN T_ff[smalltau] = Te * (tau_ff[smalltau] - (-tau_ff[smalltau])^2d/ 2d - (-tau_ff[smalltau]^3d)/6d)
+# S = 2d * 1381d * T_ff * (nu*1d9)^2 / c^2  * solid_angle
 # 
+# i.e. the formula for g_ff and tau_ff have changed, but otherwise the equations remain the same as before.
+
+
+
+# ORIGINAL model
+#
 # The model that I'm currently fitting is (in IDL code):
 # 
 # Synchrotron (simple power law):
@@ -55,6 +68,8 @@ from model import greybody, submmModel2_normalized
 # 
 # The solid_angle for this aperture is 0.00382794.
 
+
+
 def setup_AME(fname="M31/spdust2_wim.dat"):
     nu_GHz, flux = np.loadtxt(fname, unpack=True)
     return np.log(nu_GHz), np.log(flux)
@@ -67,11 +82,21 @@ def AME(nu_GHz, lognu_AME=lognu_AME, logflox_AME=logflux_AME):
 def freefree(EM, nu_GHz, Te=8000.0, Omega=solid_angle):
     ### nb, [nu] = GHz; output in Jy = 1e26 Joule / m^2
     nu2 = nu_GHz * nu_GHz
+    g_ff = np.log(np.exp(5.960 - (np.sqrt(3.0)/np.pi)*np.log(nu_GHz*(Te/10000.0)**-1.5)) + np.exp(1.0))
+    tau_ff = 5.468e-2 * Te**-1.5 * EM * g_ff / nu2
+    Tff = -Te*np.expm1(-tau_ff)  # nb. expm1(x) = exp(x)-1 
+    Sff = 2*kB*Tff * Omega * nu2*1e18/c2  ## 1e18 converts nu2 to Hz^2
+    return 1e26*Sff  ### 1e26 converts to Jy
+
+def freefree_orig(EM, nu_GHz, Te=8000.0, Omega=solid_angle):
+    ### nb, [nu] = GHz; output in Jy = 1e26 Joule / m^2
+    nu2 = nu_GHz * nu_GHz
     g_ff = np.log(4.955e-2/nu_GHz) + 1.5*np.log(Te)
     tau_ff = 3.014e-2 * Te**(-1.5) * g_ff * EM / nu2
     Tff = -Te*np.expm1(-tau_ff)  # nb. expm1(x) = exp(x)-1 
     Sff = 2*kB*Tff * Omega * nu2*1e18/c2  ## 1e18 converts nu2 to Hz^2
     return 1e26*Sff  ### 1e26 converts to Jy
+
     
 def Bnu(nu_Hz, T_K=Tcmb):
     """ black body, in W/m^2 """  ## not used
