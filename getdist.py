@@ -7,6 +7,8 @@ instance of class MCMC.MCMC or a shape=(nsamples, nparams) array of samples
 
 ### TODO: reorder the histgrid plot to put the histograms along the diagonal???A
 
+### AHJ: April 2014: add min chi2 and prob check
+
 from __future__ import division
 
 import sys
@@ -50,7 +52,13 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
     if lnLike is not None: 
         maxlnLike = max(lnLike)
         maxLikeParams = s[lnLike.argmax()]
+        maxLProb = MCMC.like.lnLike(maxLikeParams)
+        maxLchi2 = MCMC.like.chi2(maxLikeParams)
+        print "chi2 at max = %f" % maxLchi2
+        assert abs(1.-maxLProb/maxlnLike)<0.01, \
+            "different likelihood calculations differ: %f != %f" % (maxLProb,maxlnLike)
         print 'Max ln likelihood %f at parameters:' % maxlnLike
+        
         print maxLikeParams
 
     if params is None:
@@ -179,7 +187,12 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
     if lnLike is not None: 
         maxlnLike = max(lnLike)
         maxLikeParams = s[lnLike.argmax()]
+        maxLProb = MCMC.like.lnLike(maxLikeParams)
+        maxLchi2 = MCMC.like.chi2(maxLikeParams)
+        print "chi2 at max = %f" % maxLchi2
         print 'Max ln likelihood %f at parameters:' % maxlnLike
+        assert abs(1.-maxLProb/maxlnLike)<0.01, \
+            "different likelihood calculations differ: %f != %f" % (maxLProb,maxlnLike)
         print maxLikeParams
         
     if burn>0 or stride>1:

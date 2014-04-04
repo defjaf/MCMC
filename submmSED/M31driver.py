@@ -63,6 +63,7 @@ def M31(rotateParams=False, start=None, sigmas=None,
     name = dat.name 
         
     print "Object %s" % name
+    print "N_data = %d" % dat.n
     
     mod = M31model.M31model
     like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
@@ -108,7 +109,10 @@ def M31(rotateParams=False, start=None, sigmas=None,
         params = ana[0]
         meanmod = mod(*params)
         meanlnProb = like.lnLike(params)
+        mean_chi2 = like.chi2(params)
         print "ln Pr of mean = %f" % meanlnProb
+        print "chi2(mean) = %f"% mean_chi2
+        
         MLmod = mod(*maxLikeParams)
         try:
             meanmod.plot(dat, wavelength=wavelength, logplot=logplot, components=False)

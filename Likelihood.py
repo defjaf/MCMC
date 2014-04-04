@@ -8,6 +8,9 @@ from math import pi
 #    lnNorm1 [optional, rarely used]
 #    setmodel_class, setModel (depending on how the model deals with parameters)
 
+### AHJ April 2014
+###  add method to calculate chi2 at a parameter value.
+
 class Likelihood(object):
     """
     Represents a likelihood function for beam fitting.
@@ -100,6 +103,25 @@ class Likelihood(object):
         """
         self.setModel(params)
         return sum( [ self.lnLike1(v, d) for (v, d) in zip(self.model_vals, self.data) ] ) 
+
+    def chi2_1(self, model_vals=None, data=None):
+        """
+        return chi2(data|params) 
+        - for a single dataset
+        - assuming params have already been set by self.setModel
+        """
+
+        return data.chi2(model_vals)
+
+        
+    def chi2(self, params): 
+        """
+        calculate the sum of the chi2_1 for each of the datasets
+        i.e., \sum_i chi2(data_i |params) 
+        """
+        self.setModel(params)
+        return sum( [ self.chi2_1(v, d) for (v, d) in zip(self.model_vals, self.data) ] ) 
+        
 
     def __call__(self, params):
         return self.lnLike(params)
