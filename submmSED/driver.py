@@ -184,7 +184,10 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             params = ana[0]
             meanmod = mod(*params)
             meanlnProb = like.lnLike(params)
+            mean_chi2 = like.chi2(params)
             print "ln Pr of mean = %f" % meanlnProb
+            print "chi2(mean) = %f"% mean_chi2
+
             MLmod = mod(*maxLikeParams)
             try:
                 meanmod.plot(dat, wavelength=wavelength, logplot=logplot)
