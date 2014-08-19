@@ -47,6 +47,7 @@ fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 fname_Peel = "./submmSED/M31/pixelfit.dat"
 fname_Mortier = "./submmSED/print_seds_mergers"
 fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
+fname_DLC_2013 = "./submmSED/herus_phot.csv"
 delnu = 1763
 
 
@@ -56,6 +57,7 @@ wavelength = True ### Planck format
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
+         random=False, randomrestart=False,
          fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
         
         
@@ -87,6 +89,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         alldata = data.readfluxes_mortier(filename)
     elif filetype.upper() == "M31":
         alldata = data.readfluxes_M31()
+    elif filetype.upper() == "DLC_2014":
+        alldata = data.readfluxes_DLC_2014()
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -133,7 +137,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                 like = likelihood.SEDLikelihood2(data=dat, model=mod)
         
         if start is None: 
-            start_params = np.asarray(mod.startfrom(random=False))
+            start_params = np.asarray(mod.startfrom(random=random))
         else:
             start_params = np.asarray(start)
         if sigmas is None:
@@ -145,7 +149,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             like.nDerived = nDerived
     
         mcmc, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params, plotter=None,
-                            fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams)
+                            fac=None, noCorrelations=True, doBlock=True, rotateParams=rotateParams,
+                            randomrestart=randomrestart)
 
         if not noPlots:
 
@@ -568,8 +573,11 @@ def mainmain(argv=None):
         except getopt.GetoptError as msg:
              raise Usage(msg)
 
+        print opts
+
         print "normal behaviour"
         for o, a in opts:
+            print 'processing:', o, a
             if o in ("-h", "--help"):
                 print mainmain.__doc__
                 sys.exit(0)
@@ -606,6 +614,10 @@ def mainmain(argv=None):
         
         if format is not None:
             filetype = 'DLC'
+        if format==4:
+            filetype = 'DLC_2014'
+            DLC_UL = 0
+            format = 0
         else:
             format = 0 ### placeholder
 

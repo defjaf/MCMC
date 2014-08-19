@@ -5,6 +5,7 @@ import numpy as np
 import os
 import fnmatch
 from numpy.random import uniform, normal
+import csv
 
 import matplotlib.pyplot as plt
 
@@ -129,6 +130,62 @@ def readfluxes_DLC(filename, format=0, delnu=None):
     elif format == 3:
         data = readfluxes_peel(filename, delnu=delnu)
         
+
+    return data
+
+def toFloat(s):
+    return np.float(s) if s!='' else np.nan
+
+def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True):
+    """read fluxes from a DLC 2014 CSV file: each line is 
+    
+    name z f1 e1 f2 e2 ... fn en
+    headers: Fxxx_Jy = xxx micron flux
+             Exxx_Jy = xxx micron error
+             
+    if there is flux but no error, force error = np.nan (to treat as UL)
+    
+    if UL=True, treat all 25 micron data as upper limit
+             
+    NB!!! the original numbers file had a typo in the Redshift header name! was "Redfshift"!
+    
+    """
+    
+    data = []
+    with open(filename, "rb") as csvfile:
+
+        hreader = csv.reader(csvfile)
+        headers = np.array(hreader.next())
+        ncol = len(headers)
+        name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
+        z_column = np.where(headers=='Redshift')[0][0]
+        flux_columns = np.array([i for i in range(ncol) if headers[i].startswith('F')])
+        err_columns = np.array([i for i in range(ncol) if headers[i].startswith('E')])
+        assert np.all(err_columns == flux_columns+1)
+        
+        lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### Freq in GHz
+        lambda_err = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])
+        assert(np.all(lambda_obs==lambda_err))   ### check correct order
+
+        for row in hreader:
+            row = np.asarray(row)
+            z = np.float(row[z_column])
+            dat = zip(row[flux_columns], row[err_columns], lambda_obs)
+            dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
+            
+            flux = np.array(dat_compressed[:,0])
+            sig = np.array(dat_compressed[:,1])
+            lambda_obs_1 = np.array(dat_compressed[:,2])
+            nu_obs = speed_of_light/lambda_obs_1
+            if UL25:
+                l25 = np.where(np.round(lambda_obs_1)==25)[0]
+                if l25:
+                    sig[l25] = flux[l25]
+                    flux[l25] = 0
+
+            nu_rest = nu_obs*(1+z)
+
+            data.append(submmData(nu_rest, flux, sig, row[name_column], z, nu_obs=nu_obs))
 
     return data
 
