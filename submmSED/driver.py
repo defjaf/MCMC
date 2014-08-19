@@ -47,7 +47,7 @@ fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
 fname_Peel = "./submmSED/M31/pixelfit.dat"
 fname_Mortier = "./submmSED/print_seds_mergers"
 fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
-fname_DLC_2013 = "./submmSED/herus_phot.csv"
+fname_DLC_2014 = "./submmSED/herus_phot.csv"
 delnu = 1763
 
 
@@ -561,7 +561,7 @@ def mainmain(argv=None):
     DLC_ul = True
     filetype = 'MRR'
     which = []
-    datslice=(0,1717)
+    datslice=None
     format=None
     filename = fil
     next0 = False ### usually want True, but need this for indexing by the line numbers in the file
@@ -576,11 +576,8 @@ def mainmain(argv=None):
         except getopt.GetoptError as msg:
              raise Usage(msg)
 
-        print opts
-
         print "normal behaviour"
         for o, a in opts:
-            print 'processing:', o, a
             if o in ("-h", "--help"):
                 print mainmain.__doc__
                 sys.exit(0)
@@ -614,7 +611,7 @@ def mainmain(argv=None):
                 os.mkdir(fdir)
             except OSError:
                 pass
-        
+                
         if format is not None:
             filetype = 'DLC'
         if format==4:
@@ -624,6 +621,12 @@ def mainmain(argv=None):
         else:
             format = 0 ### placeholder
 
+        if datslice is None:
+            if filetype == 'DLC'
+                idata = range(1717)
+            elif filetype == 'DLC_2014'
+                idata = range(43)
+        
         print "filename: %s" % filename 
         print "fig dir: %s" % fdir
         print "out dir: %s" % odir
