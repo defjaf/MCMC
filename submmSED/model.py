@@ -37,6 +37,12 @@ minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
 minb, maxb = 0., 3.
 
+def startfrom_generic(start, stds, posidx=(), random=True):
+    while True:
+        if random:
+            start += np.random(len(stds))*stds
+        if all(start[p]>0 for p in posidx):
+            return start
 
 try:
 
@@ -156,14 +162,14 @@ class submmModel2(object):
     @classmethod
     def startfrom(cls, data=None, random=None):
         """
-        generate a set of starting parameters for the model:
+        generate a set of starting parameters for the model: b1, T1, b2, T2
         """
-        cls.start_params = (2., 30., 2., 20.)  ## careful of units
-        if random:
-            stds = (0.5, 6.0, 0.5, 4.0)
-            cls.start_params += np.random.randn(len(stds))*stds
-
+        start_params = (2., 30., 2., 20.)  ## careful of units
+        stds = (0.5, 6.0, 0.5, 4.0)
+        posidx = (1,3)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
+
 
 class submmModel1(object):
     """model a submm SED as a one-component grey body: flux = A nu^b B_nu(T)
@@ -222,13 +228,11 @@ class submmModel1(object):
         """
         generate a set of starting parameters for the model:
         """
-        cls.start_params = (2.0, 10.0)  ## careful of units
-        if random:
-            stds = (0.5, 3.0)
-            cls.start_params += np.random.randn(len(stds))*stds
-
+        start_params = (2.0, 10.0)
+        stds = (0.5, 3.0)
+        posidx = (1,)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
-
 
 class submmModel_ratio(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
@@ -302,15 +306,14 @@ class submmModel_ratio(object):
     @classmethod
     def startfrom(cls, data=None, random=None):
         """
-        generate a set of starting parameters for the model:
+        generate a set of starting parameters for the model: b1, T1, b2, T2, r12
         """
-        cls.start_params = (2., 10., 2., 5., 1.0)  ## careful of units
-        if random:
-            stds = (0.5, 3, 0.5, 2.0, 0.25)
-            cls.start_params += np.random.randn(len(stds))*stds 
-            
+        start_params = (2., 10., 2., 5., 1.0)  ## careful of units
+        stds = (0.5, 3, 0.5, 2.0, 0.25)
+        posidx = (1,3,4)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
-            
+
             
 class submmModel2_normalized(object):
     """model a submm SED as a two-component grey body: flux = A1 nu^b1 B_nu(T1) + A2 nu^b2 B_nu(T2)
@@ -395,13 +398,12 @@ class submmModel2_normalized(object):
     @classmethod
     def startfrom(cls, data=None, random=None):
         """
-        generate a set of starting parameters for the model:
+        generate a set of starting parameters for the model: A1, b1, T1, A2, b2, T2
         """
-        cls.start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
-        if random:
-            stds = (0.25, 0.5, 3.0, 0.25, 0.5, 1.0)
-            cls.start_params += np.random.randn(len(stds))*stds
-
+        start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
+        stds = (0.25, 0.5, 3.0, 0.25, 0.5, 1.0)
+        posidx = (0,2,3,5)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params            
 
 class submmModel2_normalized_logA(submmModel2_normalized):
@@ -507,11 +509,10 @@ class submmModel1_normalized(submmModel2_normalized):
         """
         generate a set of starting parameters for the model:
         """
-        cls.start_params = (1., 2., 10.)  ## careful of units
-        if random:
-            stds = (0.25, 0.5, 3.0)
-            cls.start_params += np.random.randn(len(stds))*stds
-
+        start_params = (1., 2., 10.)  ## careful of units
+        stds = (0.25, 0.5, 3.0)
+        posidx = (0,2)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
         
 

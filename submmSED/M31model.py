@@ -22,7 +22,7 @@ solid_angle = 0.00382794 # Sr
  
 import Proposal
 
-from model import greybody, submmModel2_normalized
+from model import greybody, submmModel2_normalized, startfrom_generic
 
 # UPDATED model (Feb 2014)
 # g_ff = alog(exp(5.960 - (sqrt(3d)/!DPI)*alog(1d*nu*(Te/10000d)^(-3d/2d))) + 2.71828)
@@ -252,10 +252,9 @@ class M31model(submmModel2_normalized):
         generate a set of starting parameters for the model:
         tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame
         """
-        cls.start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 50.0)  ## careful of units
-        if random:
-            ## these are all typically 1-2sigma 
-            stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 20)
-            cls.start_params += np.random.randn(len(stds))*stds
-            
+        start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 50.0)  ## careful of units
+        stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 20)
+        posidx = (0,2,5,7)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
+        

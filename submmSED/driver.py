@@ -551,6 +551,7 @@ def mainmain(argv=None):
             3: 2 comp floating b
     """
     
+    
     randomrestart = True
     random = True
     
@@ -573,6 +574,7 @@ def mainmain(argv=None):
     shortopts = "hf:o:i:"
     if argv is None:
         argv = sys.argv
+
     try:
         try:
             opts, args = getopt.getopt(argv[1:], shortopts, longopts)
@@ -625,9 +627,9 @@ def mainmain(argv=None):
             format = 0 ### placeholder
 
         if datslice is None:
-            if filetype == 'DLC'
+            if filetype == 'DLC':
                 idata = range(1717)
-            elif filetype == 'DLC_2014'
+            elif filetype == 'DLC_2014':
                 idata = range(43)
         
         print "filename: %s" % filename 
