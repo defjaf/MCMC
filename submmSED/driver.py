@@ -57,7 +57,7 @@ wavelength = True ### Planck format
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
-         random=False, randomrestart=False,
+         random=True, randomrestart=False,
          fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
         
         
@@ -548,6 +548,9 @@ def mainmain(argv=None):
             3: 2 comp floating b
     """
     
+    randomrestart = True
+    random = True
+    
     # fdir = "./figs_MRR_UL_XX/"
     # odir = "./out_MRR_UL_XX/"
     fdir = "./figs_DLC2_1/"
@@ -637,7 +640,7 @@ def mainmain(argv=None):
                 break
         print "which=", which
         ret = many(which, fdir=fdir, DLC_ul=DLC_ul, filetype=filetype, cdir=odir, idata=idata, next0=next0, 
-                   fil=filename, format=format)
+                   fil=filename, format=format, random=random, randomrestart=randomrestart)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             

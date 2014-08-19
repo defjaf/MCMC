@@ -163,7 +163,7 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True):
         err_columns = np.array([i for i in range(ncol) if headers[i].startswith('E')])
         assert np.all(err_columns == flux_columns+1)
         
-        lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### Freq in GHz
+        lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### lambda in um
         lambda_err = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 

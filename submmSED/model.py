@@ -158,10 +158,10 @@ class submmModel2(object):
         """
         generate a set of starting parameters for the model:
         """
-        if random is not None:
-            cls.start_params = (2., 30., 2., 20.)  ## careful of units
-        else:
-            pass
+        cls.start_params = (2., 30., 2., 20.)  ## careful of units
+        if random:
+            stds = (0.5, 6.0, 0.5, 4.0)
+            cls.start_params += np.random.randn(len(stds))*stds
 
         return cls.start_params
 
@@ -222,10 +222,11 @@ class submmModel1(object):
         """
         generate a set of starting parameters for the model:
         """
-        if random is not None:
-            cls.start_params = (2.0, 10.0)  ## careful of units
-        else:
-            pass
+        cls.start_params = (2.0, 10.0)  ## careful of units
+        if random:
+            stds = (0.5, 3.0)
+            cls.start_params += np.random.randn(len(stds))*stds
+
         return cls.start_params
 
 
@@ -303,10 +304,11 @@ class submmModel_ratio(object):
         """
         generate a set of starting parameters for the model:
         """
-        if random is not None:
-            cls.start_params = (2., 10., 2., 5., 1.0)  ## careful of units
-        else:
-            pass
+        cls.start_params = (2., 10., 2., 5., 1.0)  ## careful of units
+        if random:
+            stds = (0.5, 3, 0.5, 2.0, 0.25)
+            cls.start_params += np.random.randn(len(stds))*stds 
+            
         return cls.start_params
             
             
@@ -395,11 +397,12 @@ class submmModel2_normalized(object):
         """
         generate a set of starting parameters for the model:
         """
-        if random is not None:
-            cls.start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
-        else:
-            pass
-            
+        cls.start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
+        if random:
+            stds = (0.25, 0.5, 3.0, 0.25, 0.5, 1.0)
+            cls.start_params += np.random.randn(len(stds))*stds
+
+        return cls.start_params            
 
 class submmModel2_normalized_logA(submmModel2_normalized):
     """model a submm SED as a two-component grey body: flux = 10**logA1 nu^b1 B_nu(T1) + 10**A2 nu^b2 B_nu(T2)
@@ -504,10 +507,13 @@ class submmModel1_normalized(submmModel2_normalized):
         """
         generate a set of starting parameters for the model:
         """
-        if random is None:
-            cls.start_params = (1., 2., 10.)  ## careful of units
-        else:
-            pass
+        cls.start_params = (1., 2., 10.)  ## careful of units
+        if random:
+            stds = (0.25, 0.5, 3.0)
+            cls.start_params += np.random.randn(len(stds))*stds
+
+        return cls.start_params
+        
 
 class submmModel1_normalized_logA(submmModel1_normalized):
     """model a submm SED as a one-component grey body: flux = 10**(logA) nu^b B_nu(T)
