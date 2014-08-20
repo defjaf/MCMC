@@ -136,7 +136,7 @@ def readfluxes_DLC(filename, format=0, delnu=None):
 def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
-def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True):
+def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
     name z f1 e1 f2 e2 ... fn en
@@ -168,6 +168,8 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True):
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 
         for row in hreader:
+            if row[name_column]=="Arp220":
+                row[name_column] = "Arp220-short"
             row = np.asarray(row)
             z = np.float(row[z_column])
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
@@ -186,6 +188,21 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True):
             nu_rest = nu_obs*(1+z)
 
             data.append(submmData(nu_rest, flux, sig, row[name_column], z, nu_obs=nu_obs))
+            
+    if getArp220:
+        dat = lambda_obs_1, flux, sig = np.loadtxt("./Arp220.txt", unpack=True)
+        nu_obs = speed_of_light/lambda_obs_1
+        if UL25:
+            l25 = np.where(np.round(lambda_obs_1)==25)[0]
+            if l25:
+                sig[l25] = flux[l25]
+                flux[l25] = 0
+
+        nu_rest = nu_obs*(1+z)
+
+        data.append(submmData(nu_rest, flux, sig, "Arp220", z, nu_obs=nu_obs))
+        
+        z = 0.018
 
     return data
 
