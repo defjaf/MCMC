@@ -190,6 +190,7 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
             data.append(submmData(nu_rest, flux, sig, row[name_column], z, nu_obs=nu_obs))
             
     if getArp220:
+        z = 0.018
         dat = lambda_obs_1, flux, sig = np.loadtxt("./Arp220.txt", unpack=True)
         nu_obs = speed_of_light/lambda_obs_1
         if UL25:
