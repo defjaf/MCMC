@@ -129,23 +129,41 @@ class MCMC(object):
                 self.MC_append(nMC)
     
     
-    def setStart(self, params):
-        """ set the starting point for the chain. """
+    ### TODO: set random from caller!
+    def setStart(self, params, random=True, verbose=True):
+        """ set the starting point for the chain. 
+         AHJ 2014/08: randomize the starting point 
+        
+        """
         paramarr = self.like.model.unpackage(params)
         self.nparams = len(paramarr)
         self.samples = empty(dtype=float64, shape=(1, self.nparams))
         self.lnPr = empty(dtype=float64, shape=(1,))
         self.accepted = empty(dtype=float64, shape=(1, ))
+        prior = self.like.model.prior(*params)
+        
+        ### AHJ 08/2014: randomize the start by drawing from the proposal
+        if random:
+            prior = -1 ## force randomization
+            i_restart = 0
+            while prior <= 0:
+                params = self.prop.getNewParams(params)    ### want to resample all parameters each time, even if doBlock=True
+                paramarr = self.like.model.unpackage(params)
+                prior = self.like.model.prior(*params)
+                i_restart += 1
+                
+            if i_restart>1 and verbose:
+                print "Number of prior resamples: %d" % i_restart
         self.samples[0] = paramarr
         self.prev = params
-        prior = self.like.model.prior(*params)
         
         try:
             self.nDerived = self.like.nDerived
         except AttributeError:
             self.nDerived = self.like.nDerived = 0    
         
-        if prior<=0:
+        
+        if prior<=0:  ### should never get here if random=True
             raise ZeroPriorError(params)
         
         self.lnPr[0] = self.prev_lnPr = self.prob(params) + log(prior)
@@ -336,7 +354,7 @@ class MCMC(object):
         newStart = self.mean(burn, stride)
         stdevs = self.stdev(burn, stride)
         
-        if random: newStart += np.random.randn(len(stdevs))*stdevs
+        if random: newStart += np.random.randn(len(stdevs))*stdevs   ### need to check for 0 prior
         
         try:
             covar = self.covar(burn, stride, params=params)
@@ -471,6 +489,9 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
         noCorrelations = False
     noCorr1 = noCorrelations
     
+    nresample = 0
+    nresample_max = 10
+    
     params = where(like.model.unpackage(prop_sigmas)>0)[0]  # where returns a tuple
     
     for isamp, nMC1 in enumerate(nMC):
@@ -519,6 +540,10 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
                 try:
                     if max(stdvs/means) < eps:
                         print 'small relative variance; resampling'
+                        nresample += 1
+                        if nresample > nresample_max: 
+                            print 'reached max resample limit: breaking out of loop'
+                            break
                         continue
                 except (ZeroDivisionError, FloatingPointError):
                     idx = abs(means)<1.e-11

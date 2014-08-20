@@ -38,11 +38,13 @@ print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
 minb, maxb = 0., 3.
 
 def startfrom_generic(start, stds, posidx=(), random=True):
-    while True:
-        if random:
-            start += np.random(len(stds))*stds
-        if all(start[p]>0 for p in posidx):
-            return start
+    return start
+# randomization now handled elsewhere.
+#     while True:
+#         if random:
+#             start += np.random(len(stds))*stds
+#         if all(start[p]>0 for p in posidx):
+#             return start
 
 try:
 
