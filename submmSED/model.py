@@ -517,6 +517,67 @@ class submmModel1_normalized(submmModel2_normalized):
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
         
+class submmModel1_opticallythick_logA(submmModel1_normalized):
+    """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
+            tau = (nu/nu0)^b
+
+    """
+
+    nparam = 4   # A, b, T, [nu_0?]
+    fmtstring = "%.3f "*nparam
+    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    nBlock = max(paramBlocks)+1
+    texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
+    
+    def __init__(self, logA, b, T, nu0):
+
+        self.A = 10.0**logA
+        self.b = b
+        self.T = T
+        self.nu0 = nu0
+
+    def at_nu(self, nu):
+        tau = np.pow(nu/self.nu0, self.b)
+        return self.A * (1-np.exp(-tau)) * blackbody(self.T, nu)
+
+    def at(self, data):
+        tau = np.pow(nu/self.nu0, self.b)
+        return self.A * (1-np.exp(-tau)) * blackbody(self.T, self.freq)
+
+    __call__ = at    
+
+    def flux(self, nu1=None, nu2=None):
+        """return the flux between the given frequencies for each component"""
+        return array([self.A*totalflux(self.b, self.T, nu1, nu2)])   ### return a scalar?
+
+
+    @classmethod
+    def prior(cls, logA, b, T, nu0):
+        """get the unnormalized prior for the parameters"""
+
+        if T<minTemp or T>maxTemp:
+            return 0
+            
+        if b<minb or b>maxb:
+            return 0
+            
+        if nu0<0:
+            return 0
+
+        return 1
+
+        
+    @classmethod
+    def startfrom(cls, data=None, random=None):
+        """
+        generate a set of starting parameters for the model:
+        """
+        start_params = (1., 2., 10., 100.0)  ## careful of units
+        stds = (0.25, 0.5, 3.0, 30.0)
+        posidx = (0,2,3)
+        cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
+        return cls.start_params
+        
 
 class submmModel1_normalized_logA(submmModel1_normalized):
     """model a submm SED as a one-component grey body: flux = 10**(logA) nu^b B_nu(T)
