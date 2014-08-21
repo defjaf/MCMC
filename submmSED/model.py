@@ -537,12 +537,12 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
         self.nu0 = nu0
 
     def at_nu(self, nu):
-        tau = np.pow(nu/self.nu0, self.b)
-        return self.A * (1-np.exp(-tau)) * blackbody(self.T, nu)
+        tau = (nu/self.nu0)**self.b
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu)
 
     def at(self, data):
-        tau = np.pow(nu/self.nu0, self.b)
-        return self.A * (1-np.exp(-tau)) * blackbody(self.T, self.freq)
+        tau = (data.freq/self.nu0)**self.b
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq)
 
     __call__ = at    
 

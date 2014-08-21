@@ -57,6 +57,7 @@ wavelength = True ### Planck format
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
          nMC=(10000,10000), nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
+         opticallyThick=False,
          random=True, randomrestart=False,
          fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
         
@@ -122,6 +123,9 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         if filetype.upper() == "M31":
             mod = M31model.M31model
             like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
+        elif opticallyThick:
+            mod = model.submmModel1_opticallythick_logA
+            like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)   
         elif getNorm:
             if onecomponent:
                 mod = model.submmModel1_normalized_logA
@@ -265,7 +269,7 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     ret1 = ret2 = ret3 =  ret4 = []
 
     ### proposition sigmas ###
-    sA, sB, sT = 4, 8, 8   ## was 1,2,2
+    sA, sB, sT, snu = 4, 8, 8, 10   ## was 1,2,2
 
     if 0 in which:
         print "Two-Component beta = 2"
@@ -296,11 +300,18 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
                     check=cdir+"check3.npy", next0=next0, **keywords)
 
+    if 4 in which:
+        print "Optically thick"
+        ret4 = main(fil, getNorm=True, i = idata, 
+                    start=(1,2.,10, 100.0), sigmas=(sA,sB,sT,snu), retMCMC=False,
+                    nMC=nMC, onecomponent=False, opticallyThick=True, fig0=0, savefig="_thick", fdir=fdir,
+                    check=cdir+"check4.npy", next0=next0, **keywords)
+
 
     return ret1, ret2, ret3, ret4
     
 
-def postprocess(dirname="./", multiple=None, check=False):
+def postprocess(dirname="./", multiple=None, check=False, nodat=False):
     """
     process the pickle files returned by main() and many() routines.
     Can also deal with the slightly-different format of the checkpoint files.
@@ -312,11 +323,11 @@ def postprocess(dirname="./", multiple=None, check=False):
     ####        can use Savage-Dickey?
     
     
-    nrun = 4
+    nrun = 5
     
     ret = [[] for i in range(nrun)]
-    idxs = [[0,2,3,5], [0,1,2], [0,2], [0,1,2,3,4,5]]  ## final one is for full 2T-2beta fit
-    nt = [2,1,1,2]  ## number of temperature components
+    idxs = [[0,2,3,5], [0,1,2], [0,2], [0,1,2,3,4,5], [0,1,2,3]]  ## penultimate one is for full 2T-2beta fit
+    nt = [2,1,1,2,1]  ## number of temperature components
     
     
     if not multiple:
@@ -346,11 +357,11 @@ def postprocess(dirname="./", multiple=None, check=False):
                 ndat = len(ret0[0][4])
             except IndexError:
                 ndat = 0
+            if nodat:
+                ndat = 0
                 
             print 'nobj, npar, ndat = ', nobj, npar, ndat
-                
-            
-            
+                            
             dt = np.dtype([
                 ('name', 'S21'),
                 ('mean', np.float, (npar,)), 
@@ -396,7 +407,8 @@ def postprocess(dirname="./", multiple=None, check=False):
                     
                     ### new DLC information
                     ret_i[iobj]['z'] = obj[3]
-                    ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
+                    if ndat>0:
+                        ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
                     ret_i[iobj]['flux'][:] = np.array(obj[5])[:]  ### AHJ: PROBLEM HERE-- fixed with [:]
                 except IndexError:
                     pass
@@ -411,21 +423,22 @@ def postprocess(dirname="./", multiple=None, check=False):
     return ret
 
 
-def writeTabAll(ret123, fbase, ext='.npy', dirname=None, check=False):
+def writeTabAll(ret123, fbase, ext='.npy', dirname=None, check=False, nodat=False):
     if dirname is not None:
-        ret123 = postprocess(dirname, check=check)
+        ret123 = postprocess(dirname, check=check, nodat=nodat)
         
     for i, r in enumerate(ret123):
         if len(r)>0:
             fname = fbase + str(i) + ext
-            writeTab(r, fname)
+            writeTab(r, fname, nodat=nodat)
         
     return ret123
         
 
-def writeTab(ret, fname, names=None):
+def writeTab(ret, fname, names=None, nodat=False):
     """ write the output of the postprocess function to a text file 
         run separately on each of the elements of postprocess()
+        if nodat, don't include the data (needed for datasets with different number of data per object
      """
      #### TODO: write more information for DLC (z, fluxes, error, evidence, total fluxes)
      
@@ -436,8 +449,7 @@ def writeTab(ret, fname, names=None):
 
     nn = ret.shape[0]
     npar = len(ret['MLpar'][0])
-    ndat = len(ret['dat'][0])
-    
+    ndat = len(ret['dat'][0]) if not nodat else 0
     
 #    try:
     nt = ret['flux'].shape[1]
@@ -466,9 +478,10 @@ def writeTab(ret, fname, names=None):
     hdr.append("dlnLike")
     hdr.append("evidence1")
     hdr.append("evidence2")
-    for i in range(ndat):
-        hdr.append("flux %d" % i)
-        hdr.append("sigflux %d" % i)
+    if not nodat:
+        for i in range(ndat):
+            hdr.append("flux %d" % i)
+            hdr.append("sigflux %d" % i)
     for i in range(nt):   ### at least one of these is printed incorrectly!!!
         hdr.append("greybody flux %d" % i)
         
