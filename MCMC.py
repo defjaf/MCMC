@@ -24,6 +24,9 @@ from __future__ import division
 
 import math
 
+### this is actually a forked branch from https://github.com/fnoble/python-progressbar/tree/ipython_support
+# from progressbar_ipython import ProgressBar
+### `pip install progressbar-ipython` but shows up as just `import progressbar`
 from progressbar import ProgressBar
 
 from numpy import (array, float64, exp, log, concatenate, zeros, bool8,
@@ -147,13 +150,16 @@ class MCMC(object):
             prior = -1 ## force randomization
             i_restart = 0
             while prior <= 0:
-                params = self.prop.getNewParams(params)    ### want to resample all parameters each time, even if doBlock=True
-                paramarr = self.like.model.unpackage(params)
-                prior = self.like.model.prior(*params)
+                newparams = self.prop.getNewParams(params)      ### want to resample all parameters each time, even if doBlock=True
+                                                                ### nb. always start at the given params
+                paramarr = self.like.model.unpackage(newparams)
+                prior = self.like.model.prior(*newparams)
                 i_restart += 1
                 
             if i_restart>1 and verbose:
                 print "Number of prior resamples: %d" % i_restart
+                
+        params = newparams
         self.samples[0] = paramarr
         self.prev = params
         
