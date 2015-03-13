@@ -45,6 +45,7 @@ import getdist
 def M31(rotateParams=False, start=None, sigmas=None, 
          nMC=(10000,10000), noPlots=False, fig0=0, savefig=False, retMCMC=True,
          fdir = "./", logplot=True, check=None, wavelength=False, doBlock=True,
+         filename="M31/M31Flux-DX9d.dat",
          random=False, randomrestart=False):
         
         
@@ -57,7 +58,7 @@ def M31(rotateParams=False, start=None, sigmas=None,
 #    start = np.array(start) + 0.5*np.array(sigmas)*np.random.randn(len(start))
 #    print "randomizing start:", start
             
-    alldata = data.readfluxes_M31()
+    alldata = data.readfluxes_M31(filename)
         
     dat = alldata[0]
     name = dat.name 
