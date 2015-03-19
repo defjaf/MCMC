@@ -24,7 +24,7 @@ if __name__ == "__main__":
     matplotlib.use("AGG")
     plottype = "png"
     
-plottype = "png"
+plottype = "pdf"
 
     #print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
     
