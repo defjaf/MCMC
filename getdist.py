@@ -52,7 +52,7 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
     if lnLike is not None: 
         maxlnLike = max(lnLike)
         maxLikeParams = s[lnLike.argmax()]
-        maxLProb = MCMC.like.lnLike(maxLikeParams)
+        maxLProb = MCMC.like.lnLike(maxLikeParams)+np.log(MCMC.like.model.prior(*maxLikeParams))
         maxLchi2 = MCMC.like.chi2(maxLikeParams)
         print "chi2 at max = %f" % maxLchi2
         assert abs(1.-maxLProb/maxlnLike)<0.01, \
@@ -187,7 +187,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
     if lnLike is not None: 
         maxlnLike = max(lnLike)
         maxLikeParams = s[lnLike.argmax()]
-        maxLProb = MCMC.like.lnLike(maxLikeParams)
+        maxLProb = MCMC.like.lnLike(maxLikeParams)+np.log(MCMC.like.model.prior(*maxLikeParams))
         maxLchi2 = MCMC.like.chi2(maxLikeParams)
         print "chi2 at max = %f" % maxLchi2
         print 'Max ln likelihood %f at parameters:' % maxlnLike
