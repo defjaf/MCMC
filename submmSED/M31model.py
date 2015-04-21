@@ -19,6 +19,8 @@ solid_angle = 0.00382794 # Sr
 ### how can I parameterize the model rather than hardcode the prior as below?
 
 ## nb. 1 Jy = 1e-26 Joule / m^2 
+
+#### 20 April 2015 -- increase prior range on AME
  
 import Proposal
 
@@ -252,8 +254,10 @@ class M31model(submmModel2_normalized):
         generate a set of starting parameters for the model:
         tau250, beta_dust, T_dust, EM, DT_CMB, A_synch, alpha_synch, A_ame
         """
-        start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 50.0)  ## careful of units
-        stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 20)
+#         start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 50.0)  ## careful of units
+#         stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 20)
+        start_params = (1.0e-5, 2.0, 20., 8.0, 1.0, 10.0, -1.0, 1.0e18)  ## careful of units
+        stds = (0.5e-5, 0.5, 1.5, 2.0, 2.0, 2.0, 0.3, 2.0e17)
         posidx = (0,2,5,7)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
