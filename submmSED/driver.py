@@ -33,7 +33,7 @@ import likelihood
 import data
 import model
 import M31model
-import getdist
+import getdist_ahj as getdist
 
 # import joblib
 

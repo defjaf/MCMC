@@ -27,7 +27,7 @@ from numpy import concatenate as cat
 
 from BeamData import BeamData
 from ProcessBeamData import setup_sampler, sample1beam, plotter
-import getdist
+import getdist_ahj as getdist
 
 sigminmax=[0,10]
 

@@ -8,7 +8,7 @@ import os.path
 import pylab
 import pyfits
 import MCMC
-import getdist
+import getdist_ahj as getdist
 from binnedCl.binnedClLikelihood import binnedClLikelihood
 from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat, fitOffsetLognormal
 from ClData import ClData

@@ -22,7 +22,7 @@ from BeamData import BeamData
 
 from ProcessBeamData import setup_sampler, sample1beam, plotter
 
-import getdist
+import getdist_ahj as getdist
 
 #    sigcut = 0.2 
 #    ctscut = 12  

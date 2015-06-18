@@ -1,6 +1,6 @@
 from __future__ import division
 import cPickle
-import getdist
+import getdist_ahj as getdist
 import pylab
 import numpy
 

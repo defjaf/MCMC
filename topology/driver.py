@@ -7,7 +7,7 @@ import cPickle
 
 import pylab
 import MCMC
-import getdist
+import getdist_ahj as getdist
 
 import topo_model
 from topo_likelihood import topo_likelihood
