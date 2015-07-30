@@ -6,6 +6,7 @@ import os
 import fnmatch
 from numpy.random import uniform, normal
 import csv
+import re
 
 import matplotlib.pyplot as plt
 
@@ -149,8 +150,12 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
              
     NB!!! the original numbers file had a typo in the Redshift header name! was "Redfshift"!
     
-    """
     
+    """
+
+    Epat = r'^E\d+_'   ### regex patterns
+    Fpat = r'^F\d+_'
+
     data = []
     with open(filename, "rb") as csvfile:
 
@@ -159,8 +164,8 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
         ncol = len(headers)
         name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
         z_column = np.where(headers=='Redshift')[0][0]
-        flux_columns = np.array([i for i in range(ncol) if headers[i].startswith('F')])
-        err_columns = np.array([i for i in range(ncol) if headers[i].startswith('E')])
+        flux_columns = np.array([i for i in range(ncol) if re.match(Fpat, headers[i])])
+        err_columns = np.array([i for i in range(ncol) if re.match(Epat, headers[i])])
         assert np.all(err_columns == flux_columns+1)
         
         lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### lambda in um
@@ -168,9 +173,12 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 
         for row in hreader:
+            
             if row[name_column]=="Arp220":
                 row[name_column] = "Arp220-short"
             row = np.asarray(row)
+            if np.all(row==''): continue  ## ignore blank lines
+
             z = np.float(row[z_column])
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
