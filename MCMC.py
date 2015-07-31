@@ -209,7 +209,8 @@ class MCMC(object):
                 if self.nDerived:
                     newDerived[i] = derived
                 newsamples[i] = self.like.model.unpackage(samples)
-                pbar.update(100.0*(i+1)/nMC)
+                if sys.stdout.isatty():  ## only update progress if stdout is terminal
+                    pbar.update(100.0*(i+1)/nMC)
         
         self.samples = concatenate((self.samples, newsamples))
         self.lnPr = concatenate((self.lnPr, newlnPr))
