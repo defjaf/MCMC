@@ -23,6 +23,7 @@ from __future__ import division
 
 
 import math
+import sys
 
 ### this is actually a forked branch from https://github.com/fnoble/python-progressbar/tree/ipython_support
 # from progressbar_ipython import ProgressBar

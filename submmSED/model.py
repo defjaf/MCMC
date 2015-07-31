@@ -299,7 +299,7 @@ class submmModel_ratio(object):
 
     def plot(self, data, logplot=True):
         """plot the data and the model"""
-        f = linspace(data.freq[0], data.freq[-1], 100)
+        f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
         data.plot(logplot=logplot)
         plt.plot(f, model_flux)
