@@ -529,19 +529,19 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
     nBlock = max(paramBlocks)+1
     texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     
-    def __init__(self, logA, b, T, nu0):
+    def __init__(self, logA, b, T, nu_0):
 
         self.A = 10.0**logA
         self.b = b
         self.T = T
-        self.nu0 = nu0
+        self.nu_0 = nu_0
 
     def at_nu(self, nu):
-        tau = (nu/self.nu0)**self.b
+        tau = (nu/self.nu_0)**self.b
         return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu)
 
     def at(self, data):
-        tau = (data.freq/self.nu0)**self.b
+        tau = (data.freq/self.nu_0)**self.b
         return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq)
 
     __call__ = at    
@@ -552,7 +552,7 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
 
 
     @classmethod
-    def prior(cls, logA, b, T, nu0):
+    def prior(cls, logA, b, T, nu_0):
         """get the unnormalized prior for the parameters"""
 
         if T<minTemp or T>maxTemp:
@@ -561,7 +561,7 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
         if b<minb or b>maxb:
             return 0
             
-        if nu0<0:
+        if nu_0<0:
             return 0
 
         return 1

@@ -50,13 +50,15 @@ fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
 fname_DLC_2014 = "./submmSED/herus_phot.csv"
 delnu = 1763
 
+nMC = (20000,100000)
+
 
 
 wavelength = True ### Planck format
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
 def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getNorm=True, start=None, sigmas=None, 
-         nMC=(10000,10000), nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
+         nMC=nMC, nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
          opticallyThick=False,
          random=True, randomrestart=False,
          fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
@@ -302,13 +304,13 @@ def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
 
     if 4 in which:
         print "Optically thick"
-        ret4 = main(fil, getNorm=True, i = idata, 
+        ret5 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10, 100.0), sigmas=(sA,sB,sT,snu), retMCMC=False,
                     nMC=nMC, onecomponent=False, opticallyThick=True, fig0=0, savefig="_thick", fdir=fdir,
                     check=cdir+"check4.npy", next0=next0, **keywords)
 
 
-    return ret1, ret2, ret3, ret4
+    return ret1, ret2, ret3, ret4, ret5
     
 
 def postprocess(dirname="./", multiple=None, check=False, nodat=False):
@@ -558,10 +560,12 @@ def mainmain(argv=None):
     --idata, -i: comma/space-separated list in python slice format (start, stop, step) of which data to use
     --UL: use DLC upper-limit calculation
     --format: DLC file format (default 0; see data.py)
-    which = 0: 2 comp b=2
-            1: 1 comp floating b
-            2: 1 comp b=2
-            3: 2 comp floating b
+    which = 0: 2 comp b=2             logA1, T1, logA2, T2
+            1: 1 comp floating b      logA, beta, T
+            2: 1 comp b=2             logA, T
+            3: 2 comp floating b      logA1, b1, T1, logA2, b2, T2 
+            4: optical depth          logA, b, T, nu0    flux = A (1-exp(-tau)) B_nu(T)
+                                                         tau = (nu/nu_0)**b
     """
     
     
