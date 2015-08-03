@@ -93,7 +93,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     elif filetype.upper() == "M31":
         alldata = data.readfluxes_M31()
     elif filetype.upper() == "DLC_2014":
-        alldata = data.readfluxes_DLC_2014()
+        alldata = data.readfluxes_DLC_2014(filename)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
@@ -193,6 +193,9 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             mean_chi2 = like.chi2(params)
             print "ln Pr of mean = %f" % meanlnProb
             print "chi2(mean) = %f"% mean_chi2
+            
+            ML_chi2 = like.chi2(maxLikeParams)
+            print "chi2(ML) = %f" % ML_chi2
 
             MLmod = mod(*maxLikeParams)
             try:
@@ -222,6 +225,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             ret_i += (dat.z,)
             ret_i += (zip(dat.d, dat.sig),)
             ret_i += (MLmod.flux(nu1, nu2),)
+            ret_i += (ML_chi2,)   ## added Aug 2015
     
     
         if retMCMC:
@@ -262,13 +266,13 @@ idata = range(0,1717) #None   #[0,300,700] #
 fil = "./ERCSCiifsczbg.dat"
 
 
-def many(which = range(4), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
+def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
 
     print "Using file %s" % fil
     
     print "keywords:", keywords
     
-    ret1 = ret2 = ret3 =  ret4 = []
+    ret1 = ret2 = ret3 = ret4 = ret5 = []
 
     ### proposition sigmas ###
     sA, sB, sT, snu = 4, 8, 8, 10   ## was 1,2,2
@@ -320,6 +324,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
     """    
     #### TODO: save more information for DLC (z, fluxes, error, evidence, total fluxes) DONE
     #### allow combining different pickle files DONE
+    #### add chi2 at max likelihood
     
     #### TODO: fix the normalization on the evidence calculations (priors are currently incorrect)
     ####        can use Savage-Dickey?
@@ -377,7 +382,8 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
                 ('dlnLike', np.float),
                 ('z', np.float),
                 ('dat', np.float, (ndat,2)),
-                ('flux', np.float, (nt[i],))
+                ('flux', np.float, (nt[i],)),
+                ('ML_chi2', np.float)  ## added Aug 2015
             ])
         
             ret_i = np.empty(nobj, dtype = dt)
@@ -412,6 +418,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
                     if ndat>0:
                         ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
                     ret_i[iobj]['flux'][:] = np.array(obj[5])[:]  ### AHJ: PROBLEM HERE-- fixed with [:]
+                    ret_i[iobj]['ML_chi2'][:] = obj[6] ### AHJ: added Aug 2015
                 except IndexError:
                     pass
                     
