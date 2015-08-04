@@ -418,7 +418,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
                     if ndat>0:
                         ret_i[iobj]['dat'][:,:] = np.array(obj[4])[:,:]
                     ret_i[iobj]['flux'][:] = np.array(obj[5])[:]  ### AHJ: PROBLEM HERE-- fixed with [:]
-                    ret_i[iobj]['ML_chi2'][:] = obj[6] ### AHJ: added Aug 2015
+                    ret_i[iobj]['ML_chi2'] = obj[6] ### AHJ: added Aug 2015
                 except IndexError:
                     pass
                     
@@ -466,7 +466,8 @@ def writeTab(ret, fname, names=None, nodat=False):
     alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
           ret['MLpar'], ret['mean'], ret['sig'], ret['dlnLike'].reshape(nn,1), 
           ret['ev'].reshape(nn,1), ret['evMean'].reshape(nn,1),
-          ret['dat'].reshape(nn,-1), ret['flux'].reshape(nn,-1)    ### remove these two lines for old files
+          ret['dat'].reshape(nn,-1), ret['flux'].reshape(nn,-1),    ### remove these two lines for old files
+          ret['ML_chi2'].reshape(nn,1)
           ])
    # except ValueError:
     #      alls = np.hstack([anames.reshape(nn,1), ret['z'].reshape(nn,1),
@@ -493,6 +494,7 @@ def writeTab(ret, fname, names=None, nodat=False):
             hdr.append("sigflux %d" % i)
     for i in range(nt):   ### at least one of these is printed incorrectly!!!
         hdr.append("greybody flux %d" % i)
+    hdr.append("ML_chi2")
         
     nhead = len(hdr)
     hdr = ("%21s "*nhead) % tuple(hdr)
