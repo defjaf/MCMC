@@ -29,6 +29,9 @@ import Proposal
 
 ##### TODO: correctly normalized prior
 
+#### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
+#####                do this at the "__init__" step -- not sure this is right...
+
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
 nu0 = 1000.0
@@ -113,6 +116,11 @@ class submmModel2(object):
     texNames = [r"$\beta_1$", r"$T_1$", r"$\beta_2$", r"$T_2$"]
 
     def __init__(self, b1, T1, b2, T2):
+    
+        ### AHJ 08/2015 keep T1<T2 always
+        if T1>T2:
+            T1, T2 = T2, T1
+            b1, b2 = b2, b1    
 
         self.b1 = b1
         self.T1 = T1
@@ -131,8 +139,8 @@ class submmModel2(object):
         if b1<minb or b2<minb or b1>maxb or b2>maxb:
             return 0
             
-        ### want to separate the two cases: force T1<T2
-        if T1>T2: return 0
+        ## want to separate the two cases: force T1<T2
+#         if T1>T2: return 0   # AHJ 08/2015
 
         return 1.0
 
@@ -330,6 +338,12 @@ class submmModel2_normalized(object):
 
     def __init__(self, A1, b1, T1, A2, b2, T2):
 
+        ### AHJ 08/2015 keep T1<T2 always
+        if T1>T2:
+            T1, T2 = T2, T1
+            b1, b2 = b2, b1
+            A1, A2 = A2, A1
+
         self.A1 = A1
         self.b1 = b1
         self.T1 = T1
@@ -369,7 +383,7 @@ class submmModel2_normalized(object):
             return 0
 
         ### want to separate the two cases: force T1<T2
-        if T1>T2: return 0
+#         if T1>T2: return 0   # AHJ 08/2015 removed
         
 
         return 1
@@ -414,6 +428,13 @@ class submmModel2_normalized_logA(submmModel2_normalized):
     texNames = [r"$\log A_1$", r"$\beta_1$", r"$T_1$", r"$\log A_2$", r"$\beta_2$", r"$T_2$"]
 
     def __init__(self, logA1, b1, T1, logA2, b2, T2):
+    
+        ### AHJ 08/2015 keep T1<T2 always
+        if T1>T2:
+            T1, T2 = T2, T1
+            b1, b2 = b2, b1
+            logA1, logA2 = logA2, logA1
+
 
         self.A1 = 10.0**logA1
         self.b1 = b1
@@ -437,7 +458,7 @@ class submmModel2_normalized_logA(submmModel2_normalized):
             return 0
 
         ### want to separate the two cases: force T1<T2
-        if T1>T2: return 0
+#         if T1>T2: return 0  # AHJ 08/2015
         
         return 1
 
