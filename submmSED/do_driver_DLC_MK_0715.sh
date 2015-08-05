@@ -3,7 +3,7 @@
 export PYTHONPATH=${HOME}/home/proj/stats/MCMC
 
 export hfile=./herus_phot_csv.csv
-export lab=DLC_MK_2015_3ordered
+export lab=DLC_MK_2015_3ord_pack
 
 /Library/Frameworks/Python.framework/Versions/2.7/bin/python driver.py --format=DLC_2014 --fdir=./figs_${lab} --odir=./out_${lab} --file=./${hfile} 0 1> ${lab}_0.out 2> ${lab}_0.err &
 /Library/Frameworks/Python.framework/Versions/2.7/bin/python driver.py --format=DLC_2014 --fdir=./figs_${lab} --odir=./out_${lab} --file=./${hfile} 1 1> ${lab}_1.out 2> ${lab}_1.err &
