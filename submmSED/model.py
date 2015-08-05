@@ -30,7 +30,7 @@ import Proposal
 ##### TODO: correctly normalized prior
 
 #### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
-#####                do this at the "__init__" step -- not sure this is right...
+#####                do this at the "__init__" step -- not sure this is right...*****
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
