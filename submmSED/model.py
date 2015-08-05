@@ -31,6 +31,8 @@ import Proposal
 
 #### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
 #####                do this at the "__init__" step -- not sure this is right...*****
+#####               need to do this in "package"? 
+#####                (See e.g., OffsetNormalizedBeamModel which does a "% pi" operation there)
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
@@ -159,7 +161,12 @@ class submmModel2(object):
         return asarray( param_seqs, dtype=float64)
 
 
-    package = asarray
+#     package = asarray
+    def package(params_flat):
+        b1, T1, b2, T2 = params_flat
+        if T1>T2:
+            params_flat = np.array( b2, T2, b1, T1)
+        return asarray(params_flat)
 
     ## nb. an *instance* of proposal; should pass the class [name] to this?
     proposal = Proposal.GenericGaussianProposal(package=package,
@@ -174,7 +181,7 @@ class submmModel2(object):
         """
         generate a set of starting parameters for the model: b1, T1, b2, T2
         """
-        start_params = (2., 30., 2., 20.)  ## careful of units
+        start_params = (2., 20., 2., 30.)  ## careful of units
         stds = (0.5, 6.0, 0.5, 4.0)
         posidx = (1,3)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
@@ -397,7 +404,15 @@ class submmModel2_normalized(object):
             f = speed_of_light/f
         plt.plot(f, model_flux)
 
-    package = asarray
+#     package = asarray
+# 
+    def package(params_flat):
+        A1, b1, T1, A2, b2, T2 = params_flat
+        if T1>T2:
+            params_flat = np.array( A2, b2, T2, A1, b1, T1)
+        return asarray(params_flat)
+
+        
 
     def unpackage(param_seqs):
         """ convert from structured sequence of parameters to flat array """
