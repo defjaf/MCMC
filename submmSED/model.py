@@ -29,7 +29,7 @@ import Proposal
 
 ##### TODO: correctly normalized prior
 
-#### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
+#### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
 #####                do this at the "__init__" step -- not sure this is right...
 
 h_over_k = 0.04799237 ###  K/Ghz
@@ -140,7 +140,7 @@ class submmModel2(object):
             return 0
             
         ## want to separate the two cases: force T1<T2
-#         if T1>T2: return 0   # AHJ 08/2015
+#         if T1>T2: return 0   # AHJ 08/2015
 
         return 1.0
 
@@ -416,8 +416,8 @@ class submmModel2_normalized(object):
         """
         generate a set of starting parameters for the model: A1, b1, T1, A2, b2, T2
         """
-        start_params = (1., 2., 10., 1., 2., 5.)  ## careful of units
-        stds = (0.25, 0.5, 3.0, 0.25, 0.5, 1.0)
+        start_params = (1., 2., 5., 1., 2., 10.)  ## careful of units
+        stds = (0.25, 0.5, 5.0, 0.25, 0.5, 5.0)
         posidx = (0,2,3,5)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params            
