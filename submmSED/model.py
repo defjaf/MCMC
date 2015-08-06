@@ -165,7 +165,7 @@ class submmModel2(object):
     def package(params_flat):
         b1, T1, b2, T2 = params_flat
         if T1>T2:
-            params_flat = asarray( (b2, T2, b1, T1) )
+            params_flat = array( (b2, T2, b1, T1) )
         return asarray(params_flat)
 
     ## nb. an *instance* of proposal; should pass the class [name] to this?
@@ -325,7 +325,7 @@ class submmModel_ratio(object):
         """
         generate a set of starting parameters for the model: b1, T1, b2, T2, r12
         """
-        start_params = (2., 10., 2., 5., 1.0)  ## careful of units
+        start_params = (2., 5., 2., 10., 1.0)  ## careful of units
         stds = (0.5, 3, 0.5, 2.0, 0.25)
         posidx = (1,3,4)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
@@ -477,6 +477,24 @@ class submmModel2_normalized_logA(submmModel2_normalized):
         
         return 1
 
+    def package(params_flat):
+        logA1, b1, T1, logA2, b2, T2 = params_flat
+        if T1>T2:
+            params_flat = asarray( (logA2, b2, T2, logA1, b1, T1) )
+        return asarray(params_flat)
+
+    def unpackage(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        return asarray( param_seqs, dtype=float64)
+
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package,
+                                                unpackage=unpackage)
+
+## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
 
 class submmModel1_normalized(submmModel2_normalized):
     """model a submm SED as a one-component grey body: flux = A nu^b B_nu(T)
@@ -552,6 +570,22 @@ class submmModel1_normalized(submmModel2_normalized):
         posidx = (0,2)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
+        
+    package = asarray
+    
+    def unpackage(param_seqs):
+        """ convert from structured sequence of parameters to flat array """
+        return asarray( param_seqs, dtype=float64)
+
+    ## nb. an *instance* of proposal; should pass the class [name] to this?
+    proposal = Proposal.GenericGaussianProposal(package=package,
+                                                unpackage=unpackage)
+
+## need to do this conversion after we send the methods to the Proposal class
+    unpackage=staticmethod(unpackage)
+    package=staticmethod(package)
+
+
         
 class submmModel1_opticallythick_logA(submmModel1_normalized):
     """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
