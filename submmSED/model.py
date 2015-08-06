@@ -120,9 +120,9 @@ class submmModel2(object):
     def __init__(self, b1, T1, b2, T2):
     
         ### AHJ 08/2015 keep T1<T2 always
-        if T1>T2:
-            T1, T2 = T2, T1
-            b1, b2 = b2, b1    
+#         if T1>T2:
+#             T1, T2 = T2, T1
+#             b1, b2 = b2, b1    
 
         self.b1 = b1
         self.T1 = T1
@@ -165,7 +165,7 @@ class submmModel2(object):
     def package(params_flat):
         b1, T1, b2, T2 = params_flat
         if T1>T2:
-            params_flat = np.array( b2, T2, b1, T1)
+            params_flat = asarray( (b2, T2, b1, T1) )
         return asarray(params_flat)
 
     ## nb. an *instance* of proposal; should pass the class [name] to this?
@@ -409,7 +409,7 @@ class submmModel2_normalized(object):
     def package(params_flat):
         A1, b1, T1, A2, b2, T2 = params_flat
         if T1>T2:
-            params_flat = np.array( A2, b2, T2, A1, b1, T1)
+            params_flat = asarray( (A2, b2, T2, A1, b1, T1) )
         return asarray(params_flat)
 
         
