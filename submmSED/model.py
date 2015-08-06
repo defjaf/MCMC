@@ -346,10 +346,10 @@ class submmModel2_normalized(object):
     def __init__(self, A1, b1, T1, A2, b2, T2):
 
         ### AHJ 08/2015 keep T1<T2 always
-        if T1>T2:
-            T1, T2 = T2, T1
-            b1, b2 = b2, b1
-            A1, A2 = A2, A1
+#         if T1>T2:
+#             T1, T2 = T2, T1
+#             b1, b2 = b2, b1
+#             A1, A2 = A2, A1
 
         self.A1 = A1
         self.b1 = b1
@@ -445,11 +445,11 @@ class submmModel2_normalized_logA(submmModel2_normalized):
     def __init__(self, logA1, b1, T1, logA2, b2, T2):
     
         ### AHJ 08/2015 keep T1<T2 always
-        if T1>T2:
-            T1, T2 = T2, T1
-            b1, b2 = b2, b1
-            logA1, logA2 = logA2, logA1
-
+#         if T1>T2:
+#             T1, T2 = T2, T1
+#             b1, b2 = b2, b1
+#             logA1, logA2 = logA2, logA1
+# 
 
         self.A1 = 10.0**logA1
         self.b1 = b1
