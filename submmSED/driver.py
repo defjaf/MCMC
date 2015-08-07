@@ -50,7 +50,7 @@ fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
 fname_DLC_2014 = "./submmSED/herus_phot.csv"
 delnu = 1763
 
-nMC = (20000,100000)
+nMC = (50000,1000000)
 
 
 
@@ -259,7 +259,7 @@ def recover():
 # nMC = (15000,100000)
 
 #idata =[i*25 for i in range(12,57)]
-nMC = (15000,300000)
+#nMC = (15000,300000)
 #    fil = "./ercsc_iifscz.txt"
 idata = range(0,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
