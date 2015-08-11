@@ -5,11 +5,14 @@ import math
 
 import matplotlib.pyplot as plt
 from numpy import (array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, 
-                    min, max, vectorize, expm1)
+                    min, max, vectorize, expm1, zeros)
 from scipy import special,integrate
 #import numexpr as ne
 
 speed_of_light = 299792.458 ### micron GHz
+
+singleParams = True  ## to vary each parameter individually
+if not singleParams: print "varying parameters together!"
 
 import Proposal
 
@@ -127,7 +130,7 @@ class submmModel2(object):
 
     nparam = 4
     fmtstring = "%.3f "*4
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\beta_1$", r"$T_1$", r"$\beta_2$", r"$T_2$"]
 
@@ -209,7 +212,7 @@ class submmModel1(object):
 
     nparam = 2
     fmtstring = "%.3f "*2
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\beta$", "$T$"]
 
@@ -276,7 +279,7 @@ class submmModel_ratio(object):
     
     nparam = 5
     fmtstring = "%.3f "*5
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     
     def __init__(self, b1, T1, b2, T2, r12):
@@ -353,7 +356,7 @@ class submmModel2_normalized(object):
 
     nparam = 6
     fmtstring = "%.3f "*6
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A_1$", r"$\beta_1$", r"$T_1$", r"$A_2$", r"$\beta_2$", r"$T_2$"]
 
@@ -518,7 +521,7 @@ class submmModel1_normalized(submmModel2_normalized):
 
     nparam = 3
     fmtstring = "%.3f "*3
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A$", r"$\beta$", r"$T$"]
     
@@ -610,7 +613,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
 
     nparam = 4   # A, b, T, nu_0
     fmtstring = "%.3f "*nparam
-    paramBlocks = range(nparam)    #### not right with different marginalization?
+    paramBlocks = range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     
@@ -676,7 +679,7 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
 
     nparam = 4   # A, b, T, [nu_0?]
     fmtstring = "%.3f "*nparam
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     

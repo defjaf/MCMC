@@ -330,6 +330,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
     ####        can use Savage-Dickey?
     
     
+    
     nrun = 5
     
     ret = [[] for i in range(nrun)]
@@ -433,6 +434,9 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
 
 
 def writeTabAll(ret123, fbase, ext='.npy', dirname=None, check=False, nodat=False):
+
+    #### TODO: calculate convergence diagnostics from multiple chains
+
     if dirname is not None:
         ret123 = postprocess(dirname, check=check, nodat=nodat)
         
