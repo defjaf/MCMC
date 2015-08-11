@@ -61,7 +61,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
          nMC=nMC, nDerived=None, noPlots=False, fig0=0, savefig=False, retMCMC=True,
          opticallyThick=False,
          random=True, randomrestart=False,
-         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR'):
+         fdir = "./", logplot=True, DLC_ul=False, check=None, next0=True, format=0, filetype='MRR', linear=False):
         
         
     speedOfLight = 299792.  ## micron GHz
@@ -126,13 +126,13 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             mod = M31model.M31model
             like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
         elif opticallyThick:
-            mod = model.submmModel1_opticallythick_logA
+            mod = model.submmModel1_opticallythick_logA  if not linear else model.submmModel1_opticallythick
             like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)   
         elif getNorm:
             if onecomponent:
-                mod = model.submmModel1_normalized_logA
+                mod = model.submmModel1_normalized_logA if not linear else model.submmModel1_normalized
             else:
-                mod = model.submmModel2_normalized_logA
+                mod = model.submmModel2_normalized_logA if not linear else model.submmModel2_normalized
             like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)        
         else:
             if onecomponent:
@@ -568,6 +568,7 @@ def mainmain(argv=None):
     --odir, -o: output numpy pickle files
     --idata, -i: comma/space-separated list in python slice format (start, stop, step) of which data to use
     --UL: use DLC upper-limit calculation
+    --lin: use linear rather than log amplitude
     --format: DLC file format (default 0; see data.py)
     which = 0: 2 comp b=2             logA1, T1, logA2, T2
             1: 1 comp floating b      logA, beta, T
@@ -594,9 +595,10 @@ def mainmain(argv=None):
     datslice=None
     format=None
     filename = fil
+    linear = False
     next0 = False ### usually want True, but need this for indexing by the line numbers in the file
     
-    longopts = ["help", "fdir=", "odir=", "idata=", "UL=", "format=", "file="]
+    longopts = ["help", "fdir=", "odir=", "idata=", "UL=", "format=", "file=", "lin"]
     shortopts = "hf:o:i:"
     if argv is None:
         argv = sys.argv
@@ -621,6 +623,8 @@ def mainmain(argv=None):
                 idata = range(*datslice)
             elif o in ["--UL"]:
                 DLC_ul = int(a)
+            elif o in ["--lin"]:
+                linear = True
             elif o in ["--format"]:
                 try:
                     format = int(a)
@@ -665,6 +669,7 @@ def mainmain(argv=None):
         print "DLC_UL = %d" % DLC_ul
         print "format = %d" % format
         print "filetype = %s" % filetype
+        print "linear = ", linear
                 
         # process arguments
         for s in reversed(args):
@@ -674,7 +679,7 @@ def mainmain(argv=None):
                 break
         print "which=", which
         ret = many(which, fdir=fdir, DLC_ul=DLC_ul, filetype=filetype, cdir=odir, idata=idata, next0=next0, 
-                   fil=filename, format=format, random=random, randomrestart=randomrestart)
+                   fil=filename, format=format, random=random, randomrestart=randomrestart, linear=linear)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             

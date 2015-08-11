@@ -32,7 +32,12 @@ import Proposal
 #### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
 #####                do this at the "__init__" step -- not sure this is right...*****
 #####               need to do this in "package"? 
-#####                (See e.g., OffsetNormalizedBeamModel which does a "% pi" operation there)
+#####                  (See e.g., OffsetNormalizedBeamModel which does a "% pi" operation there)
+#####                  DONE
+
+#####               rewrite at(self, data) to use the data to normalize the amplitudes 
+#####                   model = A * data(nu_bar) * F(nu)/F(nu_bar)
+#####                   should be possible since it has access to the data
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
@@ -51,53 +56,62 @@ def startfrom_generic(start, stds, posidx=(), random=True):
 #         if all(start[p]>0 for p in posidx):
 #             return start
 
-try:
+# try:
+# 
+#     from blackbody import greybody, blackbody, lux
+# 
+#     print "Got blackbody.pyx"
+# 
+# except ImportError:
+# print "python version of blackbody"
+def blackbody(T, nu, nu_norm=False):
+    """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
 
-    from blackbody import greybody, blackbody, totalflux
-
-    print "Got blackbody.pyx"
-
-except ImportError:
-    print "python version of blackbody"
-    def blackbody(T, nu):
-        """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
+    # if T==0:
+    #     return 0
     
-        # if T==0:
-        #     return 0
-        
-        x = h_over_k*nu/T
-        
-        with errstate(over='ignore'):
-          #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
-          return prefac * nu**3/expm1(x)
-          
-          
-    def greybody(beta, T, nu):
-        """return the greykody flux at frequency nu for temperature T [CHECK UNITS]"""
+    x = h_over_k*nu/T
+    
+    with errstate(over='ignore'):
+      #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
+        if nu_norm:
+            x_norm = h_over_k*nu_norm/T
+            return (nu/nu_norm)**3 * expm1(x_norm)/expm1(x)
+        else:
+            return prefac * nu**3/expm1(x)
+      
+      
+def greybody(beta, T, nu, nu_norm=False):
+    """return the greykody flux at frequency nu for temperature T [CHECK UNITS]"""
 
-        # if T==0:
-        #     return 0
+    # if T==0:
+    #     return 0
 
-        x = h_over_k*nu/T
-        with errstate(over='ignore'):
-          #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
+    x = h_over_k*nu/T
+    with errstate(over='ignore'):
+      #  return ne.evaluate("prefac*nu**3/(exp(x)-1)")
 #          return prefac*nu**(3+beta)/(exp(x)-1)
-          return prefac * nu0**(-beta) * nu**(3+beta)/(exp(x)-1)
+        if nu_norm:
+            x_norm = h_over_k*nu_norm/T
+            return (nu/nu_norm)**(3+beta) * expm1(x_norm)/expm1(x)
+        else:
+            return prefac * nu0**(-beta) * nu**(3+beta)/expm1(x)
 
-    @vectorize
-    def totalflux(beta, T, nu1=None, nu2=None):
-      """
-      calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
-      NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
-      """
+@vectorize
+def totalflux(beta, T, nu1=None, nu2=None, nu_norm=False):
+  """
+  calculate the total flux of a grey body (with prefactors defined as above) over (nu1,nu2)
+  NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
+  THIS IS INCORRECT FOR self.amplitude DEFINED WITH nu_norm
+  """
 
-      if nu1 is None and nu2 is None:
-          ## return analytic expression for bolometric flux
-          return prefac * nu0**(-beta) * (T/h_over_k)**(4+beta) * \
-                 special.gamma(4+beta)*special.zeta(4+beta,1)
-      else:
-          ## do numeric integral
-          return integrate.quad(lambda nu: greybody(beta, T, nu), nu1, nu2)[0]
+  if nu1 is None and nu2 is None:
+      ## return analytic expression for bolometric flux
+      return prefac * nu0**(-beta) * (T/h_over_k)**(4+beta) * \
+             special.gamma(4+beta)*special.zeta(4+beta,1)
+  else:
+      ## do numeric integral
+      return integrate.quad(lambda nu: greybody(beta, T, nu, nu_norm=nu_norm), nu1, nu2)[0]
 
     
 class submmModel2(object):
@@ -360,19 +374,20 @@ class submmModel2_normalized(object):
 
 
     def at_nu(self, nu):
-        return self.A1 * greybody(self.b1, self.T1, nu) + \
-               self.A2 * greybody(self.b2, self.T2, nu) 
+        return self.A1 * greybody(self.b1, self.T1, nu, nu_norm=nu0) + \
+               self.A2 * greybody(self.b2, self.T2, nu, nu_norm=nu0) 
 
     def at(self, data):
-        return self.A1 * greybody(self.b1, self.T1, data.freq) + \
-               self.A2 * greybody(self.b2, self.T2, data.freq) 
+        return self.A1 * greybody(self.b1, self.T1, data.freq, nu_norm=nu0) + \
+               self.A2 * greybody(self.b2, self.T2, data.freq, nu_norm=nu0) 
 
     __call__ = at    
 
     
     def flux(self, nu1=None, nu2=None):
         """return the flux between the given frequencies for each component"""
-        return asarray([self.A1*totalflux(self.b1, self.T1, nu1, nu2), self.A2*totalflux(self.b2, self.T2, nu1, nu2)])
+        return asarray([self.A1*totalflux(self.b1, self.T1, nu1, nu2, nu_norm=nu0), 
+                        self.A2*totalflux(self.b2, self.T2, nu1, nu2, nu_norm=nu0)])
         
 
     @classmethod
@@ -515,10 +530,10 @@ class submmModel1_normalized(submmModel2_normalized):
 
 
     def at_nu(self, nu):
-        return self.A * greybody(self.b, self.T, nu)
+        return self.A * greybody(self.b, self.T, nu, nu_norm=nu0)
 
     def at(self, data):
-        return self.A * greybody(self.b, self.T, data.freq)
+        return self.A * greybody(self.b, self.T, data.freq, nu_norm=nu0)
 
     __call__ = at    
 
@@ -587,43 +602,46 @@ class submmModel1_normalized(submmModel2_normalized):
 
 
         
-class submmModel1_opticallythick_logA(submmModel1_normalized):
+class submmModel1_opticallythick(submmModel1_normalized):
     """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
             tau = (nu/nu0)^b
 
     """
 
-    nparam = 4   # A, b, T, [nu_0?]
+    nparam = 4   # A, b, T, nu_0
     fmtstring = "%.3f "*nparam
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks = range(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
-    texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
+    texNames = [r"$A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     
-    def __init__(self, logA, b, T, nu_0):
+    def __init__(self, A, b, T, nu_0):
 
-        self.A = 10.0**logA
+        self.A = A
         self.b = b
         self.T = T
         self.nu_0 = nu_0
 
     def at_nu(self, nu):
         tau = (nu/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu)
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu, nu_norm=nu0)
 
     def at(self, data):
         tau = (data.freq/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq)
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq, nu_norm=nu0)
 
     __call__ = at    
 
     def flux(self, nu1=None, nu2=None):
         """return the flux between the given frequencies for each component"""
-        return array([self.A*totalflux(self.b, self.T, nu1, nu2)])   ### return a scalar?
+        return array([self.A*totalflux(self.b, self.T, nu1, nu2, nu_norm=nu0)])   ### return a scalar?
 
 
     @classmethod
-    def prior(cls, logA, b, T, nu_0):
+    def prior(cls, A, b, T, nu_0):
         """get the unnormalized prior for the parameters"""
+        
+        if A<0: 
+            return 0
 
         if T<minTemp or T>maxTemp:
             return 0
@@ -647,7 +665,42 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
         posidx = (0,2,3)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
+
+
         
+class submmModel1_opticallythick_logA(submmModel1_normalized):
+    """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
+            tau = (nu/nu0)^b
+
+    """
+
+    nparam = 4   # A, b, T, [nu_0?]
+    fmtstring = "%.3f "*nparam
+    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    nBlock = max(paramBlocks)+1
+    texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
+    
+    def __init__(self, logA, b, T, nu_0):
+
+        self.A = 10.0**logA
+        self.b = b
+        self.T = T
+        self.nu_0 = nu_0
+
+    @classmethod
+    def prior(cls, logA, b, T, nu_0):
+        """get the unnormalized prior for the parameters"""
+        
+        if T<minTemp or T>maxTemp:
+            return 0
+            
+        if b<minb or b>maxb:
+            return 0
+            
+        if nu_0<0:
+            return 0
+
+        return 1        
 
 class submmModel1_normalized_logA(submmModel1_normalized):
     """model a submm SED as a one-component grey body: flux = 10**(logA) nu^b B_nu(T)
