@@ -28,7 +28,8 @@ def gelmanrubin(chains, burn=0, thin=1):
 	
 	print "Burn-in fraction = %f; thinning = %d" % (burn, thin)
 	
-	
+	chain_means = chains.mean(axis=1) # mean along n_sample (1) axis -- result is (n_chain, n_param)
+	global_means = chain.mean(axis=0) # mean along n_chain (0) axis -- result is (n_param,)
 		
 	# var along n_sample (1) axis -- result is (n_chain, n_param)
 	# note that the mean is not "debiased" -- divide by (n-ddof)
@@ -41,8 +42,6 @@ def gelmanrubin(chains, burn=0, thin=1):
 	totalvar = within_term + between_term
 	
 	Rhat = np.sqrt(totalvar/within)
-	
-	return Rhat
-	
+		
 	
 	
