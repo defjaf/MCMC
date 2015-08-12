@@ -27,21 +27,20 @@ def gelmanrubin(chains, burn=0, thin=1):
 	print "n_samples = ", n_samples
 	
 	print "Burn-in fraction = %f; thinning = %d" % (burn, thin)
-	
-	chain_means = chains.mean(axis=1) # mean along n_sample (1) axis -- result is (n_chain, n_param)
-	global_means = chain.mean(axis=0) # mean along n_chain (0) axis -- result is (n_param,)
-		
+			
 	# var along n_sample (1) axis -- result is (n_chain, n_param)
-	# note that the mean is not "debiased" -- divide by (n-ddof)
+	# followed by mean along chain axis -- result is (nparam,)
+	# note that var is "debiased" -- divide by (n-ddof)
 	within = chains.var(axis=1, ddof=1).mean(axis=0)
 	
 	## in the ragged-chain formulae (see STAN manual, 54.3)
+	## the within term isn't debiased, unlike above.
 	within_term = chains.var(axis=1, ddof=0).mean(axis=0)
-	between_term = chain_means.var(axis=0, ddof=1) ## nb. divide by (n_chain-1)
+	between_term = chains.mean(axis=1).var(axis=0, ddof=1) ## nb. divide by (n_chain-1)
 	
 	totalvar = within_term + between_term
 	
 	Rhat = np.sqrt(totalvar/within)
 		
-	
+
 	
