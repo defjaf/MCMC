@@ -42,5 +42,5 @@ def gelmanrubin(chains, burn=0, thin=1):
 	
 	Rhat = np.sqrt(totalvar/within)
 		
-
+    return Rhat
 	
