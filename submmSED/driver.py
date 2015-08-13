@@ -52,7 +52,7 @@ fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
 fname_DLC_2014 = "./submmSED/herus_phot.csv"
 delnu = 1763
 
-nMC = (50000,1000000)
+nMC = (50000,500000,500000)
 
 
 
