@@ -22,7 +22,8 @@ import numpy as np
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use("AGG")
-    plottype = "png"
+
+plottype = "png"
     
     #print "NOT USING LaTeX"; matplotlib.rc('text', usetex=False)  ## memory leak with latex????
     
@@ -34,6 +35,7 @@ import data
 import model
 import M31model
 import getdist_ahj as getdist
+import convergence
 
 # import joblib
 
@@ -226,7 +228,11 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             ret_i += (zip(dat.d, dat.sig),)
             ret_i += (MLmod.flux(nu1, nu2),)
             ret_i += (ML_chi2,)   ## added Aug 2015
-    
+            
+            
+        print "Rhat[0:] = ", convergence.gelmanrubin_MCMC(mcmc)
+        if len(mcmc)>2:    
+            print "Rhat[1:] = ", convergence.gelmanrubin_MCMC(mcmc[1:])
     
         if retMCMC:
             ret.append((mcmc,)+ret_i) 
@@ -275,7 +281,9 @@ def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     ret1 = ret2 = ret3 = ret4 = ret5 = []
 
     ### proposition sigmas ###
-    sA, sB, sT, snu = 4, 8, 8, 10   ## was 1,2,2
+    sA, sB, sT, snu = 2, 4, 4, 10   ## was 1,2,2
+    
+    ## I am pretty sure the start=() is ignored!
 
     if 0 in which:
         print "Two-Component beta = 2"

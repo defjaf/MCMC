@@ -199,7 +199,7 @@ class submmModel2(object):
         generate a set of starting parameters for the model: b1, T1, b2, T2
         """
         start_params = (2., 20., 2., 30.)  ## careful of units
-        stds = (0.5, 6.0, 0.5, 4.0)
+        cls.start_stds = stds = (0.5, 6.0, 0.5, 4.0)
         posidx = (1,3)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
@@ -263,7 +263,7 @@ class submmModel1(object):
         generate a set of starting parameters for the model:
         """
         start_params = (2.0, 10.0)
-        stds = (0.5, 3.0)
+        cls.start_stds = stds = (0.5, 3.0)
         posidx = (1,)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
@@ -343,7 +343,7 @@ class submmModel_ratio(object):
         generate a set of starting parameters for the model: b1, T1, b2, T2, r12
         """
         start_params = (2., 5., 2., 10., 1.0)  ## careful of units
-        stds = (0.5, 3, 0.5, 2.0, 0.25)
+        cls.start_stds = stds = (0.5, 3, 0.5, 2.0, 0.25)
         posidx = (1,3,4)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
@@ -450,7 +450,7 @@ class submmModel2_normalized(object):
         generate a set of starting parameters for the model: A1, b1, T1, A2, b2, T2
         """
         start_params = (1., 2., 5., 1., 2., 10.)  ## careful of units
-        stds = (0.25, 0.5, 5.0, 0.25, 0.5, 5.0)
+        cls.start_stds = stds = (0.25, 0.5, 5.0, 0.25, 0.5, 5.0)
         posidx = (0,2,3,5)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params            
@@ -584,7 +584,7 @@ class submmModel1_normalized(submmModel2_normalized):
         generate a set of starting parameters for the model:
         """
         start_params = (1., 2., 10.)  ## careful of units
-        stds = (0.25, 0.5, 3.0)
+        cls.start_stds = stds = (0.25, 0.5, 3.0)
         posidx = (0,2)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
@@ -664,7 +664,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
         generate a set of starting parameters for the model:
         """
         start_params = (1., 2., 10., 100.0)  ## careful of units
-        stds = (0.25, 0.5, 3.0, 30.0)
+        cls.start_stds = stds = (0.25, 0.5, 3.0, 30.0)
         posidx = (0,2,3)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params

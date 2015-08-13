@@ -1,4 +1,4 @@
-paramfrom __future__ import division
+from __future__ import division
 
 from numpy.random import normal, seed
 from numpy import dot, where, zeros, asarray, float64

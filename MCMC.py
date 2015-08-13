@@ -486,8 +486,12 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
     if a single chain doesn't produce enough samples for
     statistics, append the same amount again.
     
-    takes a callable plotter(sampler) for plotting, displaying
-    data
+    takes a callable plotter(sampler) for plotting, displaying data
+    
+    current version returns only the final analysis output (means, variances)
+    
+    TODO: store all means, variances for individual runs
+          use these to calculate gelman-rubin diagnostic
     """
     mod = like.model
     data = like.data
@@ -514,10 +518,11 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
         
         burnfrac = nMC1
         
+        
         while True:
             new_s.MC_append(nMC1)
-            print "done with chain %d. naccept=%d (%f)" % (
-                    isamp, new_s.naccept, new_s.naccept/len(new_s.samples))
+            print "done with chain %d. naccept=%d/%d (%f)" % (
+                    isamp, new_s.naccept, len(new_s.samples), new_s.naccept/len(new_s.samples))
             if new_s.doBlock:
                 print "per block: ", new_s.accept
             
