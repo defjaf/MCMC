@@ -27,6 +27,8 @@ def gelmanrubin(chains, burn=0, thin=1):
 	print "n_samples = ", n_samples
 	
 	print "Burn-in fraction = %f; thinning = %d" % (burn, thin)
+	
+	chains1 = chains[
 			
 	# var along n_sample (1) axis -- result is (n_chain, n_param)
 	# followed by mean along chain axis -- result is (nparam,)
