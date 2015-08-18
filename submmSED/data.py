@@ -21,6 +21,7 @@ from GaussianData import GaussianData
 # 545GHz    1.1
 # 353GHz    1.13
 
+verbose = True
 
 speed_of_light = 299792.458 ### micron GHz
 
@@ -137,7 +138,7 @@ def readfluxes_DLC(filename, format=0, delnu=None):
 def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
-def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
+def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True, del157=True):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
     name z f1 e1 f2 e2 ... fn en
@@ -147,6 +148,8 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
     if there is flux but no error, force error = np.nan (to treat as UL)
     
     if UL=True, treat all 25 micron data as upper limit
+    
+    if del157=True, delete 157mu point iff there is a 160mu point!
              
     NB!!! the original numbers file had a typo in the Redshift header name! was "Redfshift"!
     
@@ -183,6 +186,13 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
             
+            if del157:
+                l157 = np.where(np.round(dat_compressed[:,2])==157.0)[0]
+                l160 = np.where(np.round(dat_compressed[:,2])==160.0)[0]
+                if len(l157) and len(l160):
+                    if verbose: print row[name_column], "deleting 157 micron"
+                    dat_compressed = np.delete(dat_compressed,l157, axis=0)
+
             flux = np.array(dat_compressed[:,0])
             sig = np.array(dat_compressed[:,1])
             lambda_obs_1 = np.array(dat_compressed[:,2])
@@ -192,6 +202,8 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True):
                 if l25:
                     sig[l25] = flux[l25]
                     flux[l25] = 0
+                    
+                    
 
             nu_rest = nu_obs*(1+z)
 

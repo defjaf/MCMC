@@ -51,6 +51,7 @@ fname_Mortier = "./submmSED/print_seds_mergers"
 fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
 fname_DLC_2014 = "./submmSED/herus_phot.csv"
 delnu = 1763
+del157 = True   ### delete Herus 157mu data if 160mu data is present
 
 nMC = (50000,500000,500000)
 
@@ -95,7 +96,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
     elif filetype.upper() == "M31":
         alldata = data.readfluxes_M31()
     elif filetype.upper() == "DLC_2014":
-        alldata = data.readfluxes_DLC_2014(filename)
+        alldata = data.readfluxes_DLC_2014(filename, del157=True)
     else:
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         

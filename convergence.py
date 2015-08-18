@@ -65,6 +65,8 @@ def gelmanrubin_MCMC(MCMCs, burn=0, stride=1, verbose=False):
 
     *** use the saved/computed parameter means and variances    
     
+    TODO: also evaluate for the chi^2 or lnPr at max?
+    
     """ 
     chain_means = np.array([m.mean(burn, stride) for m in MCMCs])
     chain_vars = np.array([np.power(m.stdev(burn, stride), 2) for m in MCMCs])
