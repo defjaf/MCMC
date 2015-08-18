@@ -21,7 +21,7 @@ from GaussianData import GaussianData
 # 545GHz    1.1
 # 353GHz    1.13
 
-verbose = True
+verbose = False
 
 speed_of_light = 299792.458 ### micron GHz
 
