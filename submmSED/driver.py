@@ -35,6 +35,7 @@ import data
 import model
 import M31model
 import getdist_ahj
+import getdist
 import convergence
 
 # import joblib
@@ -234,6 +235,9 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         print "Rhat[0:] = ", convergence.gelmanrubin_MCMC(mcmc)
         if len(mcmc)>2:    
             print "Rhat[1:] = ", convergence.gelmanrubin_MCMC(mcmc[1:])
+            
+#         if use_getdist:
+#             gd_samples = MCMCtoGetDist(mcmc)
     
         if retMCMC:
             ret.append((mcmc,)+ret_i) 
