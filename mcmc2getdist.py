@@ -17,8 +17,10 @@ def mcmc2getdist(mcmc):
     loglikes = -mcmc.lnPr   ### note negative: AL version wants -lnPr
     return getdist.MCSamples(names=labels, samples=samples, loglikes=loglikes, labels=labels)
 
-def pystan2getdist(fit):
-    """ convert a pystan fit object into an A Lewis MCSamples object """
+def pystan2getdist(fit, texdict={}):
+    """ convert a pystan fit object into an A Lewis MCSamples object
+        texdict is a dictionary mapping from stan parameter names to latex labels, if desired
+    """
     
     ### have to either deal with combining chains (permute=False) 
     ###                       or separating vector-valued parameters (permute=True)
@@ -39,6 +41,7 @@ def pystan2getdist(fit):
                 for i,s in enumerate(samps.T):
                     samples.append(s)
                     names.append(par+str(i+1))
-                    labels.append(par+"_"+str(i+1))
+                    
+                    labels.append(texdict.get(par,par)+"_"+str(i+1))
     
     return getdist.MCSamples(names=labels, samples=samples, loglikes=loglikes, labels=labels)
