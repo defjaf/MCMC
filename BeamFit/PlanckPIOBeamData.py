@@ -41,7 +41,7 @@ from BeamData import BeamData
 
 from ProcessBeamData import setup_sampler, sample1beam, plotter
 
-import getdist_ahj as getdist
+import getdist_ahj
 
 try:
     import piolib as pio
@@ -310,7 +310,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
                             fig.savefig(figf+str(fig.number).strip()+'.png')
 
                         fig=pylab.figure(2)
-                        getdist.histgrid(res[ib][-1][0][-1])
+                        getdist_ahj.histgrid(res[ib][-1][0][-1])
 
                         if figName:
                             fig.savefig(figf+str(fig.number).strip()+'.png')

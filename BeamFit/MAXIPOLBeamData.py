@@ -22,7 +22,7 @@ from BeamData import BeamData
 
 from ProcessBeamData import setup_sampler, sample1beam, plotter
 
-import getdist_ahj as getdist
+import getdist_ahj
 
 #    sigcut = 0.2 
 #    ctscut = 12  
@@ -382,7 +382,7 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     fig.savefig(figf+str(fig.number).strip()+'.png')
 
                 fig=pylab.figure(2)
-                getdist.histgrid(res[det][-1][0][-1])
+                getdist_ahj.histgrid(res[det][-1][0][-1])
 
                 if figName:
                     fig.savefig(figf+str(fig.number).strip()+'.png')

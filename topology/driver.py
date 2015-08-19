@@ -7,7 +7,7 @@ import cPickle
 
 import pylab
 import MCMC
-import getdist_ahj as getdist
+import getdist_ahj
 
 import topo_model
 from topo_likelihood import topo_likelihood
@@ -123,7 +123,7 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
         pylab.show()
         
         pylab.figure(10*fig+1)
-        getdist.histgrid(res[-1], [0,1,2,3,4])
+        getdist_ahj.histgrid(res[-1], [0,1,2,3,4])
         pylab.show()
     
     return res, ana
@@ -168,7 +168,7 @@ def plotall(picklefile, pre='', suff='', save=True):
     for i, (name, res)  in enumerate(allres.iteritems()):
         pylab.figure(i)
         print name
-        getdist.histgrid(res[0][-1])
+        getdist_ahj.histgrid(res[0][-1])
         if save:
             pylab.savefig(pre+name+suff+'.png')
 

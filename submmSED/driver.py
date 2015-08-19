@@ -34,7 +34,7 @@ import likelihood
 import data
 import model
 import M31model
-import getdist_ahj as getdist
+import getdist_ahj
 import convergence
 
 # import joblib
@@ -166,7 +166,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             fig = plt.figure(fig0)
             lnLike = []
             plt.subplots_adjust(wspace=0.3, hspace=0.25)
-            maxlnLike, maxLikeParams = getdist.histgrid(
+            maxlnLike, maxLikeParams = getdist_ahj.histgrid(
                                          mcmc[-1], noPlot=noHist, params=np.where(np.array(sigmas)>0)[0],
                                          burn=0.2, stride=1)
             plt.subplots_adjust()

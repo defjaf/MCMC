@@ -1,6 +1,6 @@
 from __future__ import division
 import cPickle
-import getdist_ahj as getdist
+import getdist_ahj
 import pylab
 import numpy
 
@@ -21,7 +21,7 @@ def main(file = None):
         print 'topology: %s' % (topo)
         pylab.figtext(0.75, 0.75, topo)
         
-        getdist.histgrid(mcmc[0][-1].samples, [0,1,2,3,4])
+        getdist_ahj.histgrid(mcmc[0][-1].samples, [0,1,2,3,4])
         if i>0: break
         #pylab.savefig(topo+suff+'.png')
         

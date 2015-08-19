@@ -8,7 +8,7 @@ import os.path
 import pylab
 import pyfits
 import MCMC
-import getdist_ahj as getdist
+import getdist_ahj
 from binnedCl.binnedClLikelihood import binnedClLikelihood
 from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat, fitOffsetLognormal
 from ClData import ClData
@@ -244,9 +244,9 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
                 
     if gridPlot:
         pylab.figure(2)
-        getdist.histgrid(s)
+        getdist_ahj.histgrid(s)
     else:
-        getdist.printvals(s)
+        getdist_ahj.printvals(s)
     
     # params=xrange(s.samples.shape[1])  
     # mean = N.empty(s.samples.shape[1])
