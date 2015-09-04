@@ -44,7 +44,7 @@ import Proposal
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
-nu0 = 1000.0
+nu_b = 1000.0   ### frequency at which to normalize the SEDs
 
 minTemp, maxTemp = 3.0, 100.0
 print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
@@ -98,7 +98,7 @@ def greybody(beta, T, nu, nu_norm=False):
             x_norm = h_over_k*nu_norm/T
             return (nu/nu_norm)**(3+beta) * expm1(x_norm)/expm1(x)
         else:
-            return prefac * nu0**(-beta) * nu**(3+beta)/expm1(x)
+            return prefac * nu_b**(-beta) * nu**(3+beta)/expm1(x)
 
 @vectorize
 def totalflux(beta, T, nu1=None, nu2=None, nu_norm=False):
@@ -110,7 +110,7 @@ def totalflux(beta, T, nu1=None, nu2=None, nu_norm=False):
 
   if nu1 is None and nu2 is None:
       ## return analytic expression for bolometric flux
-      return prefac * nu0**(-beta) * (T/h_over_k)**(4+beta) * \
+      return prefac * nu_b**(-beta) * (T/h_over_k)**(4+beta) * \
              special.gamma(4+beta)*special.zeta(4+beta,1)
   else:
       ## do numeric integral
@@ -377,20 +377,20 @@ class submmModel2_normalized(object):
 
 
     def at_nu(self, nu):
-        return self.A1 * greybody(self.b1, self.T1, nu, nu_norm=nu0) + \
-               self.A2 * greybody(self.b2, self.T2, nu, nu_norm=nu0) 
+        return self.A1 * greybody(self.b1, self.T1, nu, nu_norm=nu_b) + \
+               self.A2 * greybody(self.b2, self.T2, nu, nu_norm=nu_b) 
 
     def at(self, data):
-        return self.A1 * greybody(self.b1, self.T1, data.freq, nu_norm=nu0) + \
-               self.A2 * greybody(self.b2, self.T2, data.freq, nu_norm=nu0) 
+        return self.A1 * greybody(self.b1, self.T1, data.freq, nu_norm=nu_b) + \
+               self.A2 * greybody(self.b2, self.T2, data.freq, nu_norm=nu_b) 
 
     __call__ = at    
 
     
     def flux(self, nu1=None, nu2=None):
         """return the flux between the given frequencies for each component"""
-        return asarray([self.A1*totalflux(self.b1, self.T1, nu1, nu2, nu_norm=nu0), 
-                        self.A2*totalflux(self.b2, self.T2, nu1, nu2, nu_norm=nu0)])
+        return asarray([self.A1*totalflux(self.b1, self.T1, nu1, nu2, nu_norm=nu_b), 
+                        self.A2*totalflux(self.b2, self.T2, nu1, nu2, nu_norm=nu_b)])
         
 
     @classmethod
@@ -533,10 +533,10 @@ class submmModel1_normalized(submmModel2_normalized):
 
 
     def at_nu(self, nu):
-        return self.A * greybody(self.b, self.T, nu, nu_norm=nu0)
+        return self.A * greybody(self.b, self.T, nu, nu_norm=nu_b)
 
     def at(self, data):
-        return self.A * greybody(self.b, self.T, data.freq, nu_norm=nu0)
+        return self.A * greybody(self.b, self.T, data.freq, nu_norm=nu_b)
 
     __call__ = at    
 
@@ -607,7 +607,7 @@ class submmModel1_normalized(submmModel2_normalized):
         
 class submmModel1_opticallythick(submmModel1_normalized):
     """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
-            tau = (nu/nu0)^b
+            tau = (nu/nu_0)^b
 
     """
 
@@ -626,17 +626,17 @@ class submmModel1_opticallythick(submmModel1_normalized):
 
     def at_nu(self, nu):
         tau = (nu/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu, nu_norm=nu0)
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu, nu_norm=nu_b)
 
     def at(self, data):
         tau = (data.freq/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq, nu_norm=nu0)
+        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq, nu_norm=nu_b)
 
     __call__ = at    
 
     def flux(self, nu1=None, nu2=None):
         """return the flux between the given frequencies for each component"""
-        return array([self.A*totalflux(self.b, self.T, nu1, nu2, nu_norm=nu0)])   ### return a scalar?
+        return array([self.A*totalflux(self.b, self.T, nu1, nu2, nu_norm=nu_b)])   ### return a scalar?
 
 
     @classmethod
@@ -673,7 +673,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
         
 class submmModel1_opticallythick_logA(submmModel1_normalized):
     """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
-            tau = (nu/nu0)^b
+            tau = (nu/nu_b)^b
 
     """
 
