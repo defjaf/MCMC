@@ -30,7 +30,9 @@ import Proposal
 ##### NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
 
 
-##### TODO: correctly normalized prior
+##### TODO: correctly normalized prior (done?)
+
+
 
 #### AHJ 08/2015 -- for two-component models, try to reorder the parameters rather than enforce via prior
 #####                do this at the "__init__" step -- not sure this is right...*****
@@ -41,6 +43,11 @@ import Proposal
 #####               rewrite at(self, data) to use the data to normalize the amplitudes 
 #####                   model = A * data(nu_bar) * F(nu)/F(nu_bar)
 #####                   should be possible since it has access to the data
+#### AHJ 09/2015 -- do normalization as above for optical depth model
+#####                   but now, when nu_0 -> infty, P(nu_0) -> const.
+#####               rescale nu_0 -> nu_0/1000 so O(1) 
+#####            both of these done for pystan runs -- not checked in MCMC runs
+                    
 
 h_over_k = 0.04799237 ###  K/Ghz
 prefac = 1.0e-9 #### FIXME: find a physical definition to go here
@@ -608,6 +615,10 @@ class submmModel1_normalized(submmModel2_normalized):
 class submmModel1_opticallythick(submmModel1_normalized):
     """model a submm SED as an optically-thick black body: flux = A (1-exp(-tau)) B_nu(T)
             tau = (nu/nu_0)^b
+            
+            normalize amplitude to nu=nu_bar
+            rescale nu_0 to nu_0/1000.0 (i.e., THz?)
+               done for pystan, but need to check it still works for the MCMC code
 
     """
 
@@ -625,12 +636,14 @@ class submmModel1_opticallythick(submmModel1_normalized):
         self.nu_0 = nu_0
 
     def at_nu(self, nu):
-        tau = (nu/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu, nu_norm=nu_b)
+        tau = (nu/self.nu_0/1000.0)**self.b
+        tau_b = (nu_b/self.nu_0/1000.0)**self.b
+        return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, nu, nu_norm=nu_b)
 
     def at(self, data):
-        tau = (data.freq/self.nu_0)**self.b
-        return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq, nu_norm=nu_b)
+        tau = (data.freq/self.nu_0/1000.0)**self.b
+        tau_b = (nu_b/self.nu_0/1000.0)**self.b
+        return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, data.freq, nu_norm=nu_b)
 
     __call__ = at    
 
@@ -663,8 +676,8 @@ class submmModel1_opticallythick(submmModel1_normalized):
         """
         generate a set of starting parameters for the model:
         """
-        start_params = (1., 2., 10., 100.0)  ## careful of units
-        cls.start_stds = stds = (0.25, 0.5, 3.0, 30.0)
+        start_params = (1., 2., 10., 1.0)  ## careful of units
+        cls.start_stds = stds = (0.25, 0.5, 3.0, 0.3)
         posidx = (0,2,3)
         cls.start_params = startfrom_generic(start_params, stds, posidx, random=random)
         return cls.start_params
