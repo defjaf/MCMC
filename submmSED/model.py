@@ -619,6 +619,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
             normalize amplitude to nu=nu_bar
             rescale nu_0 to nu_0/1000.0 (i.e., THz?)
                done for pystan, but need to check it still works for the MCMC code
+               need prior on nu_0 ~ Normal(1,3)?
 
     """
 
@@ -627,6 +628,8 @@ class submmModel1_opticallythick(submmModel1_normalized):
     paramBlocks = range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A$", r"$\beta$", r"$T$", r"$\nu_0$"]
+    nu_rescale = 1000.0   ### rescale so O(1)
+    nu_renorm = True      ### normalize to nu=nu_b 
     
     def __init__(self, A, b, T, nu_0):
 
@@ -635,15 +638,24 @@ class submmModel1_opticallythick(submmModel1_normalized):
         self.T = T
         self.nu_0 = nu_0
 
-    def at_nu(self, nu):
-        tau = (nu/self.nu_0/1000.0)**self.b
-        tau_b = (nu_b/self.nu_0/1000.0)**self.b
-        return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, nu, nu_norm=nu_b)
+    if nu_renorm:
+        def at_nu(self, nu):
+            tau = (nu/self.nu_0/self.nu_rescale)**self.b
+            tau_b = (nu_b/self.nu_0/self.nu_rescale)**self.b
+            return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, nu, nu_norm=nu_b)
 
-    def at(self, data):
-        tau = (data.freq/self.nu_0/1000.0)**self.b
-        tau_b = (nu_b/self.nu_0/1000.0)**self.b
-        return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, data.freq, nu_norm=nu_b)
+        def at(self, data):
+            tau = (data.freq/self.nu_0/self.nu_rescale)**self.b
+            tau_b = (nu_b/self.nu_0/self.nu_rescale)**self.b
+            return self.A * (1.0-exp(-tau))/(1.0-exp(-tau_b)) * blackbody(self.T, data.freq, nu_norm=nu_b)
+    else:
+        def at_nu(self, nu):
+            tau = (nu/self.nu_0/nu_rescale)**self.b
+            return self.A * (1.0-exp(-tau)) * blackbody(self.T, nu, nu_norm=nu_b)
+
+        def at(self, data):
+            tau = (data.freq/self.nu_0/1000.0)**self.b
+            return self.A * (1.0-exp(-tau)) * blackbody(self.T, data.freq, nu_norm=nu_b)
 
     __call__ = at    
 
@@ -667,6 +679,8 @@ class submmModel1_opticallythick(submmModel1_normalized):
             
         if nu_0<0:
             return 0
+        elif self.nu_rescale and self.nu_renorm:
+            return exp(-0.5*(nu_0-1.0)/3.0**2)
 
         return 1
 
