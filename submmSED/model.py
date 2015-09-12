@@ -618,9 +618,11 @@ class submmModel1_opticallythick(submmModel1_normalized):
             
             normalize amplitude to nu=nu_bar
             rescale nu_0 to nu_0/1000.0 (i.e., THz?)
-               done for pystan, but need to check it still works for the MCMC code
-               need prior on nu_0 ~ exponential(1/3)?  or Normal(1,3)?
-
+                done for pystan, and still works for the MCMC code
+               
+            makes P(nu_0) ~ const as nu_0 -> infty
+                need prior on nu_0 ~ exponential(1/3)?  or Normal(1,3)?
+                
     """
 
     nparam = 4   # A, b, T, nu_0
@@ -679,7 +681,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
             
         if nu_0<0:
             return 0
-        elif self.nu_rescale and self.nu_renorm:
+        elif cls.nu_rescale and cls.nu_renorm:
             #return exp(-0.5*(nu_0-1.0)/3.0**2)
             return exp(-3.0*nu_0)
 
@@ -710,6 +712,8 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
     paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
+    nu_rescale = 1000.0   ### rescale so O(1)
+    nu_renorm = True      ### normalize to nu=nu_b 
     
     def __init__(self, logA, b, T, nu_0):
 
@@ -730,7 +734,7 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
             
         if nu_0<0:
             return 0
-        elif self.nu_rescale and self.nu_renorm:
+        elif cls.nu_rescale and cls.nu_renorm:
             #return exp(-0.5*(nu_0-1.0)/3.0**2)
             return exp(-3.0*nu_0)
 
