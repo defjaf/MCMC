@@ -1,5 +1,6 @@
 
 from __future__ import division
+from __future__ import print_function
 
 import math
 
@@ -12,7 +13,7 @@ from scipy import special,integrate
 speed_of_light = 299792.458 ### micron GHz
 
 singleParams = True  ## to vary each parameter individually
-if not singleParams: print "varying parameters together!"
+if not singleParams: print("varying parameters together!")
 
 import Proposal
 
@@ -54,7 +55,7 @@ prefac = 1.0e-9 #### FIXME: find a physical definition to go here
 nu_b = 1000.0   ### frequency at which to normalize the SEDs
 
 minTemp, maxTemp = 3.0, 100.0
-print "min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp)
+print("min Temp = %f K; max Temp = %f K" % (minTemp, maxTemp))
 minb, maxb = 0., 3.
 
 def startfrom_generic(start, stds, posidx=(), random=True):
@@ -70,10 +71,10 @@ def startfrom_generic(start, stds, posidx=(), random=True):
 # 
 #     from blackbody import greybody, blackbody, lux
 # 
-#     print "Got blackbody.pyx"
+#     print("Got blackbody.pyx")
 # 
 # except ImportError:
-# print "python version of blackbody"
+# print("python version of blackbody")
 def blackbody(T, nu, nu_norm=False):
     """return the blackbody flux at frequency nu for temperature T [CHECK UNITS]"""
 

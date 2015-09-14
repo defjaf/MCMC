@@ -1,4 +1,5 @@
 from __future__ import division
+from __future__ import print_function
 
 from numpy import asarray, float64, log, where, nonzero, math, loadtxt, genfromtxt, concatenate
 import numpy as np
@@ -114,7 +115,7 @@ def readfluxes_DLC(filename, format=0, delnu=None):
         lines = loadtxt(filename, skiprows=1)
 
         lambda_obs = asarray([25.0, 60, 100, 250, 350, 350, 500, 550, 850, 1400])
-        print "converting 25u to upper limit"
+        print("converting 25u to upper limit")
         nu_obs = speed_of_light/lambda_obs ### GHz
         data = []
         nband = len(lambda_obs)
@@ -160,10 +161,10 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True, 
     Fpat = r'^F\d+_'
 
     data = []
-    with open(filename, "rb") as csvfile:
+    with open(filename) as csvfile:
 
         hreader = csv.reader(csvfile)
-        headers = np.array(hreader.next())
+        headers = np.array(next(hreader))
         ncol = len(headers)
         name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
         z_column = np.where(headers=='Redshift')[0][0]
@@ -190,7 +191,7 @@ def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True, 
                 l157 = np.where(np.round(dat_compressed[:,2])==157.0)[0]
                 l160 = np.where(np.round(dat_compressed[:,2])==160.0)[0]
                 if len(l157) and len(l160):
-                    if verbose: print row[name_column], "deleting 157 micron"
+                    if verbose: print(row[name_column], "deleting 157 micron")
                     dat_compressed = np.delete(dat_compressed,l157, axis=0)
 
             flux = np.array(dat_compressed[:,0])
@@ -360,14 +361,14 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
         cx = asarray(1.0)
         
     if np.any(cx != np.asarray([1.0])):
-        print "color corrections:", cx
+        print("color corrections:", cx)
             
     lines = np.genfromtxt(filename, dtype=dtype, delimiter=delims)
     
     data = []
     for obj in lines:
         if next0 and obj['next']!=0:
-            print "Skipping object %s" % obj['nameIRAS']
+            print("Skipping object %s" % obj['nameIRAS'])
             continue ## ignore anything w/o next==0
             
         z = obj['z']
@@ -389,7 +390,7 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
                     nq=1   ### force upper limit
             
             if flx <= 0:
-                print "skipping lamba=%f for object %s" % (lam, name)
+                print("skipping lamba=%f for object %s" % (lam, name))
                 continue
             
             if nq == 1: # upperlimit 
@@ -402,7 +403,7 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
             elif nq == 5:  ##    IRAS Large Galaxy Catalogue, equivalent to 3
                 sg = 0.1*flx
             else:
-                print 'got nq=%d at %s' % (nq, name)
+                print('got nq=%d at %s' % (nq, name))
                             
             nu_obs += [speed_of_light/lam]
             flux += [flx]
@@ -412,8 +413,8 @@ def readfluxes_MRR(filename, IRAS_ignore=None, Planck_ignore=None, DLC_ul=False,
         nu_rest = (1+z)*nu_obs
         data.append(submmData(nu_rest, flux, sig, name, z, nu_obs=nu_obs))
         
-    print "Using data in nu_obs order [GHz]:", nu_obs
-    print "Using data in lambda_obs order [mu]:", speed_of_light/nu_obs
+    print("Using data in nu_obs order [GHz]:", nu_obs)
+    print("Using data in lambda_obs order [mu]:", speed_of_light/nu_obs)
 
     return data
     
@@ -519,8 +520,8 @@ def readfluxes_peel(filename,delnu=None):
     lines = np.loadtxt(filename)
     if delnu is not None:
         didx = np.searchsorted(nu_obs,delnu)
-        print "deleting: ", delnu
-        print "at indices: ", didx
+        print("deleting: ", delnu)
+        print("at indices: ", didx)
         nu_obs = np.delete(nu_obs, didx)
         
     for i,obj in enumerate(lines):
@@ -548,8 +549,8 @@ def readfluxes_M31(filename="M31/M31Flux-v2.dat",delnu=None):
 
     if delnu is not None:
         didx = np.searchsorted(nu,delnu)
-        print "deleting: ", delnu
-        print "at indices: ", didx
+        print("deleting: ", delnu)
+        print("at indices: ", didx)
         nu = np.delete(nu, didx)
         flux = np.delete(flux, didx)
         err = np.delete(err, didx)
