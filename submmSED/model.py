@@ -337,12 +337,12 @@ class submmModel_ratio(object):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data, logplot=True):
+    def plot(self, data, logplot=True, label=None):
         """plot the data and the model"""
         f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
         data.plot(logplot=logplot)
-        plt.plot(f, model_flux)
+        plt.plot(f, model_flux, label=label)
         
         
     @classmethod
@@ -421,14 +421,14 @@ class submmModel2_normalized(object):
 
         return 1
 
-    def plot(self, data, wavelength=True, logplot=True):
+    def plot(self, data, wavelength=True, logplot=True, label=None):
         """plot the data and the model"""
         f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
         data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
         if wavelength:
             f = speed_of_light/f
-        plt.plot(f, model_flux)
+        plt.plot(f, model_flux, label=label)
 
 #     package = asarray
 # 
