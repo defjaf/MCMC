@@ -18,8 +18,9 @@ from __future__ import division
 ##            should allow some sort of loop?
 
 ### AHJ 09/13 -- if random, randomize the restart position (by a certain number of sigma?)
-###              see newMCMC
-###  TODO      multiple chains -- gelman-rubin convergence test?
+###                  see newMCMC
+### AHJ 09/15    multiple chains -- gelman-rubin convergence test? -- see convergence.py
+###                  currently only used in submm/driver.py
 
 
 import math

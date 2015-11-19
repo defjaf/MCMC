@@ -71,9 +71,9 @@ def gelmanrubin_MCMC(MCMCs, burn=0, stride=1, verbose=False):
     chain_means = np.array([m.mean(burn, stride) for m in MCMCs])
     chain_vars = np.array([np.power(m.stdev(burn, stride), 2) for m in MCMCs])
     
-    #### the actual ragged-chain definition ises ddof=1 for the "within-chain" calculation, 
+    #### the actual ragged-chain definition uses ddof=1 for the "within-chain" calculation, 
     ####    but ddof=0 for the within-chain part of the total variance. 
-    ####    Ignore that here. (Nsamp>>1)
+    ####    Ignore that here, since it's much easier to code this way. (Nsamp>>1)
     within = chain_vars.mean(axis=0)            ### the mean of the variances
     between = chain_means.var(axis=0, ddof=1)   ### the variance of the means
 
