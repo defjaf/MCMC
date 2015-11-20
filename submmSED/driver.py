@@ -7,6 +7,9 @@ Created by Andrew H. Jaffe on 2010-05-22.
 Copyright (c) 2010 Imperial College London. All rights reserved.
 """
 
+### TODO: combine different model fits into single SED plot. Can only be done in
+###    postprocessing since different models are run separately.
+
 from __future__ import division
 
 import sys
@@ -283,7 +286,7 @@ def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     
     print "keywords:", keywords
     
-    ret1 = ret2 = ret3 = ret4 = ret5 = []
+    ret1 = ret2 = ret3 = ret4 = ret5 = []   ### just so that any not done are still returned
 
     ### proposition sigmas ###
     sA, sB, sT, snu = 2, 4, 4, 10   ## was 1,2,2
@@ -342,6 +345,8 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
     #### TODO: fix the normalization on the evidence calculations (priors are currently incorrect)
     ####        can use Savage-Dickey?
     
+    
+    #### TODO: combine different (mean or ML?) parameter estimates into a single SED plot.
     
     
     nrun = 5
