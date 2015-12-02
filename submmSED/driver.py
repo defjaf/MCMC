@@ -46,14 +46,14 @@ import convergence
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
-fname_DLC = "./submmSED.txt"
-fname_ERCSC = "./submmSED/ercsc_iifscz.txt"
-fname_MRR_old = "./submmSED/ERCSCalliifscz4550850.dat"
-fname_MRR = "./submmSED/ERCSCiifsczbg.dat"
+fname_DLC = "./dat/submmSED.txt"
+fname_ERCSC = "./submmSED/dat/ercsc_iifscz.txt"
+fname_MRR_old = "./submmSED/dat/ERCSCalliifscz4550850.dat"
+fname_MRR = "./submmSED/dat/ERCSCiifsczbg.dat"
 fname_Peel = "./submmSED/M31/pixelfit.dat"
-fname_Mortier = "./submmSED/print_seds_mergers"
+fname_Mortier = "./submmSED/dat/print_seds_mergers"
 fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
-fname_DLC_2014 = "./submmSED/herus_phot.csv"
+fname_DLC_2014 = "./submmSED/dat/herus_phot.csv"
 delnu = 1763
 del157 = True   ### delete Herus 157mu data if 160mu data is present
 

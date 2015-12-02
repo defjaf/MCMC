@@ -139,7 +139,7 @@ def readfluxes_DLC(filename, format=0, delnu=None):
 def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
-def readfluxes_DLC_2014(filename="./herus_phot.csv", UL25=True, getArp220=True, del157=True):
+def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=True, del157=True):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
     name z f1 e1 f2 e2 ... fn en
