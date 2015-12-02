@@ -139,33 +139,51 @@ def readfluxes_DLC(filename, format=0, delnu=None):
 def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
-def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=True, del157=True):
+def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=True,
+                        del157=True, has_ObsID=False):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
-    name z f1 e1 f2 e2 ... fn en
-    headers: Fxxx_Jy = xxx micron flux
+    name [obsID] z f1 e1 f2 e2 ... fn en
+    headers: Fxxx_Jy = xxx micron flux  (or S_xxx)
              Exxx_Jy = xxx micron error
+             
+    [obsID] is an optional column
              
     if there is flux but no error, force error = np.nan (to treat as UL)
     
     if UL=True, treat all 25 micron data as upper limit
     
     if del157=True, delete 157mu point iff there is a 160mu point!
+    
+    if has_ObsID=True, there is an extra column between name and z 
+       (otherwise read the header and check for it)
              
     NB!!! the original numbers file had a typo in the Redshift header name! was "Redfshift"!
-    
-    
+
     """
 
-    Epat = r'^E\d+_'   ### regex patterns
-    Fpat = r'^F\d+_'
+### TODO: read from 2013 non-CSV files (should be able to use tab as delim?)
+###   allow any of S_123, F123, F123_Jy
+
+    Epat = r'^E\d+_'   ### regex patterns -- still need to be corrected for the above.
+    Fpat = r'^F\d+_|^S\_\d+_'
 
     data = []
-    with open(filename) as csvfile:
+    with open(filename) as ofile:
+        is_csv = "," in csvfile.readline() if is_csv is None else is_csv
 
-        hreader = csv.reader(csvfile)
-        headers = np.array(next(hreader))
+        if is_csv:
+            hreader = csv.reader(ofile)
+            headers = np.array(next(hreader))
+            arr = hreader
+        else:
+            headers = np.array(ofile.readline().split())
+            assert headers[0][0] == "#"
+            headers[0] = headers[0][1:]
+            arr = np.genfromtxt(ofile, dtype=None)
+            
         ncol = len(headers)
+        
         name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
         z_column = np.where(headers=='Redshift')[0][0]
         flux_columns = np.array([i for i in range(ncol) if re.match(Fpat, headers[i])])
