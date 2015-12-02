@@ -140,7 +140,7 @@ def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
 def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=True,
-                        del157=True, has_ObsID=False):
+                        del157=True, has_ObsID=False, is_csv=None):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
     name [obsID] z f1 e1 f2 e2 ... fn en
@@ -164,13 +164,16 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
 
 ### TODO: read from 2013 non-CSV files (should be able to use tab as delim?)
 ###   allow any of S_123, F123, F123_Jy
+###   allow z for redshift column name
+###   allow presence of ObsID column
 
     Epat = r'^E\d+_'   ### regex patterns -- still need to be corrected for the above.
     Fpat = r'^F\d+_|^S\_\d+_'
 
     data = []
     with open(filename) as ofile:
-        is_csv = "," in csvfile.readline() if is_csv is None else is_csv
+        is_csv = "," in ofile.readline() if is_csv is None else is_csv
+        ofile.seek(0)
 
         if is_csv:
             hreader = csv.reader(ofile)
@@ -180,27 +183,33 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             headers = np.array(ofile.readline().split())
             assert headers[0][0] == "#"
             headers[0] = headers[0][1:]
-            arr = np.genfromtxt(ofile, dtype=None)
+            arr = np.loadtxt(ofile, dtype='S')
             
         ncol = len(headers)
         
         name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
-        z_column = np.where(headers=='Redshift')[0][0]
+        zidx = np.where(headers=='Redshift')[0]
+        z_column = zidx[0] if zidx else np.where(headers=="z")[0][0]
+        print("z col= %d" % z_column)
         flux_columns = np.array([i for i in range(ncol) if re.match(Fpat, headers[i])])
         err_columns = np.array([i for i in range(ncol) if re.match(Epat, headers[i])])
         assert np.all(err_columns == flux_columns+1)
         
         lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### lambda in um
-        lambda_err = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])
+        lambda_err = np.array([float(headers[i].split('_')[0][1:]) for i in err_columns])  
+            ### AHJ 12/15: above changed to err_columns!
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 
-        for row in hreader:
+        for row in arr:   ### doesn't work for genfromtxt version since rows are not really arrays
+        
+            if not is_csv: row = row.tolist()   ### ugly? (what are the csv rows?)
             
             if row[name_column]=="Arp220":
                 row[name_column] = "Arp220-short"
             row = np.asarray(row)
             if np.all(row==''): continue  ## ignore blank lines
 
+            print(row)
             z = np.float(row[z_column])
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
