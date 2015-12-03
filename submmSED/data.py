@@ -140,14 +140,14 @@ def toFloat(s):
     return np.float(s) if s!='' else np.nan
 
 def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=True,
-                        del157=True, has_ObsID=False, is_csv=None):
+                        del157=True, is_csv=None):
     """read fluxes from a DLC 2014 CSV file: each line is 
     
     name [obsID] z f1 e1 f2 e2 ... fn en
     headers: Fxxx_Jy = xxx micron flux  (or S_xxx)
              Exxx_Jy = xxx micron error
              
-    [obsID] is an optional column
+    [obsID] is an optional column -- should just be ignored by all processing
              
     if there is flux but no error, force error = np.nan (to treat as UL)
     
@@ -162,13 +162,12 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
 
     """
 
-### TODO: read from 2013 non-CSV files (should be able to use tab as delim?)
 ###   allow any of S_123, F123, F123_Jy
 ###   allow z for redshift column name
-###   allow presence of ObsID column
 
-    Epat = r'^E\d+_'   ### regex patterns -- still need to be corrected for the above.
-    Fpat = r'^F\d+_|^S\_\d+_'
+    Epat = r'^E\d+_|^E\d+$'   ### regex patterns 
+    Fpat = r'^F\d+_|^S\_\d+$|^F\d+$'
+    Zpat = r'Redshift|Redfshift|z|Z'
 
     data = []
     with open(filename) as ofile:
@@ -183,33 +182,31 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             headers = np.array(ofile.readline().split())
             assert headers[0][0] == "#"
             headers[0] = headers[0][1:]
-            arr = np.loadtxt(ofile, dtype='S')
+            arr = np.loadtxt(ofile, dtype='S')  ### 'S' seems to pick the minimum possible len
             
         ncol = len(headers)
         
         name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
-        zidx = np.where(headers=='Redshift')[0]
-        z_column = zidx[0] if zidx else np.where(headers=="z")[0][0]
-        print("z col= %d" % z_column)
-        flux_columns = np.array([i for i in range(ncol) if re.match(Fpat, headers[i])])
-        err_columns = np.array([i for i in range(ncol) if re.match(Epat, headers[i])])
-        assert np.all(err_columns == flux_columns+1)
+
+        z_column = np.array([i for i,h in enumerate(headers) if re.match(Zpat, h)])
+        assert len(z_column)==1
+        z_column = z_column[0]
+
+        flux_columns = np.array([i for i,h in enumerate(headers) if re.match(Fpat, h)])
+        err_columns = np.array([i for i,h in enumerate(headers) if re.match(Epat, h)])
+        ### assert np.all(err_columns == flux_columns+1)### no longer true!
         
-        lambda_obs = np.array([float(headers[i].split('_')[0][1:]) for i in flux_columns])  ### lambda in um
-        lambda_err = np.array([float(headers[i].split('_')[0][1:]) for i in err_columns])  
-            ### AHJ 12/15: above changed to err_columns!
+        lambda_obs = np.array([float(headers[i].lstrip('FS_').rstrip('_Jy')) for i in flux_columns])  ### lambda in um
+        lambda_err = np.array([float(headers[i].lstrip('E_').rstrip('_Jy')) for i in err_columns])  
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 
-        for row in arr:   ### doesn't work for genfromtxt version since rows are not really arrays
-        
-            if not is_csv: row = row.tolist()   ### ugly? (what are the csv rows?)
+        for row in arr:  
             
             if row[name_column]=="Arp220":
                 row[name_column] = "Arp220-short"
             row = np.asarray(row)
             if np.all(row==''): continue  ## ignore blank lines
 
-            print(row)
             z = np.float(row[z_column])
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
@@ -231,8 +228,6 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
                     sig[l25] = flux[l25]
                     flux[l25] = 0
                     
-                    
-
             nu_rest = nu_obs*(1+z)
 
             data.append(submmData(nu_rest, flux, sig, row[name_column], z, nu_obs=nu_obs))
