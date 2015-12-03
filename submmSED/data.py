@@ -164,7 +164,9 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
 
 ###   allow any of S_123, F123, F123_Jy
 ###   allow z for redshift column name
+###   err = 0 --> no data
 
+    Npat = r'Name|Source'
     Epat = r'^E\d+_|^E\d+$'   ### regex patterns 
     Fpat = r'^F\d+_|^S\_\d+$|^F\d+$'
     Zpat = r'Redshift|Redfshift|z|Z'
@@ -186,7 +188,9 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             
         ncol = len(headers)
         
-        name_column = np.where(headers=='Name')[0][0] ### [0][0] gets the sole entry of array part of where output
+        name_column = np.array([i for i,h in enumerate(headers) if re.match(Npat, h)])
+        assert len(name_column)==1
+        name_column = name_column[0]
 
         z_column = np.array([i for i,h in enumerate(headers) if re.match(Zpat, h)])
         assert len(z_column)==1
@@ -210,6 +214,9 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             z = np.float(row[z_column])
             dat = zip(row[flux_columns], row[err_columns], lambda_obs)
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
+
+            ## remove err=0 entries
+            dat_compressed = np.array([[f,e,l] for f,e,l in dat_compressed if e>0])
             
             if del157:
                 l157 = np.where(np.round(dat_compressed[:,2])==157.0)[0]
