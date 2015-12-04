@@ -200,8 +200,8 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
         err_columns = np.array([i for i,h in enumerate(headers) if re.match(Epat, h)])
         ### assert np.all(err_columns == flux_columns+1)### no longer true!
         
-        lambda_obs = np.array([float(headers[i].lstrip('FS_').rstrip('_Jy')) for i in flux_columns])  ### lambda in um
-        lambda_err = np.array([float(headers[i].lstrip('E_').rstrip('_Jy')) for i in err_columns])  
+        lambda_obs = np.array([float(headers[i].lstrip('FS_').rstrip('_H_Jy')) for i in flux_columns])  ### lambda in um
+        lambda_err = np.array([float(headers[i].lstrip('E_').rstrip('_H_Jy')) for i in err_columns])  
         assert(np.all(lambda_obs==lambda_err))   ### check correct order
 
         for row in arr:  
