@@ -72,7 +72,10 @@ def plot_pystan(data, fit, ncomp=None, model_name=None, linear=True, wavelength=
     
     
 def pystan_postprocess_SED_plot(allfits, dat, label=""):
-    """ plot pytstan submm sed output as SEDs  -- specific to greybody models """
+    """ plot pytstan submm sed output as SEDs  -- specific to greybody models 
+    assumes each entry in allfits is in the order of `labs` for the legend
+    TODO: probably need to be able to specify a different model order
+    """
 
     labs = ("1 comp", "2 comp", r"1 $\beta=2$", r"2 $\beta=2$", "thick")
     for objname, fits in iteritems(allfits):
@@ -87,7 +90,13 @@ def pystan_postprocess_SED_plot(allfits, dat, label=""):
         
         
 def pystan_postprocess_csv(allfits, dat, label="DLC_"):
-    """ convert pystan submm sed output to csv -- specific to greybody models """
+    """ convert pystan submm sed output to csv -- specific to greybody models 
+    currently assumes that there are entries for each of the models. 
+    
+    TODO: allow not having all possible models. 
+    see *_SED_plot() above -- 
+    as in that case, we probably need to be able to specify a different model order
+    """
 
     obj_names = dat.keys()
 
