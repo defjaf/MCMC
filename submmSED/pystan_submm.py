@@ -89,7 +89,7 @@ def pystan_postprocess_SED_plot(allfits, dat, label=""):
         
         
         
-def pystan_postprocess_csv(allfits, dat, label="DLC_"):
+def pystan_postprocess_csv(allfits, dat, label="DLC_", modnames=None):
     """ convert pystan submm sed output to csv -- specific to greybody models 
     currently assumes that there are entries for each of the models. 
     
@@ -100,9 +100,15 @@ def pystan_postprocess_csv(allfits, dat, label="DLC_"):
 
     obj_names = dat.keys()
 
-    modnames = ["1comp","2comp","1compb2","2compb2","thick"]
-    for i, mod in enumerate(modnames):
+    if modnames is None:
+        modnames = ["1comp","2comp","1compb2","2compb2","thick"]
+    nmod = len(allfits.values()[1])  ### assumes same number of models for each object
+    for i in range(nmod):
         f = [a[i] for a in allfits.values()]
-        fname = label + mod + ".csv"
+        if nmod == len(modnames): 
+            mod = modnames[i]
+        else:
+            mod = str(i)
+        fname = label + '_' + mod + ".csv"
         ptab = pystan_utils.pystan2table(f)
         pystan_utils.table2csv(fname, ptab, obj_names)
