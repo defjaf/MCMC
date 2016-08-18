@@ -137,7 +137,7 @@ def pystan_postprocess_togetdist(allfits, texdict=texdict,
     return gds
     
     
-def pystan_postprocess_getdist_plot(gds, label=""):
+def pystan_postprocess_getdist_plot(gds, label="", filled=False):
     """ getdist plots from pystan (after conversion)  
         -- generic, requires output in dictionary """
 
@@ -146,7 +146,7 @@ def pystan_postprocess_getdist_plot(gds, label=""):
         for i, gd1 in enumerate(gd):
             g = getdist.plots.getSubplotPlotter()
             try:
-                g.triangle_plot(gd1)
+                g.triangle_plot(gd1, filled=filled)
                 g.export("%s_%d%s.png" % (obj, i, label))
 
             except Exception as E:
