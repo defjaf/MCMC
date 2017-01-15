@@ -24,4 +24,6 @@ Push to github at the end (should I use `--all -u` below?):
 
 (Also tried `git push --mirror https://github.com/defjaf/MCMC.git` but this seems to be the official way...)
 
+Note also that `git svn show-ignore` seems to fail, alas.
+
 [svn2git]: https://github.com/nirvdrum/svn2git
