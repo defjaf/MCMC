@@ -33,4 +33,12 @@ Note also that `git svn show-ignore` seems to fail, alas.
 
 I previously tried to follow [these instructions][1], but the branch structure seems weird. Could be due to the same structure that required `--no-minimize` above.
 
+    git svn clone svn+ssh://mekon.ph.imperial.ac.uk/Library/Subversion/Repository/MCMC --no-metadata -A authors-transform.txt --stdlayout ~/temp
+
+with the following additions:
+* remove large file: `git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch ./TOIbeams.pickle' --prune-empty --tag-name-filter cat -- --all`
+ * See <https://help.github.com/articles/removing-sensitive-data-from-a-repository/>
+* For some reason, the master branch is called `origin/trunk`, so needed `git branch -m origin/trunk master`
+* Push to github at the end: `git push --mirror https://github.com/defjaf/MCMC.git`
+
 [1]: http://john.albin.net/git/convert-subversion-to-git
