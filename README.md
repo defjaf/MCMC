@@ -28,3 +28,9 @@ Push to github at the end (should I use `--all -u` below?):
 Note also that `git svn show-ignore` seems to fail, alas.
 
 [svn2git]: https://github.com/nirvdrum/svn2git
+
+----
+
+I previously tried to follow [these instructions][1], but the branch structure seems weird. Could be due to the same structure that required `--no-minimize` above.
+
+[1]: http://john.albin.net/git/convert-subversion-to-git
