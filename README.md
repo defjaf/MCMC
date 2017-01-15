@@ -14,6 +14,7 @@ Created using [svn2git][] (installed with `sudo gem install svn2git`):
 * Need `--exclude TOIbeams.pickle` since that file is too big for github.
 * Need `--authors ../MCMC/authors-transform.txt` to get full git-style author names 
   * `authors-transform.txt` has been added to root of the project.
+  
 
 Push to github at the end (should I use `--all -u` below?):
 
