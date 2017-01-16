@@ -1,0 +1,15 @@
+#WMAP
+data/ACBAR_lge800_.dataset
+data/B03_NA_21July05.newdat
+data/CBI2.0_lge600.dataset
+data/DASI01.dataset
+data/MAXIMA.dataset
+data/VSAF.dataset
+
+#WMAP
+
+##data/BOOM01.dataset
+#data/CBI2.0_2to14.dataset
+#data/VSA_lge600.dataset
+#data/cobe_rad.dataset
+#data/sdss.dataset

@@ -1,0 +1,7 @@
+## Wang et al
+data/MAXI01.dataset
+data/DASI01.dataset
+data/BOOM01.dataset
+data/cobe_rad.dataset
+data/CBI2.0_2to14.dataset
+data/VSAF.dataset
