@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*pickle*
+*pkl
 
 # C extensions
 *.so
+
+topology/*.png
