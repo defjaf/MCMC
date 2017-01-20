@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *pickle*
 *pkl
+*pkl.gz
 
 # C extensions
 *.so
