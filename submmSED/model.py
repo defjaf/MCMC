@@ -30,6 +30,8 @@ import Proposal
 ##### TODO: get the total far-IR luminosity [for each component] of an object with a given model DONE
 ##### NOTE: the integral is done dnu in GHz so need to multiply by 1e9 to convert to (Jy Hz)
 
+##### DONE: only plot data once (the first time?) on a single plot (but it's done by hand)
+##### TODO: check that this is correct in driver.py?
 
 ##### TODO: correctly normalized prior (done?)
 
@@ -337,11 +339,12 @@ class submmModel_ratio(object):
     unpackage=staticmethod(unpackage)
     package=staticmethod(package)
 
-    def plot(self, data, logplot=True, label=None):
+    def plot(self, data, logplot=True, label=None, plot_data=True):
         """plot the data and the model"""
         f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
-        data.plot(logplot=logplot)
+        if plot_data:
+            data.plot(logplot=logplot)
         plt.plot(f, model_flux, label=label)
         
         
@@ -382,7 +385,7 @@ class submmModel2_normalized(object):
         self.b2 = b2
         self.T2 = T2
         self.A2 = A2
-
+        
 
     def at_nu(self, nu):
         return self.A1 * greybody(self.b1, self.T1, nu, nu_norm=nu_b) + \
@@ -421,11 +424,12 @@ class submmModel2_normalized(object):
 
         return 1
 
-    def plot(self, data, wavelength=True, logplot=True, label=None):
+    def plot(self, data, wavelength=True, logplot=True, label=None, plot_data=True):
         """plot the data and the model"""
         f = linspace(min(data.freq), max(data.freq), 100)
         model_flux = self.at_nu(f)
-        data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
+        if plot_data:
+            data.plot(fmt='o', wavelength=wavelength, logplot=logplot)
         if wavelength:
             f = speed_of_light/f
         plt.plot(f, model_flux, label=label)

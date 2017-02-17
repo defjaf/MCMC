@@ -17,7 +17,8 @@ import pystan_utils
 import model     ## needed for plotting SED models (duplicates some STAN code)
 
 ## Plot pystan output using MCMC/subMM routines
-def plot_pystan(data, fit, ncomp=None, model_name=None, linear=True, wavelength=True, logplot=True, label=None):
+def plot_pystan(data, fit, ncomp=None, model_name=None, linear=True, wavelength=True, 
+                logplot=True, label=None, first=True):
     """ 
     plot the output from a pystan run as a spectrum
        nb. can combine several calls into one figure.
@@ -68,7 +69,7 @@ def plot_pystan(data, fit, ncomp=None, model_name=None, linear=True, wavelength=
     MPparams = [params[flatnames==p] for p in paramorder]
 
     MPmod = mod(*MPparams)
-    MPmod.plot(data, wavelength=wavelength, logplot=logplot, label=label)
+    MPmod.plot(data, wavelength=wavelength, logplot=logplot, label=label, plot_data=first)
     
     
 def pystan_postprocess_SED_plot(allfits, dat, label=""):
@@ -79,9 +80,11 @@ def pystan_postprocess_SED_plot(allfits, dat, label=""):
 
     labs = ("1 comp", "2 comp", r"1 $\beta=2$", r"2 $\beta=2$", "thick")
     for objname, fits in iteritems(allfits):
+        first = True
         for fit, lab in zip(fits, labs):
-            plot_pystan(dat[objname], fit, label=lab)
-            plt.title(objname)
+            plot_pystan(dat[objname], fit, label=lab, first=first)
+            first = False
+        plt.title(objname)
         plt.legend(loc='best')
 
         plt.savefig("%s_%sSED.png" % (objname, label), dpi=200)
