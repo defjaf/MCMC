@@ -70,9 +70,9 @@ from model import greybody, submmModel2_normalized, startfrom_generic
 # 
 # The solid_angle for this aperture is 0.00382794.
 
+print "Importing!!!: __name__, __file__ = %s, %s" % (__name__, __file__)
 
-
-def setup_AME(fname="M31/spdust2_wim.dat"):
+def setup_AME(fname="MCMC/submmSED/M31/spdust2_wim.dat"):
     nu_GHz, flux = np.loadtxt(fname, unpack=True)
     return np.log(nu_GHz), np.log(flux)
 

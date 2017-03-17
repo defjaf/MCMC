@@ -1,5 +1,4 @@
 from __future__ import division
-import Likelihood
 
 from numpy import dot, log, empty, log10
 
@@ -9,7 +8,8 @@ try:
 except ImportError:
     from numpy import linalg    
 
-from Likelihood import ZeroPosterior
+from .. import Likelihood
+from ..Likelihood import ZeroPosterior
 
 dolog10 = False  # "compile-time" flag for the derived parameter
 dodet = False
