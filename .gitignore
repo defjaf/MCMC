@@ -10,3 +10,10 @@ __pycache__/
 *.so
 
 topology/*.png
+
+# Setuptools folders.
+/dist/
+/build/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
