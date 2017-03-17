@@ -15,7 +15,7 @@ speed_of_light = 299792.458 ### micron GHz
 singleParams = True  ## to vary each parameter individually
 if not singleParams: print("varying parameters together!")
 
-import Proposal
+from .. import Proposal
 
 ## careful -- this is the model for a *single* SED, but
 ##            would need to marginalize over the ratio r12 for *each object* 

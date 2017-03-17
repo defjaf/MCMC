@@ -14,6 +14,7 @@ from __future__ import division
 
 import sys
 import os
+import pkg_resources
 
 import getopt
 
@@ -37,23 +38,24 @@ import likelihood
 import data
 import model
 import M31model
-import getdist_ahj
+from .. import getdist_ahj
 import getdist
-import convergence
+from .. import convergence
 
 # import joblib
 
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
-fname_DLC = "./dat/submmSED.txt"
-fname_ERCSC = "./submmSED/dat/ercsc_iifscz.txt"
-fname_MRR_old = "./submmSED/dat/ERCSCalliifscz4550850.dat"
-fname_MRR = "./submmSED/dat/ERCSCiifsczbg.dat"
-fname_Peel = "./submmSED/M31/pixelfit.dat"
-fname_Mortier = "./submmSED/dat/print_seds_mergers"
-fname_M31 = "./submmSED/M31/M31Flux-v2.dat"
-fname_DLC_2014 = "./submmSED/dat/herus_phot.csv"
+### this is inefficient as it could open/cache all of these, even if not needed. 
+fname_DLC = pkg_resources.resource_filename('MCMC', "dat/submmSED.txt")
+fname_ERCSC = pkg_resources.resource_filename('MCMC', "submmSED/dat/ercsc_iifscz.txt")
+fname_MRR_old = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCalliifscz4550850.dat")
+fname_MRR = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCiifsczbg.dat")
+fname_Peel = pkg_resources.resource_filename('MCMC', "submmSED/M31/pixelfit.dat")
+fname_Mortier = pkg_resources.resource_filename('MCMC', "submmSED/dat/print_seds_mergers")
+fname_M31 = pkg_resources.resource_filename('MCMC', "submmSED/M31/M31Flux-v2.dat")
+fname_DLC_2014 = pkg_resources.resource_filename('MCMC', "./submmSED/dat/herus_phot.csv")
 delnu = 1763
 del157 = True   ### delete Herus 157mu data if 160mu data is present
 
@@ -277,7 +279,7 @@ def recover():
 #    fil = "./ercsc_iifscz.txt"
 idata = range(0,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
-fil = "./ERCSCiifsczbg.dat"
+fil = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCiifsczbg.dat")
 
 
 def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):

@@ -2,6 +2,7 @@
 from __future__ import division
 
 import math
+import pkg_resources 
 
 import matplotlib.pyplot as plt
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, linspace, log, errstate, min, max, vectorize, expm1, logspace
@@ -22,7 +23,7 @@ solid_angle = 0.00382794 # Sr
 
 #### 20 April 2015 -- increase prior range on AME
  
-import Proposal
+from .. import Proposal
 
 from model import greybody, submmModel2_normalized, startfrom_generic
 
@@ -70,9 +71,11 @@ from model import greybody, submmModel2_normalized, startfrom_generic
 # 
 # The solid_angle for this aperture is 0.00382794.
 
-print "Importing!!!: __name__, __file__ = %s, %s" % (__name__, __file__)
+# print "Importing!!!: __name__, __file__ = %s, %s" % (__name__, __file__)
+DATA_PATH = pkg_resources.resource_filename(__name__, './')
+# print "package resource filename: %s" % DATA_PATH
 
-def setup_AME(fname="MCMC/submmSED/M31/spdust2_wim.dat"):
+def setup_AME(fname=DATA_PATH+"/M31/spdust2_wim.dat"):
     nu_GHz, flux = np.loadtxt(fname, unpack=True)
     return np.log(nu_GHz), np.log(flux)
 

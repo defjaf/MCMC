@@ -11,7 +11,7 @@ import re
 
 import matplotlib.pyplot as plt
 
-from GaussianData import GaussianData
+from ..GaussianData import GaussianData
 
 # AHJ: modify/extend/subclass for non-uniform noise
 

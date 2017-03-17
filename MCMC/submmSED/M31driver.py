@@ -35,7 +35,7 @@ import likelihood
 import data
 import model
 import M31model
-import getdist_ahj ##as getdist
+from .. import getdist_ahj ##as getdist
 
 
 ### TODO: add calculation of the likelihood/posterior of the posterior mean params
