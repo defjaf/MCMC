@@ -8,8 +8,10 @@ Has likelihoods for CMB C_l, nonlinear SED fitting (with normal errors), beam fi
 ### TODO:
 * Convert to a proper module format
   * How/where to store data and outputs in module?
-  * Move up to "above" module dir?
-  * probably need to be careful of relative imports
+    * MANIFEST.in lists non-python files for module installation
+    * nb. differentiate between what's on github and what gets installed
+    * Move up to "above" module dir?
+  * need to be careful of relative imports?
 * Split off `svn2git` stuff from below
 
 
