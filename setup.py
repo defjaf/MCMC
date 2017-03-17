@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import re
 
 ## from https://gehrcke.de/2014/02/distributing-a-python-command-line-application/
@@ -20,8 +20,8 @@ setup(name='MCMC',
       url='http://github.com/defjaf/MCMC',
       author='Andrew H. Jaffe',
       author_email='a.h.jaffe@gmail.com',
-      package_requires = ['numpy', 'matplotlib', 'scipy'],
-      packages=['MCMC'],
+      install_requires = ['numpy', 'matplotlib', 'scipy', 'progressbar-ipython'],
+      packages=find_packages(),
       package_data={'MCMC': [
         'binnedCl/*.txt', 
       ##  'topology/likelihood/*/dat/*.dat',    ## don't include for now, j
@@ -29,7 +29,8 @@ setup(name='MCMC',
         'topology/likelihood/*/*.f',
         'topology/likelihood/*/*.for',
         'topology/likelihood/wmap/*',
-        'submmSED/dat/*'
+        'submmSED/dat/*',
+        'submmSED/M31/*'
     ]}
 )
 
