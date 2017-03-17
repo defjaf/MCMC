@@ -4,6 +4,15 @@ Andrew Jaffe's MCMC engine
 
 Has likelihoods for CMB C_l, nonlinear SED fitting (with normal errors), beam fitting, topology (unfinished?)
 
+
+### TODO:
+* Convert to a proper module format
+  * How/where to store data and outputs in module?
+  * Move up to "above" module dir?
+  * probably need to be careful of relative imports
+* Split off `svn2git` stuff from below
+
+
 ----
 
 Created using [svn2git][] (installed with `sudo gem install svn2git`):
