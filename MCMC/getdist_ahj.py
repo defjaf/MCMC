@@ -34,7 +34,7 @@ def getallsamples(MCMC, burn=0, stride=1, derived=True):
         s = MCMC
         
     if 0<burn<1:
-        burn *= len(s)
+        burn *= int(len(s))
 
     return s[burn::stride]
 
@@ -155,7 +155,7 @@ def scatter2d(MCMC, params, burn=0, stride=1, **kwargs):
 
     lnLike = kwargs.get('lnLike', None)
     if lnLike is not None:
-        if 0<burn<1: burn*=len(lnLike)
+        if 0<burn<1: burn *= int(len(lnLike))
         lnLike = lnLike[burn::stride]
         lnLike=copy.copy(lnLike)  ### necessary? following modifies lnLike
         lnLike -= max(lnLike)  ## normalize to P=1 at the maximum
@@ -196,7 +196,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         print maxLikeParams
         
     if burn>0 or stride>1:
-        if 0<burn<1: burn*=len(s)
+        if 0<burn<1: burn *= int(len(lnLike))
         s = s[burn::stride,:]
 
         
