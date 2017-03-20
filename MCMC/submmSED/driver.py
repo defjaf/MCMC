@@ -33,7 +33,8 @@ plottype = "png"
     
 import matplotlib.pyplot as plt
 
-import MCMC
+from MCMC import MCMC
+
 import likelihood
 import data
 import model

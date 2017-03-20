@@ -16,6 +16,7 @@ import getopt
 
 import operator
 import cPickle as pickle
+import pkg_resources
 
 import numpy as np
 
@@ -30,7 +31,7 @@ plottype = "pdf"
     
 import matplotlib.pyplot as plt
 
-import MCMC
+from MCMC import MCMC
 import likelihood
 import data
 import model
@@ -42,10 +43,15 @@ from .. import getdist_ahj ##as getdist
 
 ## added random and randomrestart params
 
+pkg_name = 'MCMC.submmSED'   #pkg_resources.Requirement.parse(__name__)
+M31filename = pkg_resources.resource_filename(pkg_name, "M31/M31Flux-DX9d.dat")
+
+#### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
+
 def M31(rotateParams=False, start=None, sigmas=None, 
          nMC=(10000,10000), noPlots=False, fig0=0, savefig=False, retMCMC=True,
          fdir = "./", logplot=True, check=None, wavelength=False, doBlock=True,
-         filename="M31/M31Flux-DX9d.dat",
+         filename=M31filename,
          random=False, randomrestart=False):
         
         
