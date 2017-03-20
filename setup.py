@@ -24,6 +24,7 @@ setup(name='MCMC',
       packages=find_packages(),
       package_data={'MCMC': [
         'binnedCl/*.txt', 
+        'ClData/*.dat', 
       ##  'topology/likelihood/*/dat/*.dat',    ## don't include for now, j
                                                 ##  just leave in source dir
         'topology/likelihood/*/*.f',

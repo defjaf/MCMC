@@ -19,7 +19,7 @@ from operator import isNumberType, __and__,  isSequenceType
 from copy import copy
 
 from numpy import array, arange, float64, zeros
-import Proposal
+from .. import Proposal
 
 class simpleModel(object):
     """ general polynomial model for the data;

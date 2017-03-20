@@ -4,7 +4,7 @@ import pylab
 
 import cPickle
 
-import BeamFit.MAXIPOLBeamData as MP
+import MAXIPOLBeamData as MP
 
 def main_TOI():
     

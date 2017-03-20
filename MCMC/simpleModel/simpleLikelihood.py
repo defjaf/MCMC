@@ -1,5 +1,5 @@
 from __future__ import division
-import Likelihood
+from .. import Likelihood
 
 class simpleLikelihood(Likelihood.Likelihood):
 

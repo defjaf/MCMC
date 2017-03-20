@@ -41,7 +41,7 @@ from BeamData import BeamData
 
 from ProcessBeamData import setup_sampler, sample1beam, plotter
 
-import getdist_ahj
+from .. import getdist_ahj
 
 try:
     import piolib as pio

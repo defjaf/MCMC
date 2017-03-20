@@ -1,5 +1,5 @@
 from __future__ import division
-import Likelihood
+from .. import Likelihood
 
 # requires the Cl_model_class.__call__(self) return Cl[ell, 0:3]
 # where 0:3 represents TT, TE, EE

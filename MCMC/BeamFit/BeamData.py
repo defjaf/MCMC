@@ -5,7 +5,7 @@ from numpy.random import uniform, normal
 
 import pylab
 
-from GaussianData import GaussianData
+from ..GaussianData import GaussianData
 
 # AHJ: modify/extend/subclass for non-uniform noise
 class BeamData(GaussianData):

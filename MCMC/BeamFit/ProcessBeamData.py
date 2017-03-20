@@ -24,7 +24,7 @@ import Likelihood
 from BeamFit import (BeamModel, NormalizedBeamModel, 
                      OffsetNormalizedBeamModel, NormalizedBeamLikelihood)
 
-import getdist_ahj
+from .. import getdist_ahj
 
 
 

@@ -8,7 +8,7 @@ from numpy import array, int32, float64, bool8, arange, rank, dot
 
 import ClData_CosmoMC
 from ClData_CosmoMC import lmax
-from WMAP_likelihood import WMAP_likelihood as WMAP
+from ..WMAP_likelihood import WMAP_likelihood as WMAP
 
 class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
     """

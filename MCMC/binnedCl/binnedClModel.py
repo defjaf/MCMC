@@ -16,7 +16,7 @@ import numpy as N
 import scipy.optimize as So
 import scipy.special as Ss
 
-import Proposal
+from .. import Proposal
 
 ## add a function to convert from "parameters" to l(l+1)C_l/(2pi)? 
 ##   this is just __call__???

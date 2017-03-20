@@ -17,7 +17,7 @@ from __future__ import division
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, fabs
 import math
 
-import Proposal
+from .. import Proposal
 
 use_xy = False ## True doesn't work yet???
 

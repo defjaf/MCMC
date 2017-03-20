@@ -8,10 +8,11 @@
 
 from __future__ import division
 
-from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
 
-import Proposal
+from numpy import array, exp, asarray, cos, sin, sqrt, float64
+
+from .. import Proposal
 
 use_xy = False ## True doesn't work yet???
 

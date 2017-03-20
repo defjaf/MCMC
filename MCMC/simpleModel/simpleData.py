@@ -4,7 +4,7 @@ from numpy.random_array import uniform, normal   #check
 
 import pylab
 
-from GaussianData import GaussianData
+from ..GaussianData import GaussianData
 
 # AHJ: modify/extend/subclass for non-uniform noise
 class simpleData(GaussianData):
