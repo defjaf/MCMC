@@ -44,18 +44,20 @@ from .. import convergence
 
 # import joblib
 
+pkg_name = 'MCMC.submmSED'   #pkg_resources.Requirement.parse(__name__)
 
 #### pattern after test_binnedCl.py and/or BeamFit/driver.py BeamFit/MAXIPOLBeamData.py
 
 ### this is inefficient as it could open/cache all of these, even if not needed. 
-fname_DLC = pkg_resources.resource_filename('MCMC', "dat/submmSED.txt")
-fname_ERCSC = pkg_resources.resource_filename('MCMC', "submmSED/dat/ercsc_iifscz.txt")
-fname_MRR_old = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCalliifscz4550850.dat")
-fname_MRR = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCiifsczbg.dat")
-fname_Peel = pkg_resources.resource_filename('MCMC', "submmSED/M31/pixelfit.dat")
-fname_Mortier = pkg_resources.resource_filename('MCMC', "submmSED/dat/print_seds_mergers")
-fname_M31 = pkg_resources.resource_filename('MCMC', "submmSED/M31/M31Flux-v2.dat")
-fname_DLC_2014 = pkg_resources.resource_filename('MCMC', "./submmSED/dat/herus_phot.csv")
+#### is there any way to not specify the package name, pkg_name
+fname_DLC = pkg_resources.resource_filename(pkg_name, "dat/submmSED.txt")
+fname_ERCSC = pkg_resources.resource_filename(pkg_name, "dat/ercsc_iifscz.txt")
+fname_MRR_old = pkg_resources.resource_filename(pkg_name, "dat/ERCSCalliifscz4550850.dat")
+fname_MRR = pkg_resources.resource_filename(pkg_name, "dat/ERCSCiifsczbg.dat")
+fname_Peel = pkg_resources.resource_filename(pkg_name, "M31/pixelfit.dat")
+fname_Mortier = pkg_resources.resource_filename(pkg_name, "dat/print_seds_mergers")
+fname_M31 = pkg_resources.resource_filename(pkg_name, "M31/M31Flux-v2.dat")
+fname_DLC_2014 = pkg_resources.resource_filename(pkg_name, "dat/herus_phot.csv")
 delnu = 1763
 del157 = True   ### delete Herus 157mu data if 160mu data is present
 
@@ -279,7 +281,7 @@ def recover():
 #    fil = "./ercsc_iifscz.txt"
 idata = range(0,1717) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
-fil = pkg_resources.resource_filename('MCMC', "submmSED/dat/ERCSCiifsczbg.dat")
+fil = pkg_resources.resource_filename(pkg_name, "dat/ERCSCiifsczbg.dat")
 
 
 def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
