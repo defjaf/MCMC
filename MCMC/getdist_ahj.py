@@ -102,7 +102,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
             norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
             ss = np.arange(smin, smax, (smax-smin)/5/nbins)
 
-            axis.hold(True)
+            # axis.hold(True)   ### no longer needed?
             axis.plot(ss, norm*GaussPDF(ss, mean, stdv), 'k')
         
     return hist
@@ -232,7 +232,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
     ylims = []
     for ipar, par in enumerate(params):
         ax=fig.add_subplot(nrow, ncol, npar*(npar-1)+ipar+1)
-        ax.hold(False)
+        ax.clear()   ### ax.hold(False)  ## hold deprecated
         label = labels[par].strip().strip("$") if labels is not None else None
         hist(MCMC, par, nbins=nbins, axis=ax, label=label)
         ax.set_yticklabels([])
@@ -254,7 +254,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         for ipar2, par2 in enumerate(islice(params, ipar1+1)):          ### columns
                   
             ax=fig.add_subplot(nrow, ncol, npar*ipar1+ipar2+1)
-            ax.hold(False)
+            ax.clear() ### ax.hold(False)   ## hold deprecated
             #splot = \ 
             scatter2d(MCMC, (par2, par1), lnLike=lnLike, norm=norm, axis=ax, 
                       derived=derived, burn=burn, stride=stride)
