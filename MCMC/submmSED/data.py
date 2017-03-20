@@ -8,6 +8,7 @@ import fnmatch
 from numpy.random import uniform, normal
 import csv
 import re
+import pkg_resources
 
 import matplotlib.pyplot as plt
 
@@ -241,7 +242,8 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             
     if getArp220:
         z = 0.018
-        dat = lambda_obs_1, flux, sig = np.loadtxt("./dat/Arp220.txt", unpack=True, usecols=(0,1,2))
+        Arp220_data = pkg_resources.resource_filename("MCMC.submmSED", "dat/Arp220.txt")
+        dat = lambda_obs_1, flux, sig = np.loadtxt(Arp220_data, unpack=True, usecols=(0,1,2))
         nu_obs = speed_of_light/lambda_obs_1
         if UL25:
             l25 = np.where(np.round(lambda_obs_1)==25)[0]

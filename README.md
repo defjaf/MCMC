@@ -14,7 +14,9 @@ Has likelihoods for CMB C_l, nonlinear SED fitting (with normal errors), beam fi
     * Move up to "above" module dir?
   * need to be careful of relative imports?
     * Done (mostly?)
-  * move shell driver code (and data??) out of the package.
+  * move shell driver code and outputs (and data??) out of the package into "run" or "work" dir?
+    * started
+  * move stan code and runs to a different package or submodule
 * Split off `svn2git` stuff from below
 
 ----
