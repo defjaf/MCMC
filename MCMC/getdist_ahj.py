@@ -19,6 +19,7 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 from itertools import islice, groupby
 
@@ -243,10 +244,15 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         #     ax.set_yticks(ax.get_ylim())
 
         if labels is not None:
-            ax.set_xlabel(labels[par], size='x-large')
+            ax.set_xlabel(labels[par], size='medium')
             ax.set_xticks(ax.get_xlim())
-        ax.tick_params(labelsize='x-large')
-        
+            
+        ax.tick_params(labelsize='small')
+        plt.xticks(rotation=90)
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+#         ax.ticklabel_format(style='sci',scilimits=(-3,4),axis='x')
+#         ax.xaxis.major.formatter._useMathText = True
+
         xlims.append(ax.get_xlim())
         ylims.append(ax.get_ylim())
         
@@ -266,10 +272,15 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
             if ipar2 != 0:
                 ax.set_yticklabels([])
             elif labels is not None:
-                ax.set_ylabel(labels[par1], size='x-large')
+                ax.set_ylabel(labels[par1], size='small', rotation=0)
                 ax.set_yticks(ax.get_ylim())
-            ax.tick_params(labelsize='x-large')
-            
+                ax.tick_params(labelsize='small')
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+#                 ax.ticklabel_format(style='sci',scilimits=(-3,4),axis='y')
+#                 ax.yaxis.major.formatter._useMathText = True
+
+#     plt.tight_layout()
+
     if not quiet: plt.draw()
     
     if lnLike is not None:
