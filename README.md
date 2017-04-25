@@ -2,26 +2,34 @@
 
 Andrew Jaffe's MCMC engine
 
-Has likelihoods for CMB C_l, nonlinear SED fitting (with normal errors), beam fitting, topology (unfinished?)
+Has likelihoods for CMB C_l, nonlinear SED fitting (with normal errors),
+beam fitting, topology (unfinished?)
 
 ## installation
 
-It is probably possible to do this remotely, but easiest is to `git clone` into some directory, 
-and then 
+It is probably possible to do this remotely, but easiest is to `git clone`
+into some directory, and then 
 
     pip install -e .
 
-The `-e` installs in "editable" or "developer" mode which doesn't actually copy the files
-into your site-packages, but just leaves them where they are.
+The `-e` installs in "editable" or "developer" mode which doesn't
+actually copy the files into your site-packages, but just leaves them
+where they are.
 
-It is possible that git will complain about not having `git-lfs` installed. If so, let me know...
+It is possible that git will complain about not having `git-lfs`
+installed. If so, let me know...
 
 There may still be some issues in accessing data files.
 
-The `run` directory shows some recent examples of SED fitting, which is the 
-most up-to-date part of the code. There are
-other driver files scattered throughout the directory tree which give some other
-examples of use, but they may not have been updated for the current directory structure.
+The `run` directory shows some recent examples of SED fitting, which is
+the most up-to-date part of the code. Look at the various `do_driver*`
+shell scripts§ (and the python driver routines to which they refer), as
+well as the ipython notebooks. There are also some notebooks in which I
+solve this problem using `Stan` rather than my own MCMC engine.
+
+There are other driver files scattered throughout the directory tree
+which give some other examples of use, but they may not have been
+updated for the current directory structure.
 
 ## structure of the code
 
