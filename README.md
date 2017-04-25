@@ -14,6 +14,8 @@ and then
 The `-e` installs in "editable" or "developer" mode which doesn't actually copy the files
 into your site-packages, but just leaves them where they are.
 
+It is possible that git will complain about not having `git-lfs` installed. If so, let me know...
+
 There may still be some issues in accessing data files.
 
 The `run` directory shows some recent examples of SED fitting, which is the 
