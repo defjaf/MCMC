@@ -10,11 +10,11 @@ from six import iteritems
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.append(os.environ['HOME']+'/home/proj/stats/MCMC')
+# sys.path.append(os.environ['HOME']+'/home/proj/stats/MCMC')
 
-import pystan_utils
+from . import pystan_utils
 
-import model     ## needed for plotting SED models (duplicates some STAN code)
+from . import model     ## needed for plotting SED models (duplicates some STAN code)
 
 ## Plot pystan output using MCMC/subMM routines
 def plot_pystan(data, fit, ncomp=None, model_name=None, linear=True, wavelength=True, 

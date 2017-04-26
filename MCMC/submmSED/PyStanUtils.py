@@ -1,5 +1,7 @@
 """
 
+SUPERSEDED BY pystan_submm.py + pystan_utils.py
+
 utilities for working with pystan and interfacing with my MCMC code and AL's getdist
 
 should split this file into generic MCMC/pystan/getdist functions and very specific submm ones
