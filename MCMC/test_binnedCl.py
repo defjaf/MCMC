@@ -6,7 +6,7 @@ import string
 import os.path
 
 import pylab
-import pyfits
+import astropy.io.fits as pyfits
 import MCMC
 import getdist_ahj
 from binnedCl.binnedClLikelihood import binnedClLikelihood

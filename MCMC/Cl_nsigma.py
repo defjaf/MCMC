@@ -10,7 +10,7 @@ from ClData import ClData
 import string
 import os.path
 import math
-import pyfits
+import astropy.io.fits as pyfits
 from pylab import *
 
 from numpy import arange, array, float64, transpose, zeros, logical_and

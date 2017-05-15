@@ -21,7 +21,7 @@ setup(name='MCMC',
       author='Andrew H. Jaffe',
       author_email='a.h.jaffe@gmail.com',
       install_requires = ['numpy', 'matplotlib', 'scipy', 'progressbar-ipython'],
-      packages=find_packages(),
+      packages=find_packages(exclude=('test',)),
       package_data={'MCMC': [
         'binnedCl/*.txt', 
         'ClData/*.dat', 
