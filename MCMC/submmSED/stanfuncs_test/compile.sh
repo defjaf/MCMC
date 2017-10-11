@@ -1,0 +1,1 @@
+g++ -c -I/Users/jaffe/home/dev/stan/stan/src/ -I/Users/jaffe/home/dev/stan/stan/lib/stan_math -I/usr/local/Cellar/eigen/3.3.4/include/eigen3 -I/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pystan/stan/lib/stan_math/lib/cvodes_2.9.0/include ./blackbody.hpp
