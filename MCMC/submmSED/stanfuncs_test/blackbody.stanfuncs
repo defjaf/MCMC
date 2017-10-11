@@ -1,0 +1,13 @@
+    functions {
+        
+        real greybody(real beta, real T, real nu) {
+          // greybody, normalized to unit flux at nu=nu_0
+            real h_over_k = 0.04799237;       //  K/Ghz
+            real nu_bar = 1000;
+            
+            real x = h_over_k * nu / T;
+            real x_bar = h_over_k * nu_bar / T;
+            
+            return (pow(nu/nu_bar, 3+beta) * expm1(x_bar) / expm1(x));
+        }
+    }
