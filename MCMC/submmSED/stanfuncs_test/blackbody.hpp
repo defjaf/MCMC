@@ -3,7 +3,7 @@
 // [[Rcpp::depends(rstan)]]
 #include <stan/model/standalone_functions_header.hpp>
 
-namespace blackbody_functions { 
+namespace blackbody_functions {
 using std::istream;
 using std::string;
 using std::stringstream;
@@ -93,6 +93,7 @@ struct greybody_functor__ {
 };
 
 // [[Rcpp::export]]
+extern "C"
 double
 greybody(const double& beta,
              const double& T,
@@ -100,4 +101,4 @@ greybody(const double& beta,
   return greybody<double, double, double>(beta, T, nu, pstream__);
 }
 
- } 
+ }
