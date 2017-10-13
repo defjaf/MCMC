@@ -8,7 +8,9 @@ INC="-I/Users/jaffe/home/dev/stan/stan/src/ \
 
 LDFLAGS=-dynamiclib
 
-${CXX} ${LDFLAGS} -o blackbody.dylib ${INC} ./blackbody.cpp
+BASE=foo
+
+${CXX} ${LDFLAGS} -o ${BASE}.dylib ${INC} ./${BASE}.cpp
 
 # -I/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 \
 #
