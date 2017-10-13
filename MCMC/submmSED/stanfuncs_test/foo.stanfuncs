@@ -1,0 +1,3 @@
+functions {
+  vector foo(vector x) { return 2 * x; }
+}
