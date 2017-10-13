@@ -4,8 +4,9 @@ CXX = clang++
 
 PYSTAN = /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pystan
 STAN_MATH = $(PYSTAN)/stan/lib/stan_math
+STAN_INC = $(PYSTAN)/stan/src
 
-INC = -I/Users/jaffe/home/dev/stan/stan/src/ \
+INC = -I$(STAN_INC) \
 	-I${STAN_MATH} \
 	-I${STAN_MATH}/lib/boost_1.64.0 \
 	-I${STAN_MATH}/lib/eigen_3.3.3/ \
@@ -26,9 +27,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
-### only works because this has a single source and object file.
-#### should be a single line per object file, using some Makefile incantation
-$(OBJS): $(SOURCE)
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 ### could do in one step:

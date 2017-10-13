@@ -3,7 +3,7 @@
 // [[Rcpp::depends(rstan)]]
 #include <stan/model/standalone_functions_header.hpp>
 
-namespace foo_functions {
+namespace foo_functions { 
 using std::istream;
 using std::string;
 using std::stringstream;
@@ -58,10 +58,9 @@ struct foo_functor__ {
 };
 
 // [[Rcpp::export]]
-extern "C"
 Eigen::Matrix<double, Eigen::Dynamic,1>
 foo(const Eigen::Matrix<double, Eigen::Dynamic,1>& x, std::ostream* pstream__ = 0){
   return foo<double>(x, pstream__);
 }
 
- }
+ } 
