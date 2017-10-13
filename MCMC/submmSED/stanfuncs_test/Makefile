@@ -25,6 +25,8 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
+### only works because this has a single source and object file.
+#### should be a single line per object file, using some Makefile incantation
 $(OBJS): $(SOURCE)
 	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
