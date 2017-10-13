@@ -28,6 +28,9 @@ $(TARGET): $(OBJS)
 $(OBJS): $(SOURCE)
 	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
+### could do in one step:
+# $(TARGET): $(SOURCE)
+# 	$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^
 
 .PHONY: clean
 clean:
