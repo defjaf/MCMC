@@ -26,7 +26,7 @@ $(TARGET): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
 $(OBJS): $(SOURCE)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 
 .PHONY: clean
