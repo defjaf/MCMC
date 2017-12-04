@@ -67,9 +67,12 @@ def figs(rel=True, single=False, wmap=False, ylim=10000):
                 plt.plot(wm[0], wm[3], 'xk', label='WMAP')
                 plt.errorbar(wm[0], wm[3], wm[4], fmt='xk')
             plt.xlim(0,2500)
-            if ylim: plt.ylim(0,10000)
+            if ylim: plt.ylim(0,ylim)
             if single:
                 plt.legend()
+                
+        plt.xlabel("multipole $\ell$"); plt.ylabel("$\ell(\ell+1)C_\ell$")
+
     if rel:
         plt.axhline(1)
         plt.ylim(0,4)
@@ -81,8 +84,8 @@ def figs(rel=True, single=False, wmap=False, ylim=10000):
         plt.plot(ll, llClTT)
         plt.legend()
         plt.xlim(0,2500)
-        if ylim: plt.ylim(0,10000)
-
+        if ylim: plt.ylim(0,ylim)
+        
 
 def main():
 	pass
