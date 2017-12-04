@@ -16,17 +16,17 @@ import pylab
 import matplotlib.pyplot as plt
 
 
-def figs(rel=True, single=False, wmap=False):
+def figs(rel=True, single=False, wmap=False, ylim=10000):
     
     wmapfile = "/Users/jaffe/Desktop/Projects/GUS/wmap_binned_tt_spectrum_5yr_v3.txt"
     
     wm = N.loadtxt(wmapfile, unpack=True)
     
-    
+    gdir = "../dat"
     prefix = ["bolo/bolo", "interf/interf", "radiometer/rad", "wang1/wang2","ground.2/ground"]
     labels = ['Bolometers','Interferometers','Radiometers','Wang et al', 'sub-orbital']
     
-    tmp = N.fromfile("CarloClModel.dat", sep=" ")
+    tmp = N.fromfile(gdir+"/" + "CarloClModel.dat", sep=" ")
     tmp.shape = -1, 6
     ells = N.int_(tmp.T[0])  ## nb doesn't usually start at l=0
     
@@ -48,7 +48,7 @@ def figs(rel=True, single=False, wmap=False):
             plt.figure()
             if not rel:
                 plt.plot(ll, llClTT)
-        with open(pre+".bp") as f:
+        with open(gdir+"/"+pre+".bp") as f:
             dat = N.loadtxt(f,unpack=True)
             l.append(N.array(dat[0], dtype=int))
             C.append(dat[1])
@@ -67,7 +67,7 @@ def figs(rel=True, single=False, wmap=False):
                 plt.plot(wm[0], wm[3], 'xk', label='WMAP')
                 plt.errorbar(wm[0], wm[3], wm[4], fmt='xk')
             plt.xlim(0,2500)
-            plt.ylim(0,10000)
+            if ylim: plt.ylim(0,10000)
             if single:
                 plt.legend()
     if rel:
@@ -81,7 +81,7 @@ def figs(rel=True, single=False, wmap=False):
         plt.plot(ll, llClTT)
         plt.legend()
         plt.xlim(0,2500)
-        plt.ylim(0,10000)
+        if ylim: plt.ylim(0,10000)
 
 
 def main():
