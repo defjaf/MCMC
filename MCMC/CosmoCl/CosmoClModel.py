@@ -1,2 +1,2 @@
 class CosmoClModel(BinnedClModel):
-    
+    pass

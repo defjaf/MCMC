@@ -278,6 +278,8 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
     neg67   = [-1, -1, +1, -1, -1, +1, +1, +1, -1, -1, +1, +1]
 
     dfac = {}
+    ### 2to3 RefactoringTool: Line 281: You should use 'operator.mul(1)' here
+    ###   - no, see https://stackoverflow.com/questions/43614756/python-2to3-warning-you-should-use-operator-mulnone-here-what-does-it-mea
     dfac[(2,3)] = dict(zip(alldets, repeat(1)))
     dfac[(4,5)] = dict(zip(alldets, neg45))
     dfac[(6,7)] = dict(zip(alldets, neg67))

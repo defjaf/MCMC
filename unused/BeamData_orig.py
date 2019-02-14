@@ -1,4 +1,4 @@
-from __future__ import division
+
 from numarray import asarray, float64
 from numarray.random_array import uniform, normal
 
@@ -15,7 +15,7 @@ class BeamData(object):
         self.n = xarr.size()
         self.nsig = len(asarray(sigma))   # need asarry since len(scalar) doesn't exist
         if (self.n != yarr.size() or self.n != data.size() or 
-            self.nsig != 1 and self.nsig != self.n)):
+            self.nsig != 1 and self.nsig != self.n):
             raise DataSizeError(self.f, self.nsig)
         
         self.x=asarray(xarr, float64)
@@ -29,7 +29,6 @@ class BeamData(object):
         else:
             self.lnDetN = self.n*log(self.sig2)
 
-        
         
 
 class BeamSim(BeamData):

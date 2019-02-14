@@ -199,10 +199,12 @@ class binnedClModel(object):
         #cls.lmax = max(rng[1] for rng in b for b in bin for bin in bins)
         #cls.lmax = min(rng[0] for rng in b for b in bin for bin in bins)
 
-        
-        if isSequenceType(shapefun) and len(shapefun)>cls.lmax:
+# 2to3 RefactoringTool: Line 203: You should use 'isinstance(shapefun, collections.Sequence)' here.
+# 2to3 RefactoringTool: Line 205: You should use 'isinstance(shapefun, collections.Sequence)' here.
+## was "isSequenceType(shapefun)"
+        if isinstance(shapefun, collections.Sequence) and len(shapefun)>cls.lmax:
             cls.shapefun=shapefun[:cls.lmax+1]
-        elif isSequenceType(shapefun) and len(shapefun[0])>cls.lmax:
+        elif isinstance(shapefun, collections.Sequence) and len(shapefun[0])>cls.lmax:
             cls.shapefun=shapefun[:,:cls.lmax+1]
         elif shapefun is None:
             cls.shapefun = 1.0
