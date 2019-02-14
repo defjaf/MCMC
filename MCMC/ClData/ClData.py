@@ -1,10 +1,10 @@
-from __future__ import division
+
 
 import string
 
-import ClData_CosmoMC
-import ClData_WMAP
-import ClData_bcp
+from . import ClData_CosmoMC
+from . import ClData_WMAP
+from . import ClData_bcp
 
 def ClData(file):
     """
@@ -29,11 +29,11 @@ def getClData(listfile, verbose=True, no_pol=False):
     for dataset in file(listfile):
         dataset=dataset.strip()
         if len(dataset) and dataset[0] != "#":
-            if verbose: print "Getting %s" % (dataset)
+            if verbose: print("Getting %s" % (dataset))
             set = ClData(dataset)
             if no_pol:
                 set.has_pol_really = set.has_pol
                 set.has_pol=False   # explicitly ignore polarization
-            if verbose: print " got %s" % (set.name)
+            if verbose: print(" got %s" % (set.name))
             data.append(set)
     return data

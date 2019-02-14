@@ -22,3 +22,6 @@ topology/*.png
 /*.egg-info
 
 /venv*/
+
+# 2to3 backups
+*.py.bak

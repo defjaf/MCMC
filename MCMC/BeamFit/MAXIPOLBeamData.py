@@ -4,23 +4,23 @@
     (e.g., not just different detectors a la MAXIPOL)
 """
 
-from __future__ import division
+
 import sys
 import math
 import os.path
 import pickle
 import pylab
 import gzip
-from itertools import izip, repeat
+from itertools import repeat
 
 import numpy
 from numpy import (array, float64, zeros, ones, int32, log, where, exp,
                    arange, asarray, sqrt, minimum, maximum, logical_and)
 from numpy import concatenate as cat
 
-from BeamData import BeamData
+from .BeamData import BeamData
 
-from ProcessBeamData import setup_sampler, sample1beam, plotter
+from .ProcessBeamData import setup_sampler, sample1beam, plotter
 
 from .. import getdist_ahj
 
@@ -70,7 +70,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 
     if cols is None: cols=(2,3)
 
-    print "Reading data from columns %d-%d" % tuple(cols)
+    print("Reading data from columns %d-%d" % tuple(cols))
     
     ngood = 0;
     ncut = 0;
@@ -87,7 +87,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 #           float(line[0]), float(line[1]), float(line[2]), float(line[3]), int(line[4]))
         az1, el1, b1, s1, c1= (
            float(line[0]), float(line[1]), float(line[cols[0]]), float(line[cols[1]]),
-           long(line[-1]))
+           int(line[-1]))
         
         if nhits:
             s1 /= sqrt(c1)
@@ -107,7 +107,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
 
     fileobj.close()
     
-    print 'Data read: ncut=%d, ngood=%d' % (ncut, ngood)
+    print('Data read: ncut=%d, ngood=%d' % (ncut, ngood))
 
     beam = asarray(beam, float64)
     sig = asarray(sig, float64)
@@ -116,7 +116,7 @@ def readMAXIPOLdataBrad(filename, day=False, sigcut=0.0, ctscut=0, cols=None,
     cts = asarray(cts, float64)
 
     if neg is not False and ((neg is None and beam.mean() < 0) or neg):
-        print 'negating data'
+        print('negating data')
         beam = -beam
 
     return BeamData(az, el, beam, sig, cts=cts)
@@ -170,7 +170,7 @@ def read_data_MAXI(dir=None, files=None, num=None, DayNight=2, LuisBrad=1, cols=
     elif LuisBrad == 1:
         if num is None and files is not None: 
             day = [False]*len(files)
-            print 'Setting day=', day
+            print('Setting day=', day)
                 
             data = [
                 readMAXIPOLdataBrad(dir+fil, d, sigcut=sigcut, ctscut=ctscut, cols=cols, 
@@ -221,7 +221,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     for run in range(nruns):
         res={}
         for ib, det in enumerate(dets):
-            print 'Detector: %d' % det
+            print('Detector: %d' % det)
             fig=pylab.figure(irun*ntotrun+nfig*run)
             if not plotOne:
                 ax=fig.add_subplot(nrow, ncol, ib+1)
@@ -278,9 +278,9 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
     neg67   = [-1, -1, +1, -1, -1, +1, +1, +1, -1, -1, +1, +1]
 
     dfac = {}
-    dfac[(2,3)] = dict(izip(alldets, repeat(1)))
-    dfac[(4,5)] = dict(izip(alldets, neg45))
-    dfac[(6,7)] = dict(izip(alldets, neg67))
+    dfac[(2,3)] = dict(zip(alldets, repeat(1)))
+    dfac[(4,5)] = dict(zip(alldets, neg45))
+    dfac[(6,7)] = dict(zip(alldets, neg67))
 
     neg1 = neg
 
@@ -307,10 +307,10 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
         for fb in filebase:
             fil = pref+fb+suff
             figf = fb
-            if isinstance(figName, (str, unicode)):
+            if isinstance(figName, str):
                 figf = figName+figf
 
-            print 'Running: ', fil
+            print('Running: ', fil)
             fig=pylab.figure(0)
             ax=fig.add_subplot(nrow, ncol, ib+1)
             ax.cla()
@@ -338,8 +338,8 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     orig_params = mod.package(ana[0])     ## startres[-1].mean()
                     orig_sigmas = mod.package(3*ana[1])   ## startres[-1].stdev()
 
-                    print ("Start: " + mod.fmtstring) % tuple(mod.unpackage(orig_params))
-                    print ("Sigma: " + mod.fmtstring) % tuple(mod.unpackage(orig_sigmas))
+                    print(("Start: " + mod.fmtstring) % tuple(mod.unpackage(orig_params)))
+                    print(("Sigma: " + mod.fmtstring) % tuple(mod.unpackage(orig_sigmas)))
                     
                 ## need to run this to get the correct likelihood.
                 ##   therefore may need to adjust prior ranges
@@ -388,8 +388,8 @@ def testTOI(nMC=(3000, 100000), useNormalizedBeam=True,
                     fig.savefig(figf+str(fig.number).strip()+'.png')
 
             except None:
-                print "Unexpected error:", sys.exc_info()[0]
-                print "... when running ", fil, fb
+                print("Unexpected error:", sys.exc_info()[0])
+                print("... when running ", fil, fb)
 
             if closeFigs: pylab.close('all')
 
@@ -406,7 +406,7 @@ def saveres(reslist, file=None):
     """
     newres=[]
     for resrun in reslist:
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             resrun[det]=(res[0][-1].samples, res[1])  ## save the 'ana' element & samples
             ## should save in a form closer to the original???
         newres.append(resrun)
@@ -426,7 +426,7 @@ def makereport(reslist, file=sys.stdout, hasTOI=False, hasRuns=False):
     
     for irun, resrun in enumerate(reslist):
         file.write("Run: %d\n" % irun)
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             file.write("%d" % det)
 
             try:
@@ -440,8 +440,8 @@ def makereport(reslist, file=sys.stdout, hasTOI=False, hasRuns=False):
                 for (v, s) in zip(val, sig):
                     file.write("   %f +- %f" % (v, s))
             except:
-                print "\n... when running ", irun, det,
-                print "Unexpected error:", sys.exc_info()[0]
+                print("\n... when running ", irun, det, end=' ')
+                print("Unexpected error:", sys.exc_info()[0])
                     
             file.write("\n")
 

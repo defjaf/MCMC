@@ -1,6 +1,6 @@
 """ represents a topologically non-trivial, slightly-closed universe """
 
-from __future__ import division
+
 
 import math
 
@@ -24,7 +24,7 @@ class topo_model(object):
     nparam = 5
     
     #paramBlocks = [0, 1, 1, 1, 2]
-    paramBlocks = range(nparam)
+    paramBlocks = list(range(nparam))
     nBlock = max(paramBlocks)+1
     
     texNames = [r"$A$", r"$\alpha$", r"$\beta$", r"$\gamma$", r"$H_0$"]

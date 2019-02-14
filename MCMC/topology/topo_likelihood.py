@@ -1,15 +1,15 @@
-from __future__ import division
+
 
 import math
 from math import log
 
 import numpy as N
 
-import Likelihood
-from likelihood.likico import likico
-from likelihood.likoct import likoct
-from likelihood.likdih import likdih
-from likelihood.liktetr import liktetr
+from . import Likelihood
+from .likelihood.likico import likico
+from .likelihood.likoct import likoct
+from .likelihood.likdih import likdih
+from .likelihood.liktetr import liktetr
 
 likfuns = {'ico': likico, 'oct': likoct, 'dih': likdih, 'tetr': liktetr}
 
@@ -19,7 +19,7 @@ ang_lims = {'ico':  [2/5, 1, 2/5],
             'dih':  [1/2, 1, 1/2], 
             'tetr': [1/2, 1, 1/2]}
 
-for key, lims in ang_lims.iteritems():
+for key, lims in ang_lims.items():
     ang_lims[key] = N.array(lims) * math.pi
 
 class topo_likelihood(Likelihood.Likelihood):
@@ -35,10 +35,10 @@ class topo_likelihood(Likelihood.Likelihood):
     def __init__(self, data=None, model=None, datdir="", almfile="",
                  topo='ico'):
         self.set_topo(topo)
-        print "reading likelihood files (data=%s)... "%almfile,
+        print("reading likelihood files (data=%s)... "%almfile, end=' ')
         
         self.likfun.readdata(datdir, almfile)
-        print "done"
+        print("done")
         Likelihood.Likelihood.__init__(self,data, model)
         self.model.ang_lims = ang_lims[topo]
         

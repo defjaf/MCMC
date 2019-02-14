@@ -3,7 +3,7 @@
 ## refactored from MAXIPOLBeamData???
 ## see ##MAXI below for candidates for latter
 
-from __future__ import division
+
 import sys
 import math
 import operator
@@ -13,6 +13,7 @@ import numpy as np
 from numpy import  (array, float64, zeros, ones, int32, log, where, exp,
                     arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
+import numbers
 
 try:
     import numpy.ma as ma
@@ -76,8 +77,7 @@ def grid1d(x, dx=0, nx=0):
     make an evenly-spaced 1d grid of x values out of the subsequence of given x
     """
             
-    u = list(set(x))   ## remove duplicates
-    u.sort()
+    u = sorted(set(x))   ## remove duplicates
     nu = len(u)
     minx = min(u)
     maxx = max(u)
@@ -104,19 +104,19 @@ def plotter(sampler):
     ana = MCMC.chain_analyze(sampler.samples[(ntot//5)::stride,:], params=params)
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
-    print sampler.fmtstring % tuple(ana[0])
-    print sampler.fmtstring % tuple(ana[1])
-    print ana[2]
+    print(sampler.fmtstring % tuple(ana[0]))
+    print(sampler.fmtstring % tuple(ana[1]))
+    print(ana[2])
         
     plt.cla()
     #for d in data: plotMod(d, vals, mod)
     try:
         plotMod(data[0], vals, mod)
     except DataSizeError:
-        print 'Data too big: Cannot plot results for this data'
+        print('Data too big: Cannot plot results for this data')
     except:
-        print 'Unknown error: Cannot plot results for this data:'
-        print sys.exc_info()[0]
+        print('Unknown error: Cannot plot results for this data:')
+        print(sys.exc_info()[0])
         raise
 
 
@@ -148,14 +148,14 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
 
     mod.setxyRange(xyrange, scale=rangeScale)    ## class variables: sets the prior for all instances
     mod.sigMin, mod.sigMax=sigminmax
-    print 'setting sigMin, sigMax=', mod.sigMin, mod.sigMax
+    print('setting sigMin, sigMax=', mod.sigMin, mod.sigMax)
 
     dx = (mod.centerMin[0],mod.centerMax[0])
     dy = (mod.centerMin[1],mod.centerMax[1])
     delx = dx[1]-dx[0]
     dely = dy[1]-dy[0]
 
-    print 'center min, max=', mod.centerMin, mod.centerMax
+    print('center min, max=', mod.centerMin, mod.centerMax)
 
 
 ### set initial width and location of proposal
@@ -178,7 +178,7 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
  #                    (uniform(0,delx)/5, uniform(0,dely)/5),
  #                    uniform(0,math.pi/2) )
 
-    print "averaging over all data for starting point"
+    print("averaging over all data for starting point")
     #stats = data[0].stats(sigcut=None, do_abs=False)
     stats = data[0].stats(sigcut=0.0)
 
@@ -219,8 +219,8 @@ def setup_sampler(data, xyrange, useNormalizedBeam=False ,
    #     mod.paramBlocks = [0,1,2,3,4,5]      ## no offset, no grad
    #     mod.nBlock = 6
 
-    print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
-    print ("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas))
+    print(("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params)))
+    print(("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas)))
 
     ### needs to
     return like, prop_sigmas, start_params
@@ -270,7 +270,7 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
     
     #plotter = None
     #print "not using plotter for now"
-    if operator.isNumberType(nMC):
+    if isinstance(nMC, numbers.Number):
          nMC = (nMC, nMC)
              
     if plotRes is None:
@@ -290,7 +290,7 @@ def sample1beam(like,  prop_sigmas, start_params, nMC=(1000,1000),
 def plotMod_OLD(data, params=None, model=None, hold=False):
     """ plot the data with params 
     actually, doesn't use the model parameter"""
-    print "in plotMod; returning right away."
+    print("in plotMod; returning right away.")
     return
     x, y, d = regrid(data.x, data.y, data.d)
     ### make full 2d x, y arrays (there's probably a more clever way to do this!)

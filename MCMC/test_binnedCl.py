@@ -1,5 +1,5 @@
-from __future__ import division
-from __future__ import with_statement
+
+
 
 import math
 import string
@@ -7,12 +7,12 @@ import os.path
 
 import pylab
 import astropy.io.fits as pyfits
-import MCMC
-import getdist_ahj
-from binnedCl.binnedClLikelihood import binnedClLikelihood
-from binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat, fitOffsetLognormal
-from ClData import ClData
-from ClData.readbins import readbins
+from . import MCMC
+from . import getdist_ahj
+from .binnedCl.binnedClLikelihood import binnedClLikelihood
+from .binnedCl.binnedClModel import binnedClModel, FisherWindows, plotcorrmat, fitOffsetLognormal
+from .ClData import ClData
+from .ClData.readbins import readbins
 
 from pylab import *
 
@@ -162,10 +162,10 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
     ell = [array(b).mean(axis=1) for b in bins]
 
     #ell = [(b[0]+b[1])/2 for b in bins]
-    print 'bins:'
-    print ell
+    print('bins:')
+    print(ell)
     
-    print mod.nbins
+    print(mod.nbins)
     
     like = binnedClLikelihood(data=data, model=mod)
     
@@ -224,11 +224,11 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
             with open(prefix+suf, "w") as f:
                 if get_x:
                     for ell1, mean1, stdv1 in zip(es, ms, ss):
-                        print >> f, ell1, mean1, stdv1, stdv1, x[ibin]   ## check that x is in tt, te, ee order
+                        print(ell1, mean1, stdv1, stdv1, x[ibin], file=f)   ## check that x is in tt, te, ee order
                         ibin += 1
                 else:
                     for ell1, mean1, stdv1 in zip(es, ms, ss):
-                        print >> f, ell1, mean1, stdv1, stdv1
+                        print(ell1, mean1, stdv1, stdv1, file=f)
                 
         with open(prefix+".covar", "w") as f:
             N.savetxt(f, Clcovar, fmt="%f")
@@ -239,7 +239,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         for ibin, win in enumerate(WBl):
             with open(prefix+str(ibin+1), "w") as f:
                 for l, Wl in enumerate(win.T):
-                    print >> f, l, Wl[0], Wl[1], Wl[2]
+                    print(l, Wl[0], Wl[1], Wl[2], file=f)
                     
                 
     if gridPlot:
@@ -260,7 +260,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
 
     for l, m, e in zip(ell, mean, stdv):
         for l1, m1, s1 in zip(l, m, e):
-            print '%d %f %f' % (int(l1),m1,s1)       
+            print('%d %f %f' % (int(l1),m1,s1))       
 
     ## split this off into mod.plotWin?
     nspec = len(bins)
@@ -272,7 +272,7 @@ def main(nMC=(1000,), gridPlot=True, testshape=True, no_pol=False, data=None, bi
         if nr*nc<len(binlist): nc+=1
         for ipanel, bin in enumerate(binlist): ## loop over panels
             pylab.subplot(nr, nc, ipanel+1)
-            for ispec in xrange(nspec):  ## loop over spectrum types 
+            for ispec in range(nspec):  ## loop over spectrum types 
                 plot(WBl[iwin, ispec])
             axvspan(bin[0], bin[1],  facecolor='g', alpha=0.25)
             axhline(0, color='k')
@@ -313,9 +313,9 @@ def plotter(sampler):
     #sigs = sigs*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
 
 
-    print vals  #sampler.like.model.fmtstring % tuple(ana[0])
-    print sigs  #sampler.like.model.fmtstring % tuple(ana[1])
-    print ana[2]
+    print(vals)  #sampler.like.model.fmtstring % tuple(ana[0])
+    print(sigs)  #sampler.like.model.fmtstring % tuple(ana[1])
+    print(ana[2])
     
 
     ### or replace with mod.plotmod if written...
@@ -417,14 +417,14 @@ def getlike(ibins=[1], data=None):
         start_params = ones(shape=(npar,), dtype=float64)
         prop_sigmas = zeros(shape=(npar,), dtype=float64) + 0.5
     
-    print 'Start:'
-    print start_params
+    print('Start:')
+    print(start_params)
 
     mod.setBinning(bins, shapefun=shape)
 
     ell = [(b[0]+b[1])/2 for b in bins]
-    print 'bins:'
-    print ell
+    print('bins:')
+    print(ell)
     
     like = binnedClLikelihood(data=data, model=mod)
     
@@ -444,7 +444,7 @@ def getlike(ibins=[1], data=None):
         likearr = exp(lnlikearr)
 
         avg = (bps*likearr).sum()/likearr.sum()
-        print '<par>=%f' % (avg)
+        print('<par>=%f' % (avg))
         
     
     return data, like, likearr

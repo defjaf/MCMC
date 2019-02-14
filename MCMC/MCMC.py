@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 ##### PROBLEM
 
@@ -39,7 +39,7 @@ from numpy.linalg import LinAlgError
 from numpy import empty, isnan, isfinite, isneginf, isinf
 import numpy as np
 
-from Likelihood import ZeroPosterior
+from .Likelihood import ZeroPosterior
 
 ### assumes likelihood > 0 (so use lnLike) but prior can be 0 (so call
 ### directly from model)
@@ -124,10 +124,10 @@ class MCMC(object):
             try:
                 self.setStart(startParams)
             except ZeroPriorError:
-                print "Can't start at", startParams, ": prior = 0"
+                print("Can't start at", startParams, ": prior = 0")
                 return
             except ZeroPosterior:
-                print "Can't start at", startParams, ": posterior = 0"
+                print("Can't start at", startParams, ": posterior = 0")
                 return
             
             if nMC>0:
@@ -159,7 +159,7 @@ class MCMC(object):
                 i_restart += 1
                 
             if i_restart>1 and verbose:
-                print "Number of prior resamples: %d" % i_restart
+                print("Number of prior resamples: %d" % i_restart)
                 
         params = newparams
         self.samples[0] = paramarr
@@ -206,7 +206,7 @@ class MCMC(object):
         newaccepted = empty(shape=nMC, dtype=bool8)
 
         with finishing(ProgressBar().start()) as pbar:
-            for i in xrange(nMC):  ## do with comprehension?
+            for i in range(nMC):  ## do with comprehension?
                 samples, newlnPr[i], newaccepted[i], derived = self.sample()
                 if self.nDerived:
                     newDerived[i] = derived
@@ -291,7 +291,7 @@ class MCMC(object):
         """ mean of the chain, with optional burn and stride (thinning)
         """
         
-        params = range(self.nparams)
+        params = list(range(self.nparams))
         self.means = [
             self.samples[burn::stride,i].mean() for i in params ]
         return self.like.model.package(self.means)
@@ -299,7 +299,7 @@ class MCMC(object):
     def stdev(self, burn=0, stride=1):
         """ std deviation of the chain, with optional burn and stride (thinning)
         """
-        params = range(self.nparams)
+        params = list(range(self.nparams))
         chain = self.samples[burn::stride]
         #nsamp = chain.shape[0]   ##nsamp = (chain.shape[0]-burn)//stride  WRONG
         self.stdevs = [ chain[:,i].std() for i in params ]
@@ -313,7 +313,7 @@ class MCMC(object):
             only calculate for sequence of params if not None
               (in which case returned matrix is just the appropriate submatrix)
         """
-        if params is None: params = range(self.nparams)
+        if params is None: params = list(range(self.nparams))
         
         ## nb, mean(), stdev() calculated on *all* params, even if 'fixed'
         ##   (so have the same index i as chain[:,i])
@@ -368,7 +368,7 @@ class MCMC(object):
         try:
             covar = self.covar(burn, stride, params=params)
         except ZeroDivisionError:
-            print "newMCMC: ZeroDivisionError"
+            print("newMCMC: ZeroDivisionError")
             ### want to allow stdev=0 for fixed parameters!
             pstdev = self.like.model.unpackage(stdevs)
             pstdev[stdevs<=0.0] = 1.e-4
@@ -395,11 +395,11 @@ class MCMC(object):
             ## only makes sense for gaussian-like proposal densities
                 pass
             except LinAlgError:
-                print 'uh oh: non-positive matrix'
+                print('uh oh: non-positive matrix')
                 newSampler.prop.setNormalizedMatrix(covar+identity(npar)*0.01)
             except:
-                print "shouldn't be here; matrix is:"
-                print covar
+                print("shouldn't be here; matrix is:")
+                print(covar)
                 raise
         
             
@@ -460,7 +460,7 @@ def chain_analyze(chain, params=None):
     
     n = chain.shape[1]
     
-    if params is None: params = range(n)
+    if params is None: params = list(range(n))
     np = len(params)
     
     nsamp = chain.shape[0]
@@ -522,14 +522,14 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
         
         while True:
             new_s.MC_append(nMC1)
-            print "done with chain %d. naccept=%d/%d (%f)" % (
-                    isamp, new_s.naccept, len(new_s.samples), new_s.naccept/len(new_s.samples))
+            print("done with chain %d. naccept=%d/%d (%f)" % (
+                    isamp, new_s.naccept, len(new_s.samples), new_s.naccept/len(new_s.samples)))
             if new_s.doBlock:
-                print "per block: ", new_s.accept
+                print("per block: ", new_s.accept)
             
             if new_s.naccept < 10:
                 noCorr1 = True
-                print "Not using correlations"
+                print("Not using correlations")
             else:
                 noCorr1 = noCorrelations
             
@@ -545,7 +545,7 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
                 means = array(ana[0])[params]
                 stdvs = array(ana[1])[params]
             except ZeroDivisionError:
-                print 'ZeroDivisionError; resampling'
+                print('ZeroDivisionError; resampling')
                 continue
             
             #check for very small variance...
@@ -553,16 +553,16 @@ def sampler(like, nMC, prop_sigmas, start_params, plotter=None, fac=None,
             with np.errstate(invalid='raise'):
                 try:
                     if max(stdvs/means) < eps:
-                        print 'small relative variance; resampling'
+                        print('small relative variance; resampling')
                         nresample += 1
                         if nresample > nresample_max: 
-                            print 'reached max resample limit: breaking out of loop'
+                            print('reached max resample limit: breaking out of loop')
                             break
                         continue
                 except (ZeroDivisionError, FloatingPointError):
                     idx = abs(means)<1.e-11
                     if max(stdvs[idx]) < eps:
-                        print 'small absolute variance; continuing'
+                        print('small absolute variance; continuing')
                         continue
             
             

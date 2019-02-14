@@ -1,11 +1,11 @@
-from __future__ import division
+
 
 import numarray
 from numarray.random_array import uniform
 
-import MCMC
-import Likelihood
-from BeamFit import BeamModel, BeamData
+from . import MCMC
+from . import Likelihood
+from .BeamFit import BeamModel, BeamData
 import math
 
 def main(nMC=1000):
@@ -33,28 +33,28 @@ def main(nMC=1000):
     sampler = MCMC.MCMC(like, startProposal=prop_sigmas, nMC=nMC,
                         startParams=start_params)
 
-    print "done with first chain. naccept=", sampler.naccept
+    print("done with first chain. naccept=", sampler.naccept)
 
     stride = nMC//sampler.naccept
     ana = MCMC.chain_analyze(sampler.samples[(nMC//5)::stride,:])
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
-    print vals
-    print sigs
-    print ana[2]
+    print(vals)
+    print(sigs)
+    print(ana[2])
     
     sampler2 = sampler.newMCMC(burn=nMC//5, stride=stride, nMC=nMC, fac=0.1)
     
-    print "done with second chain. naccept=", sampler2.naccept
+    print("done with second chain. naccept=", sampler2.naccept)
 
     stride = nMC//sampler2.naccept
     an2 = MCMC.chain_analyze(sampler2.samples[(nMC//10)::stride,:])
     val2 = sampler2.like.model.package(an2[0])
     sig2 = sampler2.like.model.package(an2[1])
     
-    print val2
-    print sig2
-    print an2[2]
+    print(val2)
+    print(sig2)
+    print(an2[2])
         
     numarray.Error.popMode()
     return sampler, sampler2

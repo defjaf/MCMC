@@ -8,7 +8,7 @@ should split this file into generic MCMC/pystan/getdist functions and very speci
 
 """
 
-from __future__ import print_function
+
 
 import warnings
 import csv
@@ -18,7 +18,7 @@ import itertools
 
 ## python 2/3 compatibility
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 import gzip
@@ -37,7 +37,7 @@ import getdist.plots
 
 sys.path.append(os.environ['HOME']+'/home/proj/stats/MCMC')
 
-import model     ## needed for plotting SED models (duplicates some STAN code)
+from . import model     ## needed for plotting SED models (duplicates some STAN code)
 
 # convert from my MCMC/subMM data format to pystan
 def makeStanDict(dobj, N_comp=2):
@@ -165,7 +165,7 @@ def table2csv(fil, table, names=None):
     with open(fil, 'wb') as f:
         fw = csv.writer(f)
         fw.writerow(("object",) + table.dtype.names )
-        for obj, row in itertools.izip_longest(names, table):
+        for obj, row in itertools.zip_longest(names, table):
             fw.writerow( [obj,] + [r for r in row] )
             
             
@@ -239,11 +239,11 @@ def pystan_postprocess_SED_plot(allfits, label=""):
 def pystan_postprocess_csv(allfits, dat, label="DLC_"):
     """ convert pystan submm sed output to csv -- specific to greybody models """
 
-    obj_names = dat.keys()
+    obj_names = list(dat.keys())
 
     modnames = ["1comp","2comp","1compb2","2compb2","thick"]
     for i, mod in enumerate(modnames):
-        f = [a[i] for a in allfits.values()]
+        f = [a[i] for a in list(allfits.values())]
         fname = label + mod + ".csv"
         ptab = pystan2table(f)
         table2csv(fname, ptab, obj_names)

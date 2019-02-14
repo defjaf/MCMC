@@ -9,7 +9,7 @@
  mar 06: assumed gzipped data
 """
 
-from __future__ import division
+
 
 from numpy import float64, sqrt, log, sum, zeros, arange, where, empty, int32
 from gzip import open as gzopen
@@ -48,18 +48,18 @@ jxl2 = empty(shape=(num_diag_TE), dtype=int32)
 def WMAP_init_TT (clFile, offDiag):
 
     fp = gzopen(clFile)
-    for l in xrange(2, WMAP_lmax_TT+1):
+    for l in range(2, WMAP_lmax_TT+1):
         line = fp.readline().split()
         try:
             if len(line):
                 cl_data[l], neff[l], fskyeff[l] = [float(e) for e in line[1:4]]
         except:
-            print 'wmap_init_tt:', l, line
+            print('wmap_init_tt:', l, line)
 
     ix = 0
     fp = gzopen(offDiag)
-    for l in xrange(2, WMAP_lmax_TT+1):
-        for ll in xrange(l+1, WMAP_lmax_TT+1):
+    for l in range(2, WMAP_lmax_TT+1):
+        for ll in range(l+1, WMAP_lmax_TT+1):
             line = fp.readline().split()
             if len(line):
                 i, j = int(line[0]), int(line[1])
@@ -76,15 +76,15 @@ def WMAP_init_TT (clFile, offDiag):
 def WMAP_init_TE (clFile, offDiag):
 
     fp = gzopen(clFile)
-    for l in xrange(2, WMAP_lmax_TE+1):
+    for l in range(2, WMAP_lmax_TE+1):
         line = fp.readline().split()
         if len(line):
             te_data[l], te_tt[l], ntt[l], nee[l] =[float(e) for e in line[1:5]]
 
     ix = 0
     fp = gzopen(offDiag)
-    for l in xrange(2, WMAP_lmax_TE+1):
-        for ll in xrange(l+1, WMAP_lmax_TE_file+1):
+    for l in range(2, WMAP_lmax_TE+1):
+        for ll in range(l+1, WMAP_lmax_TE_file+1):
             line = fp.readline().split()
             if len(line):
                 i, j = int(line[0]), int(line[1])

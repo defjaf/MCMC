@@ -1,4 +1,4 @@
-import cPickle
+import pickle
 import numpy
 import pylab
 
@@ -8,11 +8,11 @@ def test(write=True,asarray=False):
     
     if write:
         f1 = file("a.cpkl", 'w')
-        cPickle.dump(a, f1)
+        pickle.dump(a, f1)
         f1.close()
         
     f1 = open("a.cpkl", 'r')
-    a1 = cPickle.load(f1)
+    a1 = pickle.load(f1)
     f1.close()
             
     pylab.subplot(1,2,1)

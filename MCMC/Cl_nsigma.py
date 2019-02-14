@@ -3,10 +3,10 @@ module to calculate and plot the number of sigma for CMB data points
 with respect to some model
 """
 
-from __future__ import division
-from __future__ import with_statement
 
-from ClData import ClData
+
+
+from .ClData import ClData
 import string
 import os.path
 import math
@@ -21,12 +21,12 @@ def Cl_nsigma(WMAP=False, filename = filename, lmin=0,lmax=1500):
 
     names = {}
     namef = "data_names.txt"
-    print "NAMES:"
+    print("NAMES:")
     with open(namef, "r") as f:
         for line in f:
             name, fil = string.split(line)
             names[fil]=name
-            print fil, names[fil]
+            print(fil, names[fil])
     
     
     mapdir = 'cmb/misc-data/MAP/'
@@ -87,7 +87,7 @@ def Cl_nsigma(WMAP=False, filename = filename, lmin=0,lmax=1500):
             lab=names[set.name]
         except:
             lab=set.name
-        print lab, set.name
+        print(lab, set.name)
         plot(ell1[lidx], diffs[lidx], colorstring[iset%ncol]+symstring[iset//ncol], label=lab)
 
     # ### this only works for the current ordering (WMAP first)
@@ -108,7 +108,7 @@ def Cl_nsigma(WMAP=False, filename = filename, lmin=0,lmax=1500):
     m = nsig.mean()
     v = (nsig**2).mean() - m**2
 
-    print '%f +- %f' % (m, sqrt(v))
+    print('%f +- %f' % (m, sqrt(v)))
     gauss = max(hi[0])*exp(-0.5 * (hi[1]-m)**2/v)
     plot(hi[1], gauss)
 

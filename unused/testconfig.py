@@ -1,9 +1,9 @@
-import ConfigParser, os, string
+import configparser, os, string
 
 
 def tc():
     
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
 #    config.readfp(open(os.path.expanduser('~/cmb/cosmomc/data/CBI.dataset')))
     config.read('~/cmb/cosmomc/data/CBI.dataset')
     return config

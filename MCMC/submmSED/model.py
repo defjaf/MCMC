@@ -1,6 +1,6 @@
 
-from __future__ import division
-from __future__ import print_function
+
+
 
 import math
 
@@ -140,7 +140,7 @@ class submmModel2(object):
 
     nparam = 4
     fmtstring = "%.3f "*4
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\beta_1$", r"$T_1$", r"$\beta_2$", r"$T_2$"]
 
@@ -222,7 +222,7 @@ class submmModel1(object):
 
     nparam = 2
     fmtstring = "%.3f "*2
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\beta$", "$T$"]
 
@@ -289,7 +289,7 @@ class submmModel_ratio(object):
     
     nparam = 5
     fmtstring = "%.3f "*5
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     
     def __init__(self, b1, T1, b2, T2, r12):
@@ -367,7 +367,7 @@ class submmModel2_normalized(object):
 
     nparam = 6
     fmtstring = "%.3f "*6
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A_1$", r"$\beta_1$", r"$T_1$", r"$A_2$", r"$\beta_2$", r"$T_2$"]
 
@@ -533,7 +533,7 @@ class submmModel1_normalized(submmModel2_normalized):
 
     nparam = 3
     fmtstring = "%.3f "*3
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A$", r"$\beta$", r"$T$"]
     
@@ -632,7 +632,7 @@ class submmModel1_opticallythick(submmModel1_normalized):
 
     nparam = 4   # A, b, T, nu_0
     fmtstring = "%.3f "*nparam
-    paramBlocks = range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks = list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     nu_rescale = 1000.0   ### rescale so O(1)
@@ -714,7 +714,7 @@ class submmModel1_opticallythick_logA(submmModel1_normalized):
 
     nparam = 4   # A, b, T, [nu_0?]
     fmtstring = "%.3f "*nparam
-    paramBlocks =  range(nparam) if singleParams else zeros(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam)) if singleParams else zeros(nparam)    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"log $A$", r"$\beta$", r"$T$", r"$\nu_0$"]
     nu_rescale = 1000.0   ### rescale so O(1)

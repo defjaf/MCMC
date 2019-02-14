@@ -1,4 +1,4 @@
-from __future__ import division
+
 from .. import Likelihood
 
 # requires the Cl_model_class.__call__(self) return Cl[ell, 0:3]

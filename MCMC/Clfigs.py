@@ -7,7 +7,7 @@ Created by Andrew Jaffe on 2008-05-03.
 Copyright (c) 2008 __MyCompanyName__. All rights reserved.
 """
 
-from __future__ import with_statement
+
 
 import sys
 import os
@@ -57,7 +57,7 @@ def figs(rel=True, single=False, wmap=False):
                 C[-1][:] /= llClTT[l[-1]]
                 e[-1][:] /= llClTT[l[-1]]
                 chi2.append((((C[-1]-1)/e[-1])**2).mean())
-                print labels[i]+":", chi2[-1]
+                print(labels[i]+":", chi2[-1])
                 lab = "%s [%4.2f]" % (labels[i],chi2[-1])
             else:
                 lab = labels[i]

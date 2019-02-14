@@ -16,7 +16,7 @@
 ## changed: init can now accept 'setup' parameters (maybe should do with metaclass?)
 ## so may need to setparams() rather than just __init__ in Likelihood
 
-from __future__ import division
+
 
 from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
@@ -26,7 +26,7 @@ from .. import Proposal
 separate_sigma12 = False
 
 if separate_sigma12:
-    print "requiring sigma1>sigma2 in prior"
+    print("requiring sigma1>sigma2 in prior")
 
 
 class GaussianBeamModel2D(object):

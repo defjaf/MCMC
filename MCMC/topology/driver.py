@@ -1,20 +1,20 @@
-from __future__ import division
+
 
 import math
 import string
 import os.path
-import cPickle
+import pickle
 
 import pylab
 import MCMC
 import getdist_ahj
 
-import topo_model
-from topo_likelihood import topo_likelihood
-from likelihood.likico import likico
-from likelihood.likoct import likoct
-from likelihood.likdih import likdih
-from likelihood.liktetr import liktetr
+from . import topo_model
+from .topo_likelihood import topo_likelihood
+from .likelihood.likico import likico
+from .likelihood.likoct import likoct
+from .likelihood.likdih import likdih
+from .likelihood.liktetr import liktetr
 
 from numpy.random import uniform
 from numpy import arange, array, float64, transpose, zeros, ones, where, nonzero
@@ -40,7 +40,7 @@ def test(modname='ico', almfile=None):
         #    almfile = "wmapalm.dat\0"
         almfile = "alm3yrall.dat\0"
     
-    print 'using datdir=%s' % datdir
+    print('using datdir=%s' % datdir)
     likfun = lik[modname].alikelihood
     
     lik[modname].readdata(numpy.array(datdir), numpy.array(almfile))
@@ -60,9 +60,9 @@ def test(modname='ico', almfile=None):
         try:
             like = likfun(1.0,hub,alpha,beta,gamma)
         except:
-            print 'likelihood failure at alpha, hub=', alpha, hub
+            print('likelihood failure at alpha, hub=', alpha, hub)
         a+= [alpha]; h+=[hub]; l+=[like]
-        print  alpha, hub, like
+        print(alpha, hub, like)
     
     if not noplot:
         pylab.plot(h,l)
@@ -87,7 +87,7 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
                            topo=topo)
     npar = 5
     
-    print "Using likelihood: %s" % like.topo
+    print("Using likelihood: %s" % like.topo)
     
     doBlock=True
     
@@ -105,12 +105,12 @@ def main(nMC=(100, 300, 1000), noCorrelations=True, fac=None, doBlock=True,
     mod.nBlock = 5
     
     if doSim:
-        print "Assuming simulation amplitude ~ 1"
+        print("Assuming simulation amplitude ~ 1")
         start_params=(1.0, (0.0,0.0,0.0), H0_start)
         prop_sigmas = (0.3, (0.5, 0.5, 0.5), 2.0)
     
-    print ("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params))
-    print ("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas))
+    print(("Starting point:  " + mod.fmtstring) % tuple(mod.unpackage(start_params)))
+    print(("Starting sigmas: " + mod.fmtstring) % tuple(mod.unpackage(prop_sigmas)))
     
     res, ana = MCMC.sampler(like, nMC, prop_sigmas, start_params,
                         plotter=plotter, fac=fac,
@@ -143,9 +143,9 @@ def plotter(sampler):
     ana = MCMC.chain_analyze(sampler.samples[(ntot//5)::stride,:], params=params)
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
-    print vals  #sampler.like.model.fmtstring % tuple(ana[0])
-    print sigs  #sampler.like.model.fmtstring % tuple(ana[1])
-    print ana[2]
+    print(vals)  #sampler.like.model.fmtstring % tuple(ana[0])
+    print(sigs)  #sampler.like.model.fmtstring % tuple(ana[1])
+    print(ana[2])
 
 def doall(nMC=(100,500,10000), file='wmap06res_10000.pickle'):
     
@@ -154,7 +154,7 @@ def doall(nMC=(100,500,10000), file='wmap06res_10000.pickle'):
         res[x] = main(almfile='alm3yrall.dat\0', nMC=nMC, topo=x, fig=10*i)
     
     pkl = open(file, 'w')
-    cPickle.dump(res, pkl);
+    pickle.dump(res, pkl);
     pkl.close()
     
     return res
@@ -162,12 +162,12 @@ def doall(nMC=(100,500,10000), file='wmap06res_10000.pickle'):
 def plotall(picklefile, pre='', suff='', save=True):
     
     fp = open(picklefile)
-    allres = cPickle.load(fp)
+    allres = pickle.load(fp)
     fp.close()
     
-    for i, (name, res)  in enumerate(allres.iteritems()):
+    for i, (name, res)  in enumerate(allres.items()):
         pylab.figure(i)
-        print name
+        print(name)
         getdist_ahj.histgrid(res[0][-1])
         if save:
             pylab.savefig(pre+name+suff+'.png')

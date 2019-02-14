@@ -1,6 +1,6 @@
 # subclasses for Gaussian, correlated gaussian,  offset-ln, WMAP, etc.?
 # how to make the product of multiple datasets automatic?
-from __future__ import division
+
 
 import Likelihood
 

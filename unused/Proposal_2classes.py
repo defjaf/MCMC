@@ -1,4 +1,4 @@
-from __future__ import division
+
 from numarray.random_array import normal
 from numarray import matrixmultiply
 import numarray.linear_algebra as la

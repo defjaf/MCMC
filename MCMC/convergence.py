@@ -25,11 +25,11 @@ def gelmanrubin(chains_complete, burn=0, thin=1, verbose=False):
     assert all(np == n_param for np in n_params[1:])
     
     if verbose:
-        print "n_chain = %d" % n_chain
-        print "n_param = %d" % n_param
-        print "n_samples = ", n_samples
+        print("n_chain = %d" % n_chain)
+        print("n_param = %d" % n_param)
+        print("n_samples = ", n_samples)
     
-        print "Burn-in fraction = %f; thinning = %d" % (burn, thin)
+        print("Burn-in fraction = %f; thinning = %d" % (burn, thin))
     
     chains = [c[burn::stride] for c, ns in zip(chains_complete, n_samples)]
         

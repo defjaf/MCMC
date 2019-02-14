@@ -1,6 +1,6 @@
 # need a different class for correlated gaussian data?
 
-from __future__ import division
+
 
 from numpy import asarray, float64, log, dot, transpose
 

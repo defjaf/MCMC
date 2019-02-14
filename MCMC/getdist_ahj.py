@@ -9,8 +9,8 @@ instance of class MCMC.MCMC or a shape=(nsamples, nparams) array of samples
 
 ### AHJ: April 2014: add min chi2 and prob check
 
-from __future__ import division
-from __future__ import print_function
+
+
 
 import sys
 import os
@@ -64,7 +64,7 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
         print(maxLikeParams)
 
     if params is None:
-        params=xrange(s.shape[1])
+        params=range(s.shape[1])
     
     for param,ML in zip(params, maxLikeParams):
         s1 = s.T[param]
@@ -119,7 +119,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
 
     if params is None:
         npar = s.shape[1]
-        params=xrange(npar)
+        params=range(npar)
     else:
         npar=len(params)
 
@@ -131,7 +131,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
         else:
             ncol = int(npar/nrow+1)
         
-    for ip in xrange(npar):
+    for ip in range(npar):
         plt.subplot(nrow, ncol, ip+1)   ### 1...n instead of 0...n-1!
         hist(s, ip, nbins=nbins, orientation=orientation)
     
@@ -211,7 +211,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         #     npar = len(params)
         # except AttributeError:            
             npar = s.shape[1]
-            params=xrange(npar)
+            params=range(npar)
     else:
         npar=len(params)
 

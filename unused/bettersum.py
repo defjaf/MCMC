@@ -24,10 +24,10 @@ def lsum(iterable):
     # Adjust (tmant,texp) and (mant,exp) to make texp the common exponent.
     # Given a common exponent, the mantissas can be summed directly.
 
-    tmant, texp = 0L, 0
+    tmant, texp = 0, 0
     for x in iterable:
         mant, exp = frexp(x)
-        mant, exp = long(mant * 2.0 ** 53), exp-53
+        mant, exp = int(mant * 2.0 ** 53), exp-53
         if texp < exp:
             mant <<= exp - texp
         elif texp > exp:
@@ -51,7 +51,7 @@ def dsum(iterable):
     for x in iterable:
         mant, exp = frexp(x)
         mant, exp = int(mant * 2.0 ** 53), exp-53
-        while 1:
+        while True:
             try:
                 newtotal = total + mant * Decimal(2) ** exp
             except Inexact:
@@ -65,17 +65,17 @@ def dsum(iterable):
 from random import random, normalvariate, shuffle
 
 def test(nvals):
-    for j in xrange(1000):
+    for j in range(1000):
         vals = [7, 1e100, -7, -1e100, -9e-20, 8e-20] * 10
         s = 0
-        for i in xrange(nvals):
+        for i in range(nvals):
             v = normalvariate(0, random())**7 - s
             s += v
             vals.append(v)
         shuffle(vals)
         assert msum(vals) == lsum(vals) == dsum(vals)
-        print '.',
-    print 'Tests Passed'
+        print('.', end=' ')
+    print('Tests Passed')
 
 if __name__ == '__main__':
     test(200)

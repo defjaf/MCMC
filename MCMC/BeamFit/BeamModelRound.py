@@ -1,11 +1,11 @@
 ## changed: init can now accept 'setup' parameters (maybe should do with metaclass?)
 ## so may need to setparams() rather than just __init__ in Likelihood
 
-from __future__ import division
+
 from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
 from .. import Proposal
-import BeamModel
+from . import BeamModel
 
 class GaussianBeamModelRound(BeamModel.GaussianBeamModel2D):
     """

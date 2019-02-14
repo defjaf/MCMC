@@ -1,4 +1,4 @@
-from __future__ import division
+
 from numpy import asarray, float64, log
 from numpy.random_array import uniform, normal   #check
 

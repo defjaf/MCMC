@@ -16,7 +16,7 @@ import os
 
 import numpy as np
 
-from model import totalflux
+from .model import totalflux
 
 speedOfLight = 299792.  ## micron GHz
 nu2, nu1 = speedOfLight/8.0, speedOfLight/1000.0 ### rest-frame microns -> GHz
@@ -71,12 +71,12 @@ coldnames = [
 def getratios(coldnames=coldnames):
     tab, flux_ML, flux_mean, ratio_ML, ratio_mean = rp("figs_Planckfinal/next0_model0.npy")
     
-    print ('name', 'mean logA0', 'mean T0', 'mean logA1', 'mean T1','ML logA0', 'ML T0', 'ML logA1', 'ML T1', 
-           'mean flux0', 'mean flux1',  'ML flux0', 'ML flux1', 'mean ratio', 'ML ratio')
+    print(('name', 'mean logA0', 'mean T0', 'mean logA1', 'mean T1','ML logA0', 'ML T0', 'ML logA1', 'ML T1', 
+           'mean flux0', 'mean flux1',  'ML flux0', 'ML flux1', 'mean ratio', 'ML ratio'))
     for c in coldnames:
         idx = np.where(tab['name']==c)[0]
         lin = np.hstack( ((c,), tab['mean'][idx][0], tab['ML'][idx][0],flux_mean[idx][0], flux_ML[idx][0], ratio_mean[idx][0], ratio_ML[idx][0]) )
-        print lin
+        print(lin)
     
 
 if __name__ == '__main__':

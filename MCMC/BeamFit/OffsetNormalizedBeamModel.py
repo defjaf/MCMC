@@ -12,7 +12,7 @@
 ## NB. MCMC.py & Proposal.py have been modified to allow 'fixed' parameters via
 ##     sigma=0 proposal density
 
-from __future__ import division
+
 
 from numpy import array, exp, asarray, cos, sin, sqrt, float64, fabs
 import math
@@ -22,11 +22,11 @@ from .. import Proposal
 use_xy = False ## True doesn't work yet???
 
 if use_xy:
-    from BeamModel import GaussianBeamModel2D_xy as G2D
-    print "Using sigma_x, sigma_y, rho params"
+    from .BeamModel import GaussianBeamModel2D_xy as G2D
+    print("Using sigma_x, sigma_y, rho params")
 else:
-    from BeamModel import GaussianBeamModel2D as G2D
-    print "Using, sigma_1, sigma_2, angle params"
+    from .BeamModel import GaussianBeamModel2D as G2D
+    print("Using, sigma_1, sigma_2, angle params")
 
 class OffsetNormalizedBeamModel(G2D):
     """

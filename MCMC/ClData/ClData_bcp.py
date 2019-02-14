@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 import os.path
 import math
@@ -9,8 +9,8 @@ from numpy import (array, exp, log, transpose, zeros, ones,
                    int32, float64, bool8, empty, concatenate)
 import numpy.linalg as la
 
-import ClData_CosmoMC
-from ClData_CosmoMC import num_cls, lmax
+from . import ClData_CosmoMC
+from .ClData_CosmoMC import num_cls, lmax
 
 class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
     """
@@ -114,13 +114,13 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
 
         self.Clpol_idx = {}
         
-        inpol = [k for k in xrange(6) if npol[k]!=0]
+        inpol = [k for k in range(6) if npol[k]!=0]
         ## maps from all 6 polz types to the ones actually present
         for k in inpol:
             ch_type = fp.readline().strip()[0:2]
             self.Clpol_idx[ch_type] = [use_i, use_i]
-            print '  ch_type=%s' % ch_type
-            for i in xrange(npol[k]):
+            print('  ch_type=%s' % ch_type)
+            for i in range(npol[k]):
                 line = fp.readline().split()
                 if i>=minmax[0,k] and i<=minmax[1,k]:
                     self.Clpol_idx[ch_type][1] += 1
@@ -142,7 +142,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
                 file_i += 1     ## (inside 'for i') 
                 
             ## discard the correlation matrix
-            for i in xrange(npol[k]):
+            for i in range(npol[k]):
                 fp.readline()
 
         self.has_corr_errors = True
@@ -160,7 +160,7 @@ class ClData_bcp(ClData_CosmoMC.ClData_CosmoMC):
                 #print "Possible syntax error; ignoring line:", line.strip()
             
         if nignore:
-            print "Ignored %d lines." % nignore
+            print("Ignored %d lines." % nignore)
 
         tmp_lis = concatenate(tmp_lis)
         tmp_mat=array(tmp_lis).copy()

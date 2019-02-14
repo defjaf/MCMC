@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 """ 
     read and process TOI data from Planck (based on original from MAXIPOL
@@ -25,8 +25,8 @@ from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace
                    arange, asarray, sqrt, minimum, maximum, logical_and, empty)
 from numpy import concatenate as cat
 
-from BeamData import BeamData
-from ProcessBeamData import setup_sampler, sample1beam, plotter
+from .BeamData import BeamData
+from .ProcessBeamData import setup_sampler, sample1beam, plotter
 from .. import getdist_ahj
 
 sigminmax=[0,10]
@@ -43,7 +43,7 @@ def read_data_Planck_TOI(files=None, sigma=None):
     
         if sigma is None:
             sigma_white = np.std(img)
-            print "%s: setting sigma=%f" % (fset,sigma_white)
+            print("%s: setting sigma=%f" % (fset,sigma_white))
         else:
             sigma_white = sigma
 
@@ -64,8 +64,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     run the sampler nruns times 
     """
     
-    iters = range(1,3)
-    MCs = range(20)
+    iters = list(range(1,3))
+    MCs = list(range(20))
     
     fdir = os.path.expanduser("~/FPtesting/Beams/TOIs/")
     files = ["model_10_143_5.dat", "model_84_217_4.dat"]
@@ -81,7 +81,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
             for it in iters:
                 for MC in MCs:
                     ib += 1
-                    print 'file: %s, iter: %d, MC: %d' % (f, it, MC)
+                    print('file: %s, iter: %d, MC: %d' % (f, it, MC))
                     fig=plt.figure(irun*ntotrun+nfig*run)
                     ax=fig.add_subplot(nrow, ncol, ib+1, adjustable='box',aspect='equal')
                     ax.cla()
@@ -131,7 +131,7 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
 
     res={}
     for ib, (f, MC) in enumerate(itt.product(files, MCs)):
-        print 'File: %s, MC: %d' % (f, MC)
+        print('File: %s, MC: %d' % (f, MC))
         figf = '_'.join([figName, f, str(MC).strip()])
         
         res[ib] = []
@@ -182,8 +182,8 @@ def testPlanck(nMC=(3000, 10000), useNormalizedBeam=True,
                 fig.savefig(figf+str(fig.number).strip()+'.png')
 
         except None:
-            print "Unexpected error:", sys.exc_info()[0]
-            print "... when running File: %s, iter: %d, MC: %d" % (file, it, MC)
+            print("Unexpected error:", sys.exc_info()[0])
+            print("... when running File: %s, iter: %d, MC: %d" % (file, it, MC))
                                 
 
         if closeFigs: plt.close('all')

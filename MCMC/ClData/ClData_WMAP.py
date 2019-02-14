@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 import os.path
 import math
@@ -6,8 +6,8 @@ import copy
 
 from numpy import array, int32, float64, bool8, arange, rank, dot
 
-import ClData_CosmoMC
-from ClData_CosmoMC import lmax
+from . import ClData_CosmoMC
+from .ClData_CosmoMC import lmax
 from ..WMAP_likelihood import WMAP_likelihood as WMAP
 
 class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
@@ -92,7 +92,7 @@ class ClData_WMAP(ClData_CosmoMC.ClData_CosmoMC):
         else:
             raise MyErr('Cl shape wrong in getWinBandpower:', Cl.shape)
 
-        for ch_type, lrange in self.Clpol_idx.iteritems():
+        for ch_type, lrange in self.Clpol_idx.items():
             ell = arange(len(ClTT), dtype=float64)   # **** STOPPED HERE, NOT DONE
         win = ell*(ell+1)
         win /= sum(win)

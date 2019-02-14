@@ -1,11 +1,11 @@
-from __future__ import division
+
 
 import math
 
-from likelihood.likico import likico
-from likelihood.likoct import likoct
-from likelihood.likdih import likdih
-from likelihood.liktetr import liktetr
+from .likelihood.likico import likico
+from .likelihood.likoct import likoct
+from .likelihood.likdih import likdih
+from .likelihood.liktetr import liktetr
 
 import numpy as N
 from numpy import float64
@@ -15,7 +15,7 @@ def do_all():
     ret = {}
     dir = 'topology/out/'
     for mod in ['ico', 'oct', 'dih', 'tetr']:
-        print '*********** running model %s *****************' % mod
+        print('*********** running model %s *****************' % mod)
         ret[mod] = like_grid(modname=mod, outfile=dir+'lik_'+mod+'_grid.out', nstep=12)
     
     return ret
@@ -48,7 +48,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
         #    almfile = "wmapalm.dat\0"
         almfile = "alm3yrall.dat\0"
     
-    print 'using datdir=%s' % datdir
+    print('using datdir=%s' % datdir)
     likfun = lik[modname].alikelihood
     
     lik[modname].readdata(N.array(datdir), N.array(almfile))
@@ -58,7 +58,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
                 'dih':  [1/2, 1, 1/2],
                 'tetr': [1/2, 1, 1/2]}
     
-    for key, lims in ang_lims.iteritems():
+    for key, lims in ang_lims.items():
         ang_lims[key] = N.array(lims) * math.pi
     
     al = ang_lims[modname]
@@ -88,7 +88,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
     
     viewstep = 100
     for ip, par in enumerate(param_list):
-        if not (ip % viewstep): print ip, par, ' ',
+        if not (ip % viewstep): print(ip, par, ' ', end=' ')
         like1 = likfun(*par)
         ## the following is a problem since it catches things like ctrl-C!
         
@@ -99,7 +99,7 @@ def like_grid(modname='ico', almfile=None, datname=None, outfile=None, nstep=10)
         #    like1 = N.nan
         
         like.flat[ip] = like1
-        if not (ip % viewstep): print like1
+        if not (ip % viewstep): print(like1)
         
         if outfile is not None:
             fp.write(('%d '+parfmt+'%f\n') % ((ip,) + tuple(par) + (like1,)))
@@ -125,9 +125,9 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     ## (i.e. recreate the ogrid)
     deltas = N.empty(npar, dtype=float64)
     steps = []
-    for i in xrange(npar):
+    for i in range(npar):
         steps.append(N.array([param_grid[(i,) + (0,)*i + (j,) + (0,)*(npar-1-i)]
-                            for j in xrange(param_grid.shape[i+1])]))
+                            for j in range(param_grid.shape[i+1])]))
         deltas[i] = steps[-1][1] - steps[-1][0]
     
     dNpar = deltas.prod()
@@ -139,11 +139,11 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
     
     lnEv = N.log(weights.sum()) + N.log(dNpar)
     
-    for i in xrange(npar):
+    for i in range(npar):
         means[i] = N.average(param_grid[i].flat, weights=weights)
     
-    for i in xrange(npar):
-        for j in xrange(npar):
+    for i in range(npar):
+        for j in range(npar):
             covar[i,j] = (N.average((param_grid[i]*param_grid[j]).flat,
                                     weights=weights)
                           -means[i]*means[j])
@@ -159,9 +159,9 @@ def analyze_grid(param_grid, lnlike, names=None, printstats=True):
         lnlike1d.append
     
     if printstats:
-        print 'ln Evidence: ', lnEv
-        print means
-        print stdevs
-        print covar
+        print('ln Evidence: ', lnEv)
+        print(means)
+        print(stdevs)
+        print(covar)
     
     return lnEv, means, stdevs, covar

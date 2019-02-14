@@ -6,14 +6,14 @@ should split this file into generic MCMC/pystan/getdist functions and very speci
 
 """
 
-from __future__ import print_function
+
 
 import csv
 import itertools
 
 ## python 2/3 compatibility
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 import gzip
@@ -97,7 +97,7 @@ def table2csv(fil, table, names=None):
     with open(fil, 'wb') as f:
         fw = csv.writer(f)
         fw.writerow(("object",) + table.dtype.names )
-        for obj, row in itertools.izip_longest(names, table):
+        for obj, row in itertools.zip_longest(names, table):
             fw.writerow( [obj,] + [r for r in row] )
             
             

@@ -1,5 +1,5 @@
 
-from __future__ import division
+
 
 import math
 import pkg_resources 
@@ -25,7 +25,7 @@ solid_angle = 0.00382794 # Sr
  
 from .. import Proposal
 
-from model import greybody, submmModel2_normalized, startfrom_generic
+from .model import greybody, submmModel2_normalized, startfrom_generic
 
 # UPDATED model (Feb 2014)
 # g_ff = alog(exp(5.960 - (sqrt(3d)/!DPI)*alog(1d*nu*(Te/10000d)^(-3d/2d))) + 2.71828)
@@ -133,7 +133,7 @@ def dust(tau_250, beta, T_dust, nu_GHz, Omega=solid_angle):
 class M31model(submmModel2_normalized):
     nparam = 8
     fmtstring = "%.3f "*nparam
-    paramBlocks =  range(nparam)    #### not right with different marginalization?
+    paramBlocks =  list(range(nparam))    #### not right with different marginalization?
     nBlock = max(paramBlocks)+1
     texNames = [r"$\tau_{250}$", r"$\beta_{dust}$", r"$T_{dust}$", r"EM", r"$\Delta T_{CMB}$", r"$A_{synch}$", 
                 r"$\alpha_{synch}$", r"$A_{AME}$"]
@@ -160,10 +160,10 @@ class M31model(submmModel2_normalized):
     @classmethod
     def set_prior(cls, EM_inv_sigma2, EM_mean, alpha_synch_inv_sigma2, alpha_synch_mean):
         if EM_inv_sigma2 > 0:
-            print "setting EM prior to %f +- %f" % (EM_mean, EM_inv_sigma2**(-0.5))
+            print("setting EM prior to %f +- %f" % (EM_mean, EM_inv_sigma2**(-0.5)))
             
         if alpha_synch_inv_sigma2 > 0:
-            print "setting alpha_synch prior to %f +- %f" % (alpha_synch_mean, alpha_synch_inv_sigma2**(-0.5))
+            print("setting alpha_synch prior to %f +- %f" % (alpha_synch_mean, alpha_synch_inv_sigma2**(-0.5)))
             
         cls.EM_inv_sigma2 = EM_inv_sigma2
         cls.EM_mean = EM_mean

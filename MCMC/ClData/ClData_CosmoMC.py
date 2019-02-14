@@ -19,8 +19,8 @@ Initialize from COSMOMC data files -- see cosmomc/source/getdata.f90
 ##   -only *.newdat (B03) actual has polarization data now
 ##   -could retain this but just have accessor functions which put you in the right place.
 
-from __future__ import division
-from __future__ import with_statement
+
+
 
 import string
 import os.path
@@ -32,6 +32,7 @@ from numpy import (array, float64, int32, bool8, ones, zeros, nonzero, empty, nd
                    reshape, log, exp, transpose, fabs, dot, arange, any, 
                    logical_not, where, logical_and, errstate, inf, isinf)
 import numpy.linalg as la
+from functools import reduce
 
 ### "static" variables for this whole module
 num_cls = 3   ### TT, TE, EE (change to 4 for BB)
@@ -139,7 +140,7 @@ class ClData_CosmoMC(object):
         if band_file:
             raise NotImplementedError
         else:
-            for i in xrange(self.num_points):
+            for i in range(self.num_points):
                 
                 iline = i + first_band
                 line = tuple([float(e) for e in
@@ -214,11 +215,11 @@ class ClData_CosmoMC(object):
                 win[:,l] = [ float(w) for w in splitline[1:self.ncls+1] ]
 
         if l>lmax:
-            print "   [ignored l=%d>%d]" % (l, lmax)
+            print("   [ignored l=%d>%d]" % (l, lmax))
 
             
         if not are_bare:
-            win[:,:] *= range(lmax+1)
+            win[:,:] *= list(range(lmax+1))
 
         ## get the window min and max
         nz = where(win)[1]
@@ -253,7 +254,7 @@ class ClData_CosmoMC(object):
         maxw = max(fabs(win[0,:]))
         midx = where(logical_and(fabs(win[0,:])<maxw*small_win, fabs(win[0,:]>0.0)))
         if len(midx[0])>0: 
-            print "zeroing %d points< %f in window" % (len(midx[0]), maxw*small_win)
+            print("zeroing %d points< %f in window" % (len(midx[0]), maxw*small_win))
             win[0,midx] *= 0
 
         # these methods all relate to "models" but require access to lots of local data
@@ -325,7 +326,7 @@ class ClData_CosmoMC(object):
         chisq=empty(dtype=float64, shape=2*halfsteps+1)
         low = -1400.0 # + zeros(2*halfsteps+1, float64)   ## NO LONGER USED (was -30 in cosmoMC)
 
-        hrange=range(-halfsteps, halfsteps+1)
+        hrange=list(range(-halfsteps, halfsteps+1))
         for ibeam in hrange:
 
             beambandpowers = bandpowers.copy()
@@ -449,7 +450,7 @@ class ClData_CosmoMC(object):
             need to correct for polarized channels
             -- only include the appropriate window
         """
-        return dot(range(self.win_min[band], self.win_max[band]+1),
+        return dot(list(range(self.win_min[band], self.win_max[band]+1)),
                    self.window[band, 0, self.win_min[band]:
                                self.win_max[band]+1])/ \
                    sum(self.window[band, 0, self.win_min[band]:

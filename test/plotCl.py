@@ -1,6 +1,6 @@
 """ read from datasets and plot """
 
-from __future__ import division
+
 
 from ClData import ClData
 import string
@@ -71,11 +71,11 @@ def plotCl(filename, plotLike=False, plotBP=False):
         for amplitude in ampl:
             lnlikelist.append(set.calcLnLike(amplitude*Cl) for set in data)
             lnlike.append(sum(lnlikelist[-1]))
-            print amplitude, lnlikelist[-1]
+            print(amplitude, lnlikelist[-1])
         
         lnlike=array(lnlike)
         lnlikelist=array(lnlikelist)
-        print lnlike
+        print(lnlike)
         
         figure(2)
         hold(True)

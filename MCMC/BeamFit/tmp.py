@@ -1,6 +1,6 @@
 """ deal with 2d beam data (from MAXIPOL) """
 
-from __future__ import division
+
 import sys
 import math
 import operator
@@ -24,7 +24,8 @@ from numarray.random_array import uniform
 import MCMC
 import Likelihood
 from BeamFit import BeamModel, BeamData, NormalizedBeamModel, NormalizedBeamLikelihood
-from BeamData import BeamData
+from .BeamData import BeamData
+import numbers
 
 
 def readMAXIPOLdataLuis(filename):
@@ -148,9 +149,9 @@ def plotter(sampler):
     ana = MCMC.chain_analyze(sampler.samples[(ntot//5)::stride,:])
     vals = sampler.like.model.package(ana[0])
     sigs = sampler.like.model.package(ana[1])
-    print vals
-    print sigs
-    print ana[2]
+    print(vals)
+    print(sigs)
+    print(ana[2])
         
     pylab.cla()
     #for d in data: plotMod(d, vals, mod)
@@ -207,7 +208,7 @@ def sample1beam(dir=None, files=None, nMC=(1000,1000), num=None,
         files=["Day/binnedb25.txt", "Night/binnedb25.txt"]
         day = [True, False]
 
-    if operator.isNumberType(nMC):
+    if isinstance(nMC, numbers.Number):
         nMC = (nMC, nMC)
     if LuisBrad == 0:
         data = [ readMAXIPOLdataLuis(dir+fil) for fil in files ]
@@ -285,7 +286,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=False, irun=0):
     for run in range(nruns):
         res={}
         for ib, det in enumerate(dets):
-            print 'Detector: %d' % det
+            print('Detector: %d' % det)
             pylab.figure(irun*ntotrun+nfig*run)
             pylab.subplot(nrow, ncol, ib+1)
             pylab.cla()
@@ -307,7 +308,7 @@ def saveres(reslist, file=None):
     """
     newres=[]
     for resrun in reslist:
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             resrun[det]=(res[0][-1].samples, res[1])  ## save the 'ana' element & samples
             ## should save in a form closer to the original???
         newres.append(resrun)
@@ -323,7 +324,7 @@ def makereport(reslist, file=sys.stdout):
     """
     for irun, resrun in enumerate(reslist):
         file.write("Run: %d\n" % irun)
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             file.write("%d" % det)
             
             val = res[1][0]

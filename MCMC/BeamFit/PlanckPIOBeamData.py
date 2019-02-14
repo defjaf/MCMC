@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 """ 
     read and process 2d beam data from Planck (based on original from MAXIPOL) 
@@ -28,7 +28,7 @@ import os.path
 import pickle
 import pylab
 import gzip
-from itertools import izip, repeat
+from itertools import repeat
 
 import numpy
 from numpy import (array, float64, zeros, ones, int32, log, where, exp, linspace,
@@ -37,16 +37,16 @@ from numpy import concatenate as cat
 
 import numpy as np
 
-from BeamData import BeamData
+from .BeamData import BeamData
 
-from ProcessBeamData import setup_sampler, sample1beam, plotter
+from .ProcessBeamData import setup_sampler, sample1beam, plotter
 
 from .. import getdist_ahj
 
 try:
     import piolib as pio
 except:
-    print "Will probably fail, piolib not available"
+    print("Will probably fail, piolib not available")
 
 #    sigcut = 0.2 
 #    ctscut = 12  
@@ -136,7 +136,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
             det = kwargs['det']
             sigma_white = sqrt(whitenoise[int(det[:3])])  ## this is a cheat to convert the det to an integer
         except KeyError:   ## should catch appropriate exception
-            print "Can't get white noise; using 1"
+            print("Can't get white noise; using 1")
             sigma_white = 1.0
 
     data = []
@@ -147,7 +147,7 @@ def read_data_Planck(files=None, sigcut=0.0, ctscut=0, nhits=None, neg=False, no
         ## assume square, although really should read keywords for size
         npix = int(sqrt(img.size))
         if npix*npix != img.size:
-            print "Image size problem: size=%d, npix=%f" % (img.size, npix)
+            print("Image size problem: size=%d, npix=%f" % (img.size, npix))
         
         sh = (npix, npix)
         hit.shape = sh
@@ -192,8 +192,8 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
     
     dets = ["217-1"]
     objs = ["HII", "radio"]
-    iters = range(1,3)
-    MCs = range(20)
+    iters = list(range(1,3))
+    MCs = list(range(20))
     
     
     
@@ -208,7 +208,7 @@ def sampleall(nruns=2, nMC=(3000, 100000), useNormalizedBeam=True, irun=0,
                 for it in iters:
                     for MC in MCs:
                         ib += 1
-                        print 'Detector: %d, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
+                        print('Detector: %d, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC))
                         fig=pylab.figure(irun*ntotrun+nfig*run)
                         ax=fig.add_subplot(nrow, ncol, ib+1)
                         ax.cla()
@@ -252,7 +252,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
     if dets is None: dets = ["217-1"]
     if objs is None: objs = ["HII", "radio"]
     if iters is None: iters = [1] ##range(1,3)
-    if MCs is None: MCs = range(20)
+    if MCs is None: MCs = list(range(20))
 
 
     ntot = len(dets) * len(objs) * len(iters) * len(MCs)
@@ -267,7 +267,7 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
         for obj in objs:
             for it in iters:
                 for MC in MCs:
-                    print 'Detector: %s, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC)
+                    print('Detector: %s, obj: %s, iter: %d, MC: %d' % (det, obj, it, MC))
                     figf = '_'.join(['',figName, det, str(MC).strip(), str(it).strip(), obj, ''])
                     
                     res[ib] = []
@@ -316,8 +316,8 @@ def testPlanck(nMC=(3000, 100000), useNormalizedBeam=True,
                             fig.savefig(figf+str(fig.number).strip()+'.png')
 
                     except None:
-                        print "Unexpected error:", sys.exc_info()[0]
-                        print "... when running Detector: %d, obj: %s, iter: %d, MC: %d" % (det, obj, it, MC)
+                        print("Unexpected error:", sys.exc_info()[0])
+                        print("... when running Detector: %d, obj: %s, iter: %d, MC: %d" % (det, obj, it, MC))
                         
                     ib += 1
                     
@@ -337,7 +337,7 @@ def saveres(reslist, file=None):
     """
     newres=[]
     for resrun in reslist:
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             resrun[det]=(res[0][-1].samples, res[1])  ## save the 'ana' element & samples
             ## should save in a form closer to the original???
         newres.append(resrun)
@@ -357,7 +357,7 @@ def makereport(reslist, file=sys.stdout, hasRuns=False):
     
     for irun, resrun in enumerate(reslist):
         file.write("Run: %d\n" % irun)
-        for det, res in resrun.iteritems():
+        for det, res in resrun.items():
             file.write("%d" % det)
 
             val = res[0][1][0]

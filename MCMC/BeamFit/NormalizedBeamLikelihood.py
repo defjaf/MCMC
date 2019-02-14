@@ -1,4 +1,4 @@
-from __future__ import division
+
 from .. import Likelihood
 
 class NormalizedBeamLikelihood(Likelihood.Likelihood):

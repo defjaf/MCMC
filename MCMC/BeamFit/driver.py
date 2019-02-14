@@ -2,9 +2,9 @@ import matplotlib
 #matplotlib.use('TkAgg')
 import pylab
 
-import cPickle
+import pickle
 
-import MAXIPOLBeamData as MP
+from . import MAXIPOLBeamData as MP
 
 def main_TOI():
     
@@ -26,7 +26,7 @@ def main_TOI():
                
     fp = open("all2.pickle", 'wb')  
     
-    cPickle.dump(res, fp)   
+    pickle.dump(res, fp)   
     
     fp.close()
 
@@ -48,7 +48,7 @@ def main_maps():
 
     fp = open("allmaps.pickle", 'wb')  
 
-    cPickle.dump(res, fp)   
+    pickle.dump(res, fp)   
 
     fp.close()
 

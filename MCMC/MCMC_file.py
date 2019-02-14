@@ -33,7 +33,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical'):
     if gauss:
         mean = s1.mean()
         stdv = stddev(s1)
-        print 'mean = %f +- %f' % (mean, stdv)
+        print('mean = %f +- %f' % (mean, stdv))
         smin, smax = min(hist[1]), max(hist[1])
         norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
         ss = numpy.arange(smin, smax, (smax-smin)/5/nbins)
@@ -71,7 +71,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None):
 
     if params is None:
         npar = s.shape[1]
-        params=xrange(npar)
+        params=range(npar)
     else:
         npar=len(params)
 
@@ -134,8 +134,8 @@ def main(filename, burn = None):
 
     labels = ['EE1', 'EE2', 'EE3', 'BB1', 'BB2', 'BB3']
 
-    print 'lnLike: ', lnLike.shape, lnLike.dtype
-    print 'samples: ', samples.shape, samples.dtype
+    print('lnLike: ', lnLike.shape, lnLike.dtype)
+    print('samples: ', samples.shape, samples.dtype)
     histgrid(samples[burn:], labels = labels)
                
 

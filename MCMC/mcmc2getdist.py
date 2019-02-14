@@ -2,7 +2,7 @@
 Convert an AHJ MCMC object into an A Lewis MCSamples object
 """
 
-import getdist
+from . import getdist
 
 def mcmc2getdist(mcmc):
     """
@@ -30,7 +30,7 @@ def pystan2getdist(fit, texdict=texdict):
     names = []
     labels = []
     samples = []
-    for par, samps in sample_dict.iteritems():
+    for par, samps in sample_dict.items():
         if par == "lp__":
             loglikes = -samps
         else:

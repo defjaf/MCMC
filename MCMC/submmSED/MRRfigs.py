@@ -10,8 +10,8 @@ Copyright (c) 2010 Imperial College London. All rights reserved.
 import sys
 import os
 
-import cPickle as pickle
-import driver
+import pickle as pickle
+from . import driver
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -77,7 +77,7 @@ def figs(ret123=None, mean_or_ML='mean',lab="", fdir="./out_MRR/"):
 #    objs = np.logical_and(ret123[0][:][mean_or_ML][:][:,0] > -10, ret123[0][:][mean_or_ML][:][:,2] > -10)
     ### below is not very sensitive to the limit used
     objs = (ret123[0][:][mean_or_ML][:][:,0] - ret123[0][:][mean_or_ML][:][:,2] > -20)
-    print "got %d 2 T objs" % sum(objs)
+    print("got %d 2 T objs" % sum(objs))
     T1 = ret123[0][objs][mean_or_ML][:][:,1]
     T2 = ret123[0][objs][mean_or_ML][:][:,3]
     T1mean = np.mean(T1)

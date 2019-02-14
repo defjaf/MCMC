@@ -1,5 +1,5 @@
 
-from __future__ import print_function
+
 
 import sys
 import os
@@ -101,13 +101,13 @@ def pystan_postprocess_csv(allfits, dat, label="DLC_", modnames=None):
     as in that case, we probably need to be able to specify a different model order
     """
 
-    obj_names = dat.keys()
+    obj_names = list(dat.keys())
 
     if modnames is None:
         modnames = ["1comp","2comp","1compb2","2compb2","thick"]
-    nmod = len(allfits.values()[1])  ### assumes same number of models for each object
+    nmod = len(list(allfits.values())[1])  ### assumes same number of models for each object
     for i in range(nmod):
-        f = [a[i] for a in allfits.values()]
+        f = [a[i] for a in list(allfits.values())]
         if nmod == len(modnames): 
             mod = modnames[i]
         else:

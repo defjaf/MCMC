@@ -9,7 +9,7 @@ instance of class MCMC.MCMC or a shape=(nsamples, nparams) array of samples
 
 ### AHJ: April 2014: add min chi2 and prob check
 
-from __future__ import division
+
 
 import sys
 import os
@@ -54,22 +54,22 @@ def printvals(MCMC, params=None, lnLike=None, derived=True):
         maxLikeParams = s[lnLike.argmax()]
         maxLProb = MCMC.like.lnLike(maxLikeParams)+np.log(MCMC.like.model.prior(*maxLikeParams))
         maxLchi2 = MCMC.like.chi2(maxLikeParams)
-        print "chi2 at max = %f" % maxLchi2
+        print("chi2 at max = %f" % maxLchi2)
         assert abs(1.-maxLProb/maxlnLike)<0.01, \
             "different likelihood calculations differ: %f != %f" % (maxLProb,maxlnLike)
-        print 'Max ln likelihood %f at parameters:' % maxlnLike
+        print('Max ln likelihood %f at parameters:' % maxlnLike)
         
-        print maxLikeParams
+        print(maxLikeParams)
 
     if params is None:
-        params=xrange(s.shape[1])
+        params=range(s.shape[1])
     
     for param,ML in zip(params, maxLikeParams):
         s1 = s.T[param]
         
         mean = s1.mean()
         stdv = s1.std()  ## stddev(s1)
-        print 'mean = %g +- %g | ML = %g' % (mean, stdv, ML)        
+        print('mean = %g +- %g | ML = %g' % (mean, stdv, ML))        
         
     return (maxlnLike, maxLikeParams)
     
@@ -96,7 +96,7 @@ def hist(MCMC, param, nbins=10, gauss=True, orientation='vertical', axis=None, d
         if label is None: label = ""
         stdv = s1.std()  ## stddev(s1)
         mean = s1.mean()
-        print '%20s mean = %g +- %g' % (label, mean, stdv)
+        print('%20s mean = %g +- %g' % (label, mean, stdv))
         if stdv > 0:
             smin, smax = min(hist[1]), max(hist[1])
             norm = s1.size * (smax-smin)/nbins  # sum(hist[0])
@@ -117,7 +117,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
 
     if params is None:
         npar = s.shape[1]
-        params=xrange(npar)
+        params=range(npar)
     else:
         npar=len(params)
 
@@ -129,7 +129,7 @@ def hists(MCMC, nbins=30, params=None, orientation='vertical',
         else:
             ncol = int(npar/nrow+1)
         
-    for ip in xrange(npar):
+    for ip in range(npar):
         plt.subplot(nrow, ncol, ip+1)   ### 1...n instead of 0...n-1!
         hist(s, ip, nbins=nbins, orientation=orientation)
     
@@ -189,11 +189,11 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         maxLikeParams = s[lnLike.argmax()]
         maxLProb = MCMC.like.lnLike(maxLikeParams)+np.log(MCMC.like.model.prior(*maxLikeParams))
         maxLchi2 = MCMC.like.chi2(maxLikeParams)
-        print "chi2 at max = %f" % maxLchi2
-        print 'Max ln likelihood %f at parameters:' % maxlnLike
+        print("chi2 at max = %f" % maxLchi2)
+        print('Max ln likelihood %f at parameters:' % maxlnLike)
         assert abs(1.-maxLProb/maxlnLike)<0.01, \
             "different likelihood calculations differ: %f != %f" % (maxLProb,maxlnLike)
-        print maxLikeParams
+        print(maxLikeParams)
         
     if burn>0 or stride>1:
         if 0<burn<1: burn*=len(s)
@@ -209,7 +209,7 @@ def histgrid(MCMC, params=None, nbins=30, labels=None, lnLike=None, quiet=False,
         #     npar = len(params)
         # except AttributeError:            
             npar = s.shape[1]
-            params=xrange(npar)
+            params=range(npar)
     else:
         npar=len(params)
 
@@ -352,12 +352,12 @@ def doall(dir=None, burn=None, labels=None, thin=None, quiet=False, keyfn=None):
 
     for root, dirs, files in os.walk(dir):
         for key, names in groupby(files, keyfn):
-            print 'key:', key
+            print('key:', key)
             i=0
             for name in names:
                 base, ext = os.path.splitext(os.path.basename(name))
                 if ext == '.txt' and len(base)>0:
-                    print 'file:', base
+                    print('file:', base)
                     lnLike1, samples1 = convertSampleFile(dir+name)
                     if i==0:
                         lnLike=lnLike1[burn::thin]; samples=samples1[burn::thin]

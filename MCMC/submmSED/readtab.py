@@ -17,8 +17,8 @@ def readtab(f):
         
         ret = np.genfromtxt(fp, names=names)
         
-    for col in ret.dtype.fields.iterkeys():
-        print "%s = %f +- %f" % (col, ret[col].mean(), ret[col].std())
+    for col in ret.dtype.fields.keys():
+        print("%s = %f +- %f" % (col, ret[col].mean(), ret[col].std()))
 
     return ret
         

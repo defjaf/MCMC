@@ -12,7 +12,7 @@
 ## changed: init can now accept 'setup' parameters (maybe should do with metaclass?)
 ## so may need to setparams() rather than just __init__ in Likelihood
 
-from __future__ import division
+
 
 from numpy import array, exp, asarray, cos, sin, sqrt, float64
 import math
@@ -30,7 +30,7 @@ class ComplexBeamModel(object):
     fmtstring = "(%.3f %.3f) (%.3f %.3f) %.3f"
     
     #paramBlocks = [0, 0, 1, 1, 2]
-    paramBlocks =  range(nparam)
+    paramBlocks =  list(range(nparam))
     nBlock = max(paramBlocks)+1
     
     texNames = []

@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 from numpy import dot, log, empty, log10
 

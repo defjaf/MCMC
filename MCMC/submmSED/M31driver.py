@@ -7,7 +7,7 @@ Created by Andrew H. Jaffe on 2012-08-26.
 
 """
 
-from __future__ import division
+
 
 import sys
 import os
@@ -15,7 +15,7 @@ import os
 import getopt
 
 import operator
-import cPickle as pickle
+import pickle as pickle
 import pkg_resources
 
 import numpy as np
@@ -32,10 +32,10 @@ plottype = "pdf"
 import matplotlib.pyplot as plt
 
 from MCMC import MCMC
-import likelihood
-import data
-import model
-import M31model
+from . import likelihood
+from . import data
+from . import model
+from . import M31model
 from .. import getdist_ahj ##as getdist
 
 
@@ -69,8 +69,8 @@ def M31(rotateParams=False, start=None, sigmas=None,
     dat = alldata[0]
     name = dat.name 
         
-    print "Object %s" % name
-    print "N_data = %d" % dat.n
+    print("Object %s" % name)
+    print("N_data = %d" % dat.n)
     
     mod = M31model.M31model
     like = likelihood.SEDLikelihood_normalized(data=dat, model=mod)
@@ -106,19 +106,19 @@ def M31(rotateParams=False, start=None, sigmas=None,
                 fig.savefig(fname+"_0."+plottype)
                 plt.close(fig)
             except Exception as err:  ## dangerous -- catch anything!
-                print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png"
-                print "Error Info: "
-                print type(err)     # the exception instance
-                print err.args      # arguments stored in .args
-                print err
+                print("CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png")
+                print("Error Info: ")
+                print(type(err))     # the exception instance
+                print(err.args)      # arguments stored in .args
+                print(err)
 
         fig=plt.figure(fig0+1)
         params = ana[0]
         meanmod = mod(*params)
         meanlnProb = like.lnLike(params)
         mean_chi2 = like.chi2(params)
-        print "ln Pr of mean = %f" % meanlnProb
-        print "chi2(mean) = %f"% mean_chi2
+        print("ln Pr of mean = %f" % meanlnProb)
+        print("chi2(mean) = %f"% mean_chi2)
         
         MLmod = mod(*maxLikeParams)
         try:
@@ -132,18 +132,18 @@ def M31(rotateParams=False, start=None, sigmas=None,
                 fig.savefig(fname+"_1."+plottype)
                 plt.close(fig)
             except Exception as err:   ## dangerous -- catch anything!
-                print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png"
-                print "Error Info: "
-                print type(err)     # the exception instance
-                print err.args      # arguments stored in .args
-                print err
+                print("CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png")
+                print("Error Info: ")
+                print(type(err))     # the exception instance
+                print(err.args)      # arguments stored in .args
+                print(err)
 
         fig0 += 2
 
     ret= (ana, (maxlnLike, maxLikeParams, meanlnProb), name) ### meanlnProb added
 
     ### collect further information to return
-    ret += (zip(dat.d, dat.sig),)
+    ret += (list(zip(dat.d, dat.sig)),)
     #ret += (MLmod.flux(nu1, nu2),)
     ret += (0,)
 

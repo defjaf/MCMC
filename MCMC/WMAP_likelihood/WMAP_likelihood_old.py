@@ -7,7 +7,7 @@
  Python version by Andrew Jaffe Aug 05
 """
 
-from __future__ import division
+
 from numarray import array, float64, sqrt, log, sum, zeros, arange, where
 
 
@@ -39,18 +39,18 @@ te_tt = array(shape=WMAP_lmax_TE+1, type=float64)
 def WMAP_init_TT (clFile, offDiag):
 
     fp = open(clFile)
-    for l in xrange(2, WMAP_lmax_TT+1):
+    for l in range(2, WMAP_lmax_TT+1):
         line = fp.readline().split()
         try:
             if len(line):
                 cl_data[l], neff[l], fskyeff[l] = [float(e) for e in line[1:4]]
         except:
-            print 'wmap_init_tt:', l, line
+            print('wmap_init_tt:', l, line)
 
     ix = 0
     fp = open(offDiag)
-    for l in xrange(2, WMAP_lmax_TT+1):
-        for ll in xrange(l+1, WMAP_lmax_TT+1):
+    for l in range(2, WMAP_lmax_TT+1):
+        for ll in range(l+1, WMAP_lmax_TT+1):
             line = fp.readline().split()
             if len(line):
                 i, j = int(line[0]), int(line[1])
@@ -66,15 +66,15 @@ def WMAP_init_TT (clFile, offDiag):
 def WMAP_init_TE (clFile, offDiag):
 
     fp = open(clFile)
-    for l in xrange(2, WMAP_lmax_TE+1):
+    for l in range(2, WMAP_lmax_TE+1):
         line = fp.readline().split()
         if len(line):
             te_data[l], te_tt[l], ntt[l], nee[l] =[float(e) for e in line[1:5]]
 
     ix = 0
     fp = open(offDiag)
-    for l in xrange(2, WMAP_lmax_TE+1):
-        for ll in xrange(l+1, WMAP_lmax_TE_file+1):
+    for l in range(2, WMAP_lmax_TE+1):
+        for ll in range(l+1, WMAP_lmax_TE_file+1):
             line = fp.readline().split()
             if len(line):
                 i, j = int(line[0]), int(line[1])
@@ -130,8 +130,8 @@ def WMAP_LnLike_TT(clth):
         #will be wildly wrong
         offchisq = 0
         ix = 0
-        for l in xrange(WMAP_lmin_TT, lmax):
-            for ll in xrange(l+1, lmax):
+        for l in range(WMAP_lmin_TT, lmax):
+            for ll in range(l+1, lmax):
                 Fisher = r_off_diag[ix]*Fdiagsqrt[l]*Fdiagsqrt[ll] \
                          + off_diag[ix]/(Fdiag[l]*Fdiag[ll])
                 off_log_curv =(clth[l] + neff[l])*Fisher*(clth[ll] + neff[ll])
@@ -169,8 +169,8 @@ def WMAP_LnLike_TE(cltt, clte, clee):
 
     offchisq = 0
     ix = 0
-    for il in xrange(WMAP_lmin_TE, lmax):
-        for ill in xrange(il+1, lmax):
+    for il in range(WMAP_lmin_TE, lmax):
+        for ill in range(il+1, lmax):
             Fisher = te_off_diag[ix]*Fdiagsqrt[il]*Fdiagsqrt[ill]
             delta_chisq = (clte[il] - te_data[il])*Fisher* \
                           (clte[ill]-te_data[ill])

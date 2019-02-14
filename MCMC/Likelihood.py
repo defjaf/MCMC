@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 from numpy import sum, log, exp, asarray
 from math import pi

@@ -1,5 +1,5 @@
-from __future__ import division
-from __future__ import print_function
+
+
 
 from numpy import asarray, float64, log, where, nonzero, math, loadtxt, genfromtxt, concatenate
 import numpy as np
@@ -213,7 +213,7 @@ def readfluxes_DLC_2014(filename="./dat/herus_phot.csv", UL25=True, getArp220=Tr
             if np.all(row==''): continue  ## ignore blank lines
 
             z = np.float(row[z_column])
-            dat = zip(row[flux_columns], row[err_columns], lambda_obs)
+            dat = list(zip(row[flux_columns], row[err_columns], lambda_obs))
             dat_compressed = np.array([[np.float(f), toFloat(e), l] for f,e,l in dat if f!=''])
 
             ## remove err=0 entries
@@ -500,7 +500,7 @@ def readfluxes_ERCSC_TopCat(filename, upperlim=2.0, delete_upperlim=False):
         l = f.readline()
         names = [s.strip() for s in l.split("|")]
         
-        lines = genfromtxt(f, delimiter="|", comments="+-", dtype=None, usecols=range(1,20))
+        lines = genfromtxt(f, delimiter="|", comments="+-", dtype=None, usecols=list(range(1,20)))
         
     data = []
     for obj in lines:

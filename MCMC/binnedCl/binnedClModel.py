@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 import math
 from operator import isSequenceType
@@ -174,9 +174,9 @@ class binnedClModel(object):
         cls.nCl = nCl
                 
         ## so bins is now bins[iCl][ibin, 0:1]
-        print 'nCl:', nCl
-        print 'bins:'
-        print bins
+        print('nCl:', nCl)
+        print('bins:')
+        print(bins)
 
         cls.bins = bins # should probably allow just a single sequence
                         # of the start of all bins, followed by lmax
@@ -247,7 +247,7 @@ class binnedClModel(object):
         else:
             cls.BPnorm = [bin_spectrum(b, s) for (b, s) in zip(bins, shapefun)]
             
-        print 'nparam: ', cls.nparam
+        print('nparam: ', cls.nparam)
         #print 'BPnorm:', cls.BPnorm
 
     ## don't really need package/unpackage for this case since
@@ -395,9 +395,9 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
     sigz2_0 = ((log(samples+x_0)-zbar_0)**2).mean()
     par_0 = array([zbar_0, sigz2_0, x_0])
         
-    print 'Starting values:', par_0
-    print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
-    print 'Starting KSnorm: ', o.KSnorm(par_0)
+    print('Starting values:', par_0)
+    print('Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0))
+    print('Starting KSnorm: ', o.KSnorm(par_0))
     
     f = So.fmin(o.KSnorm, par_0, maxfun=100000, maxiter=100000, xtol=0.00001, ftol=0.00001)
     if do_plot==1:
@@ -412,8 +412,8 @@ def fitOffsetLognormal_cum(samples, full_output=0, do_plot=1):
         plt.plot(hh[1], hh[0], ls='steps' )
         
     zbar_f, sigz2_f, x_f = f
-    print 'Final chi2:', o.chi2(zbar_f, sigz2_f, x_f)
-    print 'Final KSnorm: ', o.KSnorm(f)
+    print('Final chi2:', o.chi2(zbar_f, sigz2_f, x_f))
+    print('Final KSnorm: ', o.KSnorm(f))
 
     return f
     
@@ -435,9 +435,9 @@ def fitOffsetLognormal_like(samples, full_output=0):
     sigz2_0 = ((log(samples+x_0)-zbar_0)**2).mean()
     par_0 = array([zbar_0, sigz2_0, x_0])
         
-    print 'Starting values:', par_0
-    print 'Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0)
-    print 'Starting derivs:', o.derivs(par_0)
+    print('Starting values:', par_0)
+    print('Starting chi2:', o.chi2(zbar_0, sigz2_0, x_0))
+    print('Starting derivs:', o.derivs(par_0))
     
     
     f = So.fmin_l_bfgs_b(o.like, par_0, fprime=o.derivs)
@@ -490,7 +490,7 @@ def FisherWindows(F, bins=None, isCovar=False):
         ##lmax = max([bin[0][1] for bin in (spec for spec in bins)])
         
         WBl = zeros((nbin, 3, lmax+1), dtype=float64)
-        for ibin in xrange(nbin):    ### there must be a more numpyish way to do this...
+        for ibin in range(nbin):    ### there must be a more numpyish way to do this...
             jbin = 0
             for ispec, spec in enumerate(bins):
                 for bin in spec:

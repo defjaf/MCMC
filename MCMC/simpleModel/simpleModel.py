@@ -12,7 +12,7 @@
 ##     the dataset information)
 
 
-from __future__ import division
+
 
 import math
 from operator import isNumberType, __and__,  isSequenceType

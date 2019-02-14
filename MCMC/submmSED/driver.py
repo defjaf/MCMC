@@ -10,7 +10,7 @@ Copyright (c) 2010 Imperial College London. All rights reserved.
 ### TODO: combine different model fits into single SED plot. Can only be done in
 ###    postprocessing since different models are run separately.
 
-from __future__ import division
+
 
 import sys
 import os
@@ -19,9 +19,10 @@ import pkg_resources
 import getopt
 
 import operator
-import cPickle as pickle
+import pickle as pickle
 
 import numpy as np
+import collections
 
 if __name__ == "__main__":
     import matplotlib
@@ -35,10 +36,10 @@ import matplotlib.pyplot as plt
 
 from MCMC import MCMC
 
-import likelihood
-import data
-import model
-import M31model
+from . import likelihood
+from . import data
+from . import model
+from . import M31model
 from .. import getdist_ahj
 import getdist
 from .. import convergence
@@ -91,10 +92,10 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         alldata = data.readfluxes_DLC(filename, format=format, delnu=delnu)   ### nb. format=3 is PEEL
     elif filetype.upper() == 'MRR':
         if DLC_ul==1:
-            print "Removing 12micron and 217GHz; 25micron UL"
+            print("Removing 12micron and 217GHz; 25micron UL")
             alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[3], DLC_ul=True, next0=next0)
         elif DLC_ul==2:
-            print "Removing 12micron, 353 GHz, 217GHz; 25micron UL"
+            print("Removing 12micron, 353 GHz, 217GHz; 25micron UL")
             alldata = data.readfluxes_MRR(filename, IRAS_ignore=[0], Planck_ignore=[2,3], DLC_ul=True, next0=next0)
         else:
             alldata = data.readfluxes_MRR(filename)
@@ -110,8 +111,8 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         alldata = data.readfluxes_ERCSC_TopCat(filename)
         
     if i is None:
-        idata = range(len(alldata))
-    elif not operator.isSequenceType(i):
+        idata = list(range(len(alldata)))
+    elif not isinstance(i, collections.Sequence):
         idata = [i]
     else:
         idata = i
@@ -127,10 +128,10 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             name = " + ".join(str(int(d.name)) for d in dat)
             singleObject = False
         except IndexError:
-            print "Got IndexError -- no more objects at i=%d" % i
+            print("Got IndexError -- no more objects at i=%d" % i)
             break   ## or continue?
         
-        print "Object[s] %s" % name
+        print("Object[s] %s" % name)
     
         ## initialize the model (with a class, not an object)
         
@@ -192,22 +193,22 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                     fig.savefig(fname+"_0."+plottype)
                     plt.close(fig)
                 except Exception as err:  ## dangerous -- catch anything!
-                    print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png"
-                    print "Error Info: "
-                    print type(err)     # the exception instance
-                    print err.args      # arguments stored in .args
-                    print err
+                    print("CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_0.png")
+                    print("Error Info: ")
+                    print(type(err))     # the exception instance
+                    print(err.args)      # arguments stored in .args
+                    print(err)
     
             fig=plt.figure(fig0+1)
             params = ana[0]
             meanmod = mod(*params)
             meanlnProb = like.lnLike(params)
             mean_chi2 = like.chi2(params)
-            print "ln Pr of mean = %f" % meanlnProb
-            print "chi2(mean) = %f"% mean_chi2
+            print("ln Pr of mean = %f" % meanlnProb)
+            print("chi2(mean) = %f"% mean_chi2)
             
             ML_chi2 = like.chi2(maxLikeParams)
-            print "chi2(ML) = %f" % ML_chi2
+            print("chi2(ML) = %f" % ML_chi2)
 
             MLmod = mod(*maxLikeParams)
             try:
@@ -221,11 +222,11 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
                     fig.savefig(fname+"_1."+plottype)
                     plt.close(fig)
                 except Exception as err:   ## dangerous -- catch anything!
-                    print "CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png"
-                    print "Error Info: "
-                    print type(err)     # the exception instance
-                    print err.args      # arguments stored in .args
-                    print err
+                    print("CAUGHT Exception!! -- WHILE SAVING %s" % fname+"_1.png")
+                    print("Error Info: ")
+                    print(type(err))     # the exception instance
+                    print(err.args)      # arguments stored in .args
+                    print(err)
                 
                 
             fig0 += 2
@@ -235,14 +236,14 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
         if singleObject:
             ### collect further information to return
             ret_i += (dat.z,)
-            ret_i += (zip(dat.d, dat.sig),)
+            ret_i += (list(zip(dat.d, dat.sig)),)
             ret_i += (MLmod.flux(nu1, nu2),)
             ret_i += (ML_chi2,)   ## added Aug 2015
             
             
-        print "Rhat[0:] = ", convergence.gelmanrubin_MCMC(mcmc)
+        print("Rhat[0:] = ", convergence.gelmanrubin_MCMC(mcmc))
         if len(mcmc)>2:    
-            print "Rhat[1:] = ", convergence.gelmanrubin_MCMC(mcmc[1:])
+            print("Rhat[1:] = ", convergence.gelmanrubin_MCMC(mcmc[1:]))
             
 #         if use_getdist:
 #             gd_samples = MCMCtoGetDist(mcmc)
@@ -280,16 +281,16 @@ def recover():
 #idata =[i*25 for i in range(12,57)]
 #nMC = (15000,300000)
 #    fil = "./ercsc_iifscz.txt"
-idata = range(0,1717) #None   #[0,300,700] #
+idata = list(range(0,1717)) #None   #[0,300,700] #
 # fil = "./ERCSCalliifscz4550850.dat"
 fil = pkg_resources.resource_filename(pkg_name, "dat/ERCSCiifsczbg.dat")
 
 
-def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
+def many(which = list(range(5)), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./", next0=True, **keywords):
 
-    print "Using file %s" % fil
+    print("Using file %s" % fil)
     
-    print "keywords:", keywords
+    print("keywords:", keywords)
     
     ret1 = ret2 = ret3 = ret4 = ret5 = []   ### just so that any not done are still returned
 
@@ -299,21 +300,21 @@ def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
     ## I am pretty sure the start=() is ignored!
 
     if 0 in which:
-        print "Two-Component beta = 2"
+        print("Two-Component beta = 2")
         ret1 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(sA,0,sT)*2, retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp_b2", fdir=fdir,
                     check=cdir+"check0.npy", next0=next0, **keywords)
 
     if 1 in which:
-        print "One-Component"
+        print("One-Component")
         ret2 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(sA,sB,sT), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=100, savefig="_1comp", fdir=fdir,
                     check=cdir+"check1.npy", next0=next0, **keywords)
                 
     if 2 in which:
-        print "One-Component beta = 2"
+        print("One-Component beta = 2")
         ret3 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10), sigmas=(sA,0,sT), retMCMC=False,
                     nMC=nMC, onecomponent=True, fig0=200, savefig="_1comp_b2", fdir=fdir,
@@ -321,14 +322,14 @@ def many(which = range(5), idata=idata, nMC = nMC, fil=fil, fdir="./", cdir="./"
                 
                 
     if 3 in which:
-        print "Two-Component"
+        print("Two-Component")
         ret4 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10,0.1,2.,20), sigmas=(sA,sB,sT)*2, retMCMC=False,
                     nMC=nMC, onecomponent=False, fig0=0, savefig="_2comp", fdir=fdir,
                     check=cdir+"check3.npy", next0=next0, **keywords)
 
     if 4 in which:
-        print "Optically thick"
+        print("Optically thick")
         ret5 = main(fil, getNorm=True, i = idata, 
                     start=(1,2.,10, 100.0), sigmas=(sA,sB,sT,snu), retMCMC=False,
                     nMC=nMC, onecomponent=False, opticallyThick=True, fig0=0, savefig="_thick", fdir=fdir,
@@ -372,7 +373,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
                 fname = dirn+"check%d.npy" % i                        
             else:
                 fname = dirn+"out_[%d].pickle" % i        
-            print fname
+            print(fname)
             try:
                 with open(fname) as f:
                     ret0 = pickle.load(f)
@@ -391,7 +392,7 @@ def postprocess(dirname="./", multiple=None, check=False, nodat=False):
             if nodat:
                 ndat = 0
                 
-            print 'nobj, npar, ndat = ', nobj, npar, ndat
+            print('nobj, npar, ndat = ', nobj, npar, ndat)
                             
             dt = np.dtype([
                 ('name', 'S21'),
@@ -503,7 +504,7 @@ def writeTab(ret, fname, names=None, nodat=False):
     #            ])
     #      nt = 0
          
-    print 'nn, npar, ndat, nt = ', nn, npar, ndat, nt
+    print('nn, npar, ndat, nt = ', nn, npar, ndat, nt)
         
     hdr = ['Name', 'z']
     for i in range(npar):
@@ -562,9 +563,9 @@ def plotter(sampler):
     #sigs = sigs*mod.ellctr*(mod.ellctr+1)/(2*math.pi)
 
 
-    print vals  #sampler.like.model.fmtstring % tuple(ana[0])
-    print sigs  #sampler.like.model.fmtstring % tuple(ana[1])
-    print ana[2]
+    print(vals)  #sampler.like.model.fmtstring % tuple(ana[0])
+    print(sigs)  #sampler.like.model.fmtstring % tuple(ana[1])
+    print(ana[2])
 
 
     #m = mod(vals); c1 = m()[0]; ell = N.arange(c1.size)
@@ -636,10 +637,10 @@ def mainmain(argv=None):
         except getopt.GetoptError as msg:
              raise Usage(msg)
 
-        print "normal behaviour"
+        print("normal behaviour")
         for o, a in opts:
             if o in ("-h", "--help"):
-                print mainmain.__doc__
+                print(mainmain.__doc__)
                 sys.exit(0)
             elif o in ("--fdir", "-f"):
                 fdir = a
@@ -647,7 +648,7 @@ def mainmain(argv=None):
                 odir = a
             elif o in ("-i", "--idata"):
                 datslice = [int(i) for i in a.replace(","," ").split()]
-                idata = range(*datslice)
+                idata = list(range(*datslice))
             elif o in ["--UL"]:
                 DLC_ul = int(a)
             elif o in ["--lin"]:
@@ -685,18 +686,18 @@ def mainmain(argv=None):
 
         if datslice is None:
             if filetype == 'DLC':
-                idata = range(1717)
+                idata = list(range(1717))
             elif filetype == 'DLC_2014':
-                idata = range(43)
+                idata = list(range(43))
         
-        print "filename: %s" % filename 
-        print "fig dir: %s" % fdir
-        print "out dir: %s" % odir
-        print "data range", datslice
-        print "DLC_UL = %d" % DLC_ul
-        print "format = %d" % format
-        print "filetype = %s" % filetype
-        print "linear = ", linear
+        print("filename: %s" % filename) 
+        print("fig dir: %s" % fdir)
+        print("out dir: %s" % odir)
+        print("data range", datslice)
+        print("DLC_UL = %d" % DLC_ul)
+        print("format = %d" % format)
+        print("filetype = %s" % filetype)
+        print("linear = ", linear)
                 
         # process arguments
         for s in reversed(args):
@@ -704,15 +705,15 @@ def mainmain(argv=None):
                 which.append(int(s))
             except ValueError:
                 break
-        print "which=", which
+        print("which=", which)
         ret = many(which, fdir=fdir, DLC_ul=DLC_ul, filetype=filetype, cdir=odir, idata=idata, next0=next0, 
                    fil=filename, format=format, random=random, randomrestart=randomrestart, linear=linear)
         with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
             pickle.dump(ret, f)
             
-    except Usage, err:
-        print >>sys.stderr, err.msg
-        print >>sys.stderr, "for help use --help"
+    except Usage as err:
+        print(err.msg, file=sys.stderr)
+        print("for help use --help", file=sys.stderr)
         return 2
 
 
