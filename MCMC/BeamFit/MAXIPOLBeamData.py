@@ -413,7 +413,7 @@ def saveres(reslist, file=None):
             ## should save in a form closer to the original???
         newres.append(resrun)
     if file is not None:
-        fp = open(file, 'w')
+        fp = open(file, 'wb')
         pickle.dump(newres, fp)
         fp.close()
     return newres

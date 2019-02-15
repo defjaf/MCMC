@@ -153,7 +153,7 @@ def doall(nMC=(100,500,10000), file='wmap06res_10000.pickle'):
     for i, x in enumerate(['ico', 'oct', 'tetr', 'dih']):
         res[x] = main(almfile='alm3yrall.dat\0', nMC=nMC, topo=x, fig=10*i)
     
-    pkl = open(file, 'w')
+    pkl = open(file, 'wb')
     pickle.dump(res, pkl);
     pkl.close()
     

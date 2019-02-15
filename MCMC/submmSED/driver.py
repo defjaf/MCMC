@@ -36,13 +36,16 @@ import matplotlib.pyplot as plt
 
 from MCMC import MCMC
 
-from . import likelihood
-from . import data
-from . import model
-from . import M31model
-from .. import getdist_ahj
+## need to use absolute imports here since we want to use this as a main program
+## so perhaps should split off the actual driver into a minimal module with a simple
+##    import?
+from MCMC.submmSED import likelihood
+from MCMC.submmSED import data
+from MCMC.submmSED import model
+from MCMC.submmSED import M31model
+from MCMC import getdist_ahj
 import getdist
-from .. import convergence
+from MCMC import convergence
 
 # import joblib
 
@@ -255,7 +258,7 @@ def main(filename=fname_MRR, i=None, rotateParams=False, onecomponent=True, getN
             ret.append(ret_i)
             
         if check is not None:
-            with open(check, 'w') as f:
+            with open(check, 'wb') as f:
                 pickle.dump(ret, f)
             
             
@@ -708,7 +711,7 @@ def mainmain(argv=None):
         print("which=", which)
         ret = many(which, fdir=fdir, DLC_ul=DLC_ul, filetype=filetype, cdir=odir, idata=idata, next0=next0, 
                    fil=filename, format=format, random=random, randomrestart=randomrestart, linear=linear)
-        with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'w') as f:
+        with open(odir+"out_"+"".join(str(which).split(' '))+".pickle", 'wb') as f:
             pickle.dump(ret, f)
             
     except Usage as err:

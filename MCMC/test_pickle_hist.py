@@ -7,7 +7,7 @@ def test(write=True,asarray=False):
     a = numpy.linspace(-3,3,num=100)
     
     if write:
-        f1 = file("a.cpkl", 'w')
+        f1 = file("a.cpkl", 'wb')
         pickle.dump(a, f1)
         f1.close()
         

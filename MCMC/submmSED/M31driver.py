@@ -154,7 +154,7 @@ def M31(rotateParams=False, start=None, sigmas=None,
         ret = ret
                 
     if check is not None:
-        with open(check, 'w') as f:
+        with open(check, 'wb') as f:
             pickle.dump(ret, f)
             
     if len(ret) == 1:
