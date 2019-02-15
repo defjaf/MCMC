@@ -67,7 +67,7 @@ class submmData(GaussianData):
             plt.xlabel(xlab, size='x-large')
             plt.ylabel("flux density [Jy]", size='x-large')
             
-        plt.ylim(ymin=self.d[self.d>0].min()/10.)
+        plt.ylim(bottom=self.d[self.d>0].min()/10.)
         plt.tick_params(labelsize='large')
         
         
