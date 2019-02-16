@@ -34,18 +34,18 @@ plottype = "png"
     
 import matplotlib.pyplot as plt
 
-from MCMC import MCMC
+from .. import MCMC
 
 ## need to use absolute imports here since we want to use this as a main program
 ## so perhaps should split off the actual driver into a minimal module with a simple
 ##    import?
-from MCMC.submmSED import likelihood
-from MCMC.submmSED import data
-from MCMC.submmSED import model
-from MCMC.submmSED import M31model
-from MCMC import getdist_ahj
+from . import likelihood
+from . import data
+from . import model
+from . import M31model
+from .. import getdist_ahj
 import getdist
-from MCMC import convergence
+from .. import convergence
 
 # import joblib
 
@@ -718,10 +718,10 @@ def mainmain(argv=None):
         print(err.msg, file=sys.stderr)
         print("for help use --help", file=sys.stderr)
         return 2
-
-
-if __name__ == "__main__":
-    sys.exit(mainmain())
+# 
+# 
+# if __name__ == "__main__":
+#     sys.exit(mainmain())
 # 
 # 
 # ### TODO: allow setting directory and idata from the command line
