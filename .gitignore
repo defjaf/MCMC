@@ -11,6 +11,8 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
+*.dylib
 
 topology/*.png
 
@@ -25,3 +27,5 @@ topology/*.png
 
 # 2to3 backups
 *.py.bak
+
+*
